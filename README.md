@@ -17,6 +17,13 @@
 
 ---
 
+> [!TIPS]  
+> The following project is fully python-typed safe and uses the great [@beartype](https://github.com/beartype/beartype)!
+> 
+> The following project is under active development and is not yet stable. Expect bugs & changes!
+> 
+> Cheers ☂️
+
 ![OSMNxMapping Cover](public/resources/osmnx_mapping_cover.png)
 
 ## 🌆 OSMNxMapping –– In a Nutshell
@@ -115,6 +122,210 @@ following [these instructions](https://docs.astral.sh/uv/getting-started/install
 
 Voila 🥐 ! You’re all set to explore `OSMNxMapping` in Jupyter Lab.
 
+# Getting Started!
+
+Below are two approaches to get you started with the `OSMNxMapping` library in a Jupyter notebook. These examples are also available in the `examples/` directory as `1-OSMNX_MAPPING_with_Auctus_basics.ipynb` (for the step-by-step approach) and `5-Advanced_Urban_Pipeline_Save_and_Load.ipynb` (for the pipeline approach).
+
+---
+
+<details>
+<summary><strong> 🐥Fine-Grained Step-by-Step</strong></summary>
+
+This detailed approach walks you through each step of mapping urban data to a street network using PLUTO (Primary Land Use Tax Lot Output) buildings in New York City as an example. It’s perfect for understanding the full process.
+
+#### Cell 1: Import the Library
+
+```python
+import osmnx_mapping as oxm
+```
+
+#### Cell 2: Initialise an OSMNxMapping Instance
+
+```python
+pluto_buildings = oxm.OSMNxMapping()  # Here, PLUTO buildings represent an urban analysis study of The Primary Land Use Tax Lot Output in New York City, USA. Note that nothing is loaded or queried yet—everything is to be done.
+```
+
+#### Cell 3: Search for Datasets
+
+Note: You can always load your dataset manually—see the `/examples` folder for details. Here, we use `Auctus` to search for datasets related to "PLUTO".
+
+```python
+collection = pluto_buildings.search_datasets(search_query="PLUTO", display_initial_results=True)
+
+# Search for datasets related to "PLUTO". The `search_datasets` method queries the Auctus API and returns a
+# `DatasetCollection`. Setting `display_initial_results=True` shows the initial results interactively in the notebook,
+# allowing you to see available datasets right away.
+
+# More parameters like page and size for pagination are available—check the Auctus Search / OSMNxMapping API for details.
+```
+
+#### Cell 4: Load the Selected Dataset
+
+```python
+dataset = pluto_buildings.load_dataset_from_auctus()
+
+# After selecting a dataset in the previous step, this loads it into memory as a `pandas.DataFrame` (or
+# `geopandas.GeoDataFrame` if spatial). By default, it displays an interactive table preview of the dataset.
+```
+
+#### Cell 5: Load Your Auctus Dataset into OSMNxMapping
+
+Note: `load_from_dataframe` doesn’t reload the data entirely—it transposes it into a format OSMNxMapping understands.
+
+```python
+loaded_data = pluto_buildings.loader.load_from_dataframe(
+    input_dataframe=dataset, 
+    latitude_column="latitude",  # Assuming the dataset has a column named "latitude" for latitude values
+    longitude_column="longitude"  # Assuming the dataset has a column named "longitude" for longitude values
+)
+
+pluto_buildings.table_vis.interactive_display(loaded_data)
+```
+
+#### Cell 6: Query a Road Network for the Selected Place
+
+```python
+graph, nodes, edges = pluto_buildings.network.network_from_place("Manhattan, New York City, USA", render=True)  # render=True shows the plain network.
+```
+
+#### Cell 7: Map the Loaded Data to the Nearest Street Nodes
+
+By default, this creates a new column in `loaded_data` with the node ID to which each record (e.g., a building) is closest—key for enrichment.
+
+```python
+loaded_data = pluto_buildings.network.map_nearest_street(
+    data=loaded_data, 
+    longitude_column="longitude", 
+    latitude_column="latitude"
+)
+```
+
+#### Cell 8: Geo Preprocess Your Dataset
+
+First, we impute missing values in the `latitude` and `longitude` columns using `SimpleGeoImputer`, which naively drops rows with missing values. For advanced methods, see the `PreprocessingMixin` API.
+
+```python
+loaded_data = (
+    pluto_buildings.preprocessing
+    .with_default_imputer(latitude_column_name="latitude", longitude_column_name="longitude")
+    .transform(input_data=loaded_data)
+)
+```
+
+Second, we filter data to keep only points within the road network’s bounding box using `BoundingBoxFilter`. See the `PreprocessingMixin` API for other filters.
+
+```python
+loaded_data = (
+    pluto_buildings.preprocessing
+    .with_default_filter(nodes=nodes)
+    .transform(input_data=loaded_data)
+)
+```
+
+#### Cell 9: Enrich the Network with the Loaded Data
+
+We enrich the network by calculating the average number of floors (`numfloors`) per street segment using `CreateEnricher`.
+
+```python
+pluto_buildings_enricher = (
+    CreateEnricher()
+    .with_data(group_by="nearest_node", values_from="numfloors")
+    .aggregate_with(method="mean", output_column="avg_numfloors")
+)
+
+# Preview the enricher configuration (optional)
+print(pluto_buildings_enricher.preview())
+
+# Apply the enricher
+enriched_data, graph, nodes, edges = pluto_buildings.enricher.enrich_network(
+    input_data=loaded_data,
+    input_graph=graph,
+    input_nodes=nodes,
+    input_edges=edges
+)
+```
+
+#### Cell 10: Visualise Your Enriched Network
+
+We visualise the enriched network with `StaticVisualiser` (default) for a Matplotlib plot.
+
+```python
+viz = pluto_buildings.visual.visualise(graph, edges, "avg_numfloors")
+viz
+```
+
+Or use `InteractiveVisualiser` for an interactive Folium map.
+
+```python
+from osmnx_mapping import InteractiveVisualiser
+
+viz = pluto_buildings.visual(visualiser=InteractiveVisualiser()).visualise(graph, edges, "avg_numfloors")
+viz
+```
+
+</details>
+
+---
+
+<details>
+<summary><strong> 💨 Urban Pipeline: ~10 Lines of Code!</strong></summary>
+
+For a faster, more concise, and reproducible approach, use the `UrbanPipeline` class to chain all steps into a single workflow. Here’s an example with local PLUTO data (`pluto.csv`), as Auctus is not available in a pipeline you may reckon why!
+
+#### Quick Pipeline Example
+
+```python
+import osmnx_mapping as oxm
+from osmnx_mapping.modules.network import OSMNxNetwork
+from osmnx_mapping.modules.loader import CSVLoader
+from osmnx_mapping.modules.preprocessing import CreatePreprocessor
+from osmnx_mapping.modules.enricher import CreateEnricher
+from osmnx_mapping.modules.visualiser import InteractiveVisualiser
+from osmnx_mapping.pipeline import UrbanPipeline
+
+# Define the pipeline with all steps
+pipeline = UrbanPipeline([
+    ("network", OSMNxNetwork(place_name="Manhattan, NYC", network_type="drive")),
+    ("load", CSVLoader(file_path="../data/PLUTO/csv/pluto.csv")),
+    ("impute", CreatePreprocessor().with_default_imputer("latitude", "longitude").build()),
+    ("filter", CreatePreprocessor().with_default_filter().build()), 
+    ("enrich", CreateEnricher()
+        .with_data(group_by="nearest_node", values_from="numfloors")
+        .aggregate_with(method="mean", output_column="avg_numfloors")
+        .build()),
+    ("viz", InteractiveVisualiser())
+])
+
+# Execute the pipeline and visualise the result
+data, graph, nodes, edges = pipeline.compose_transform("latitude", "longitude")
+viz = pipeline.visualise("avg_numfloors", colormap="Greens", tile_provider="CartoDB positron")
+viz
+
+# Save the pipeline for reuse
+# pipeline.save("pluto_pipeline.joblib")
+```
+
+#### What’s Happening? 👀
+
+- **Network**: Queries Manhattan’s road network.
+- **Load**: Loads `pluto.csv` locally.
+- **Impute/Filter**: Cleans and bounds the data.
+- **Enrich**: Averages floors per street segment.
+- **Visualise**: Shows an interactive Folium map.
+- **Save**: Stores the pipeline for reuse.
+
+This ~10-line pipeline replaces the detailed steps above, offering efficiency and reproducibility. Load it later with `UrbanPipeline.load("pluto_pipeline.joblib")` and visualise again!
+
+> **Note**: Adjust the file path and column names (`latitude`, `longitude`, `numfloors`) to match your local dataset.
+
+</details>
+
+---
+
+Voila! 🥐 Whether you prefer the fine-grained control of the step-by-step approach or the concise reproducible urban pipeline, you’ve successfully mapped urban data to a street network, enriched it, and visualised the results. 🎉
+
+> [!NOTE]  
+> More advanced usage is possible—explore the API and `examples/` directory for details!
 
 ---
 
