@@ -1,0 +1,22 @@
+# Changes here will be overwritten by Copier
+_commit: 1.5.7
+_src_path: https://github.com/pawamoy/copier-uv.git
+author_email: sgp9504@nyu.edu
+author_fullname: Provost Simon
+author_username: simonprovost
+copyright_date: '2025'
+copyright_holder: Provost Simon
+copyright_holder_email: sgp9504@nyu.edu
+copyright_license: MIT License
+insiders: false
+project_description: OSMNX Mapping leverages OSMNX and any external csv/shape files
+    to map them interchangeably. Say, a function f(x, y) where x=OSMNX and y=user_data.
+    Hence, OSMNX Mapping allow for `y` to be playing with `x` and vice-versa.
+project_name: OSMNX-mapping
+python_package_command_line_name: osmnx-mapping
+python_package_distribution_name: osmnx-mapping
+python_package_import_name: osmnx_mapping
+repository_name: osmnx-mapping
+repository_namespace: simonprovost
+repository_provider: github.com
+

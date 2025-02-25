@@ -1,0 +1,49 @@
+# editors
+.idea/
+.vscode/
+
+# python
+*.egg-info/
+*.py[cod]
+.venv/
+.venvs/
+/build/
+/dist/
+
+# tools
+.coverage*
+/.pdm-build/
+/htmlcov/
+/site/
+uv.lock
+
+# cache
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+__pycache__/
+
+
+# Jetbrains
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Data
+*.csv
+*.shp
+data/
+
+# Jupyter
+.ipynb_checkpoints/
+cache/
+
+
+
+# UV / Python
+.python-version
+
+# Model
+*.joblib
