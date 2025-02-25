@@ -23,3 +23,6 @@ class AuctusSearchMixin(AuctusSearch):
         self, display_table: bool = True
     ) -> Union[pd.DataFrame, gpd.GeoDataFrame]:
         return self.load_selected_dataset(display_table)
+
+    def profile_dataset_from_auctus(self) -> None:
+        self.profile_selected_dataset()
