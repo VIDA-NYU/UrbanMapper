@@ -17,14 +17,12 @@
 
 ---
 
-> [!TIPS]  
+![OSMNxMapping Cover](public/resources/osmnx_mapping_cover.png)
+
+> [!NOTE]
 > The following project is fully python-typed safe and uses the great [@beartype](https://github.com/beartype/beartype)!
 > 
 > The following project is under active development and is not yet stable. Expect bugs & changes!
-> 
-> Cheers ☂️
-
-![OSMNxMapping Cover](public/resources/osmnx_mapping_cover.png)
 
 ## 🌆 OSMNxMapping –– In a Nutshell
 
@@ -38,6 +36,10 @@ attach to the _street network_.
 we want to cover as much as users’ wishes in a welcoming way without having to code 20+/50+ lines of code for one,
 ~~non-reproducible, non-shareable, non-updatable piece of code;~~ and (II) the library’s flexibility allows for easy
 contributions to sub-modules without having to start from scratch _“all the time”_.
+
+
+<details>
+<summary><strong> 👀Read me! Click here ⬅️</strong></summary>
 
 To answer (I) –– one out many other ways –– we propose a `scikit-like` pipeline to, for instance, stack the following
 steps:
@@ -70,6 +72,9 @@ reaching a decent test coverage and documentation to make the library more robus
 We embrace a **DRY (Do Not Repeat Yourself)** philosophy—focusing on what matters and letting us handle the mapping
 intricacies. Of course, I mentioned the `pipeline`, but each of the _steps_ mentioned works independently to each other
 🙃!
+
+</details>
+
 
 See further notebook-based examples in the `examples/` directory. 📓
 
@@ -287,8 +292,8 @@ from osmnx_mapping.pipeline import UrbanPipeline
 pipeline = UrbanPipeline([
     ("network", OSMNxNetwork(place_name="Manhattan, NYC", network_type="drive")),
     ("load", CSVLoader(file_path="../data/PLUTO/csv/pluto.csv")),
-    ("impute", CreatePreprocessor().with_default_imputer("latitude", "longitude").build()),
-    ("filter", CreatePreprocessor().with_default_filter().build()), 
+    ("impute", CreatePreprocessor().with_default_imputer().build()), # yes latitude and longitude based columns are passed during the compose_transform, like X, and Y during a Sklearn pipeline, if modified are passed throughout the steps.
+    ("filter", CreatePreprocessor().with_default_filter().build()),  # yes nodes are passed during the compose_transform, like X, and Y during a Sklearn pipeline, if modified are passed throughout the steps.
     ("enrich", CreateEnricher()
         .with_data(group_by="nearest_node", values_from="numfloors")
         .aggregate_with(method="mean", output_column="avg_numfloors")
