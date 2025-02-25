@@ -68,34 +68,13 @@ Discussions = "https://github.com/simonprovost/osmnx-mapping/discussions"
 Gitter = "https://gitter.im/osmnx-mapping/community"
 Funding = "https://github.com/sponsors/simonprovost"
 
-[project.scripts]
-osmnx-mapping = "osmnx_mapping.cli:main"
-
-[tool.pdm.version]
-source = "call"
-getter = "scripts.get_version:get_version"
-
 [tool.pdm.build]
 # Include as much as possible in the source distribution, to help redistributors.
 excludes = ["**/.pytest_cache"]
 source-includes = [
     "config",
-    "docs",
-    "scripts",
-    "share",
-    "tests",
-    "duties.py",
-    "mkdocs.yml",
     "*.md",
     "LICENSE",
-]
-
-[tool.pdm.build.wheel-data]
-# Manual pages can be included in the wheel.
-# Depending on the installation tool, they will be accessible to users.
-# pipx supports it, uv does not yet, see https://github.com/astral-sh/uv/issues/4731.
-data = [
-    {path = "share/**/*", relative-to = "."},
 ]
 
 [tool.uv.sources]
