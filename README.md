@@ -781,12 +781,11 @@ The `TableVisMixin` offers interactive table visualisations for your data within
 <details>
 <summary><strong>AuctusSearchMixin</strong> – Discover (Urban) Datasets</summary>
 
-The `AuctusSearchMixin` integrates with [Auctus Search](https://github.com/VIDA-NYU/auctus_search), allowing you to
-discover and load (urban) datasets directly into your OSMNxMapping workflow.
+The `AuctusSearchMixin` integrates with [Auctus Search](https://github.com/VIDA-NYU/auctus_search), allowing you to discover, 
+profile, and load (urban) datasets directly into your OSMNxMapping workflow.
 
-For detailed usage and examples, please refer to
-the [Auctus Search README](https://github.com/VIDA-NYU/auctus_search/blob/main/README.md). In the meantime, here are
-two straightforward usage with OSMNxMapping:
+For detailed usage and examples, please refer to the [Auctus Search README](https://github.com/VIDA-NYU/auctus_search/blob/main/README.md). 
+In the meantime, here are the key methods for using AuctusSearchMixin with OSMNxMapping:
 
 - **`explore_datasets_from_auctus(search_query, page=1, size=10, display_initial_results=False)`**
     - **Purpose**: Searches Auctus for datasets matching the query and optionally displays initial results.
@@ -794,13 +793,23 @@ two straightforward usage with OSMNxMapping:
         - `search_query` (str or list): Search term(s).
         - `page` (int, default=1): Page number (pagination).
         - `size` (int, default=10): Number of results per page.
-        - `display_initial_results` (bool, default=False): If True, displays initial search results. 
-          Note if you add some .with_<action> from AuctusSearch here, it will display prior the filtering actions you 
-          have to .display() after the filtering actions to see the filtered datasets.
-    - **Returns**: An `AuctusDatasetCollection` object. See more in the [Auctus Search README(https://github.com/VIDA-NYU/auctus_search/blob/main/README.md).
+        - `display_initial_results` (bool, default=False): If True, displays initial search results. Note that if you add `.with_<action>` filtering from AuctusSearch, results display before filtering; use `.display()` afterward to see filtered datasets.
+    - **Returns**: An `AuctusDatasetCollection` object. See more in the [Auctus Search README](https://github.com/VIDA-NYU/auctus_search/blob/main/README.md).
+
+- **`profile_dataset_from_auctus()`**
+    - **Purpose**: Displays an interactive data profile summary of the selected dataset using the Data Profile Viz library.
+    - **Parameters**: None
+    - **Returns**: None (displays the profile interactively in the notebook)
+    - **Example**:
+      ```python
+      osmnx_mapping = OSMNxMapping()
+      osmnx_mapping.explore_datasets_from_auctus("Taxis")
+      # Select a dataset from the interactive results
+      osmnx_mapping.profile_dataset_from_auctus()  # Displays the profile using Data Profile Viz.
+      ```
 
 - **`load_dataset_from_auctus(display_table=True)`**
-    - **Purpose**: Loads the selected dataset from Auctus. That is from the interactive search results, after you clicked on one of the "Select This Dataset". Recall, after this one you could use the OSMNxMapping Loader module to `load_from_dataframe`.
+    - **Purpose**: Loads the selected dataset from Auctus after choosing one via "Select This Dataset" from the interactive search results. Afterward, you can use the OSMNxMapping Loader module’s `load_from_dataframe` method.
     - **Parameters**:
         - `display_table` (bool, default=True): If True, displays a preview table using `Skrub`.
     - **Returns**: A `pandas.DataFrame` or `geopandas.GeoDataFrame`.
