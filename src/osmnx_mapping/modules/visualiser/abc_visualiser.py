@@ -1,0 +1,37 @@
+from abc import ABC, abstractmethod
+from typing import Any
+import geopandas as gpd
+import networkx as nx
+from beartype import beartype
+from osmnx_mapping.config import DEFAULT_CRS
+from osmnx_mapping.utils import require_dynamic_columns, require_arguments_not_none
+
+
+class VisualiserBase(ABC):
+    @beartype
+    def __init__(self, coordinate_reference_system: str = DEFAULT_CRS) -> None:
+        self.coordinate_reference_system = coordinate_reference_system
+
+    @abstractmethod
+    @beartype
+    def _render(
+        self,
+        graph: nx.MultiDiGraph,
+        edges: gpd.GeoDataFrame,
+        result_column: str,
+        **kwargs,
+    ) -> Any: ...
+
+    @require_arguments_not_none(
+        "graph", error_msg="Graph cannot be None while rendering."
+    )
+    @require_dynamic_columns("edges", lambda args: [args["result_column"]])
+    @beartype
+    def render(
+        self,
+        graph: nx.MultiDiGraph,
+        edges: gpd.GeoDataFrame,
+        result_column: str,
+        **kwargs,
+    ) -> Any:
+        return self._render(graph, edges, result_column, **kwargs)
