@@ -129,7 +129,7 @@ class PipelineExecutor:
         return self.transform()
 
     @beartype
-    def visualise(self, result_column: str, **kwargs: Any) -> Any:
+    def visualise(self, result_columns: Union[str, List[str]], **kwargs: Any) -> Any:
         if not self._composed:
             raise ValueError("Pipeline not composed. Call compose() first.")
         visualiser = next(
@@ -142,4 +142,4 @@ class PipelineExecutor:
         )
         if not visualiser:
             raise ValueError("No VisualiserBase step defined.")
-        return visualiser.render(self.graph, self.edges, result_column, **kwargs)
+        return visualiser.render(self.graph, self.edges, result_columns, **kwargs)

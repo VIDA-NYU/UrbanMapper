@@ -4,7 +4,7 @@ import geopandas as gpd
 import matplotlib.cm as cm
 import matplotlib.colors as mcolors
 from beartype import beartype
-from typing import Any, Optional
+from typing import Any, Optional, Union, List
 
 from osmnx_mapping.modules.visualiser.abc_visualiser import VisualiserBase
 
@@ -15,15 +15,23 @@ class StaticVisualiser(VisualiserBase):
         self,
         graph: nx.MultiDiGraph,
         edges: gpd.GeoDataFrame,
-        result_column: str,
+        result_columns: Union[str, List[str]],
         colormap: str = "Greens",
         edge_line_width: float = 0.5,
         missing_value_color: Optional[str] = None,
         colorbar_label: str = "Aggregated Value",
         **kwargs,
     ) -> Any:
-        missing_value_color = missing_value_color or "#cccccc"
+        if isinstance(result_columns, list):
+            if len(result_columns) > 1:
+                raise ValueError(
+                    "StaticVisualiser only supports a single result_column."
+                )
+            result_column = result_columns[0]
+        else:
+            result_column = result_columns
 
+        missing_value_color = missing_value_color or "#cccccc"
         edges_converted = edges.to_crs(self.coordinate_reference_system)
 
         edge_colors = ox.plot.get_edge_colors_by_attr(
