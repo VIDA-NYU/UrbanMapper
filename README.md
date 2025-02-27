@@ -291,7 +291,7 @@ from osmnx_mapping.pipeline import UrbanPipeline
 # Define the pipeline with all steps
 pipeline = UrbanPipeline([
     ("network", OSMNxNetwork(place_name="Manhattan, NYC", network_type="drive")),
-    ("load", CSVLoader(file_path="../data/PLUTO/csv/pluto.csv")),
+    ("load", CSVLoader(file_path="./pluto.csv")),
     ("impute", CreatePreprocessor().with_default_imputer().build()), # yes latitude and longitude based columns are passed during the compose_transform, like X, and Y during a Sklearn pipeline, if modified are passed throughout the steps.
     ("filter", CreatePreprocessor().with_default_filter().build()),  # yes nodes are passed during the compose_transform, like X, and Y during a Sklearn pipeline, if modified are passed throughout the steps.
     ("enrich", CreateEnricher()
@@ -479,12 +479,12 @@ the [UrbanPipelineMixin](#urbanpipelinemixin--chain-your-workflow) section for m
     > Available filter:
 > - `BoundingBoxFilter`: Keeps only data points within the bounding box of the road network’s nodes (requires `nodes`).
 
-- **`with_imputer(imputer_type, latitude_column_name, longitude_column_name, **extra_params)`**
+- **`with_imputer(imputer_type, latitude_column_name=None, longitude_column_name=None, **extra_params)`**
     - **Purpose**: Configures an imputer to handle missing lat/lon values.
     - **Parameters**:
         - `imputer_type` (str): Imputer type (e.g., "SimpleGeoImputer", "AddressGeoImputer").
-        - `latitude_column_name` (str): Latitude column.
-        - `longitude_column_name` (str): Longitude column.
+        - `latitude_column_name` (str, optional): Latitude column name. If omitted and used within a pipeline, it will be set by the pipeline’s `compose` method.
+        - `longitude_column_name` (str, optional): Longitude column name. If omitted and used within a pipeline, it will be set by the pipeline’s `compose` method.
         - `**extra_params`: Additional parameters (e.g., `address_column_name` for "AddressGeoImputer").
     - **Returns**: The mixin instance for chaining.
     - **Example**:
@@ -494,7 +494,7 @@ the [UrbanPipelineMixin](#urbanpipelinemixin--chain-your-workflow) section for m
       mapping.preprocessing.with_imputer("SimpleGeoImputer", "lat", "lon")
       ```
 
-- **`with_default_imputer(latitude_column_name, longitude_column_name)`**
+- **`with_default_imputer(latitude_column_name=None, longitude_column_name=None)`**
     - **Purpose**: Uses a default imputer that drops rows with missing lat/lon.
     - **Parameters**: Same as above, without `imputer_type`.
     - **Returns**: The mixin instance.
@@ -717,17 +717,15 @@ maps) to the constructor for custom visualisations.
 > - `StaticVisualiser`: Generates a static Matplotlib plot of the network (default).
 > - `InteractiveVisualiser`: Creates an interactive Folium map for exploration in a browser.
 
-- **`visualise(graph, edges, result_column, **kwargs)`**
+- **`visualise(graph, edges, result_columns, **kwargs)`**
     - **Purpose**: Creates a visualisation of the enriched network using the configured visualiser.
     - **Parameters**:
         - `graph` (networkx.MultiDiGraph): The network graph.
         - `edges` (geopandas.GeoDataFrame): Enriched edges.
-        - `result_column` (str): Column to visualise (e.g., "aggregated_value").
-        - `**kwargs`: visualisation parameters (e.g., `colormap="Blues"` for `StaticVisualiser`, or
-          `tile_provider="CartoDB positron"` for `InteractiveVisualiser`).
-    - **Returns**: A Matplotlib figure (for `StaticVisualiser`) or Folium map (for `InteractiveVisualiser`), depending
-      on the visualiser.
-    - **Example (Static visualiser)**:
+        - `result_columns` (str or list of str): Column(s) to visualise. For static visualisers (e.g., `StaticVisualiser`), provide a single string (e.g., `"aggregated_value"`). For interactive visualisers (e.g., `InteractiveVisualiser`), provide a list of strings (e.g., `["column1", "column2"]`) to enable multi-layer visualisation with a dropdown selection.
+        - `**kwargs`: Visualisation parameters (e.g., `colormap="Blues"` for `StaticVisualiser`, or `tile_provider="CartoDB positron"` for `InteractiveVisualiser`).
+    - **Returns**: A Matplotlib figure (for `StaticVisualiser`) or Folium map (for `InteractiveVisualiser`), depending on the visualiser.
+    - **Example (Static Visualiser)**:
       ```python
       import osmnx_mapping as oxm
       mapping = oxm.OSMNxMapping()
@@ -739,15 +737,18 @@ maps) to the constructor for custom visualisations.
       ```
     - **Example (Interactive visualiser)**:
       ```python
-      import osmnx_mapping as oxm
-      from osmnx_mapping.modules.visualiser.visualisers.interactive_visualiser import InteractiveVisualiser
-      mapping = oxm.OSMNxMapping()
-      data = mapping.loader.load_from_file("city_data.csv", latitude_column="lat", longitude_column="lon")
-      graph, nodes, edges = mapping.network.network_from_place("Manhattan, New York City, USA")
-      mapping.enricher.with_default("nearest_node", "traffic", method="sum")
-      enriched_data, graph, nodes, edges = mapping.enricher.enrich_network(data, graph, nodes, edges)
-      # Use InteractiveVisualiser instead of the default StaticVisualiser
-      fmap = mapping.visual(InteractiveVisualiser()).visualise(graph, edges, "aggregated_value", colormap="Greens", tile_provider="CartoDB positron")
+        import osmnx_mapping as oxm
+        from osmnx_mapping.modules.visualiser.visualisers.interactive_visualiser import InteractiveVisualiser
+        mapping = oxm.OSMNxMapping()
+        data = mapping.loader.load_from_file("city_data.csv", latitude_column="lat", longitude_column="lon")
+        graph, nodes, edges = mapping.network.network_from_place("Manhattan, New York City, USA")
+        mapping.enricher.with_default("nearest_node", "traffic", method="sum")
+        enriched_data, graph, nodes, edges = mapping.enricher.enrich_network(data, graph, nodes, edges)
+        # Use InteractiveVisualiser for multi-layer visualisation –– Note that here we assume "aggregated_value" and 
+        # "traffic_density" are columns in the enriched edges GeoDataFrame.
+        fmap = mapping.visual(InteractiveVisualiser()).visualise(
+            graph, edges, ["aggregated_value", "traffic_density"], colormap="Greens", tile_provider="CartoDB positron"
+        )
       ```
 
 </details>
@@ -819,149 +820,113 @@ In the meantime, here are the key methods for using AuctusSearchMixin with OSMNx
 <details>
 <summary><strong>UrbanPipelineMixin</strong> – Chain Your Workflow</summary>
 
-The `UrbanPipelineMixin` lets you chain multiple steps into a single, reproducible pipeline, similar to scikit-learn’s
-`Pipeline`.
+The `UrbanPipelineMixin` enables you to chain multiple steps into a single, reproducible pipeline, modeled after scikit-learn’s `Pipeline`.
 
 > [!IMPORTANT]  
-> Pipeline restrictions (per configuration):
-> - **Exactly 1** `NetworkBase` step (e.g., `OSMNxNetwork`).
-> - **Exactly 1** `LoaderBase` step (e.g., `CSVLoader`).
-> - **Exactly 1** `EnricherBase` step.
-> - **0 or 1** `VisualiserBase` step.
+> **Pipeline Restrictions (per configuration):**  
+> - **Exactly 1** `NetworkBase` step (e.g., `OSMNxNetwork`).  
+> - **Exactly 1** `LoaderBase` step (e.g., `CSVLoader`).  
+> - **1 or more** `EnricherBase` steps (e.g., `SingleAggregatorEnricher`).  
+> - **0 or 1** `VisualiserBase` step.  
 > - **0 or more** `GeoImputerBase` or `GeoFilterBase` steps.  
-    > Steps must match these constraints, or the pipeline will raise an error during validation.
+> Steps must adhere to these constraints, or the pipeline will raise a validation error upon creation or execution.
 
-- **`urban_pipeline(steps)`**
-    - **Purpose**: Creates a pipeline from a list of (name, mixin) tuples or concrete instances.
-    - **Parameters**:
-        - `steps` (list of tuples): Steps to include (e.g.,
-          `[("loader", CSVLoader(...)), ("network", OSMNxNetwork(...))]`).
-    - **Returns**: An `UrbanPipeline` object.
-    - **Example**:
-      ```python
-      import osmnx_mapping as oxm
-      from osmnx_mapping.modules.loader.loaders.csv_loader import CSVLoader
-      from osmnx_mapping.modules.network.networks.osmnx_network import OSMNxNetwork
-      mapping = oxm.OSMNxMapping()
-      pipeline = mapping.urban_pipeline([
-          ("loader", CSVLoader(file_path="city_data.csv")),
-          ("network", OSMNxNetwork(place_name="Manhattan, New York City, USA"))
-      ])
-      ```
+> [!NOTE]  
+> When using multiple `EnricherBase` steps, ensure each writes to a unique `output_column`. If multiple enrichers target 
+> the same `output_column`, the last one executed will silently overwrite the others.
 
-- **`compose(latitude_column_name, longitude_column_name)`**
-    - **Purpose**: Configures the pipeline with latitude and longitude column names, setting up steps for execution.
-    - **Parameters**:
-        - `latitude_column_name` (str): Name of the latitude column.
-        - `longitude_column_name` (str): Name of the longitude column.
-    - **Example**:
-      ```python
-      import osmnx_mapping as oxm
-      from osmnx_mapping.modules.loader.loaders.csv_loader import CSVLoader
-      from osmnx_mapping.modules.network.networks.osmnx_network import OSMNxNetwork
-      mapping = oxm.OSMNxMapping()
-      pipeline = mapping.urban_pipeline([
-          ("loader", CSVLoader(file_path="city_data.csv")),
-          ("network", OSMNxNetwork(place_name="Manhattan, New York City, USA"))
-      ])
-      pipeline.compose("lat", "lon")
-      ```
+---
 
-- **`transform()`**
-    - **Purpose**: Executes the pipeline after `compose()`, returning the processed data and network.
-    - **Parameters**: None (requires prior `compose()` call).
-    - **Returns**: A tuple (`GeoDataFrame`, `MultiDiGraph`, `GeoDataFrame`, `GeoDataFrame`) of data, graph, nodes, and
-      edges.
-    - **Example**:
-      ```python
-      import osmnx_mapping as oxm
-      from osmnx_mapping.modules.loader.loaders.csv_loader import CSVLoader
-      from osmnx_mapping.modules.network.networks.osmnx_network import OSMNxNetwork
-      mapping = oxm.OSMNxMapping()
-      pipeline = mapping.urban_pipeline([
-          ("loader", CSVLoader(file_path="city_data.csv")),
-          ("network", OSMNxNetwork(place_name="Manhattan, New York City, USA"))
-      ])
-      pipeline.compose("lat", "lon")
-      data, graph, nodes, edges = pipeline.transform()
-      ```
+### **`urban_pipeline(steps)`**
+- **Purpose**: Constructs a pipeline from a list of (name, step) tuples, where each step is an instance of a supported base class.  
+- **Parameters**:  
+  - `steps` (list of tuples): Steps to include, e.g., `[("loader", CSVLoader(...)), ("network", OSMNxNetwork(...)), ("enricher", CreateEnricher().with_data(...).build())]`.  
+- **Returns**: An `UrbanPipeline` object.  
+- **Example**:  
+  ```python
+  import osmnx_mapping as oxm
+  from osmnx_mapping.modules.loader.loaders.csv_loader import CSVLoader
+  from osmnx_mapping.modules.network.networks.osmnx_network import OSMNxNetwork
+  from osmnx_mapping.modules.enricher import CreateEnricher
+  mapping = oxm.OSMNxMapping()
+  pipeline = mapping.urban_pipeline([
+      ("loader", CSVLoader(file_path="city_data.csv")),
+      ("network", OSMNxNetwork(place_name="Manhattan, New York City, USA")),
+      ("enricher1", CreateEnricher()
+          .with_data(group_by="nearest_node", values_from="traffic")
+          .aggregate_with(method="sum", output_column="total_traffic")
+          .build()),
+      ("enricher2", CreateEnricher()
+          .with_data(group_by="nearest_node", values_from="incidents")
+          .count_by(output_column="incident_count")
+          .build())
+  ])
+  ```
 
-- **`compose_transform(latitude_column_name, longitude_column_name)`**
-    - **Purpose**: Configures and runs the pipeline in one step.
-    - **Parameters**: Same as `compose`.
-    - **Returns**: A tuple (`GeoDataFrame`, `MultiDiGraph`, `GeoDataFrame`, `GeoDataFrame`).
-    - **Example**:
-      ```python
-      import osmnx_mapping as oxm
-      from osmnx_mapping.modules.loader.loaders.csv_loader import CSVLoader
-      from osmnx_mapping.modules.network.networks.osmnx_network import OSMNxNetwork
-      from osmnx_mapping.modules.enricher import CreateEnricher
-      from osmnx_mapping.modules.visualiser.visualisers.static_visualiser import StaticVisualiser
-      mapping = oxm.OSMNxMapping()
-      pipeline = mapping.urban_pipeline([
-          ("loader", CSVLoader(file_path="city_data.csv")),
-          ("network", OSMNxNetwork(place_name="Manhattan, New York City, USA")),
-          ("enricher", CreateEnricher()
-              .with_data(group_by="nearest_node", values_from="traffic")
-              .aggregate_with(method="sum", edge_method="average", output_column="total_traffic")
-              .build()),
-          ("visual", StaticVisualiser())
-      ])
-      data, graph, nodes, edges = pipeline.compose_transform("lat", "lon")
-      ```
+### **`compose(latitude_column_name, longitude_column_name)`**
+- **Purpose**: Configures the pipeline by setting latitude and longitude column names, which are propagated to all relevant steps (e.g., imputers, filters) requiring geographic data.  
+- **Parameters**:  
+  - `latitude_column_name` (str): Name of the latitude column in the input data.  
+  - `longitude_column_name` (str): Name of the longitude column in the input data.  
+- **Example**:  
+  ```python
+  pipeline.compose("lat", "lon")
+  ```
 
-- **`visualise(result_column, **kwargs)`**
-    - **Purpose**: Visualises the pipeline’s output using the configured `VisualiserBase` step.
-    - **Parameters**:
-        - `result_column` (str): Column to visualise.
-        - `**kwargs`: Additional visualisation options (e.g., `colormap="Blues"`).
-    - **Returns**: A plot (e.g., Matplotlib figure) or interactive map, depending on the visualiser.
-    - **Example**:
-      ```python
-      import osmnx_mapping as oxm
-      from osmnx_mapping.modules.loader.loaders.csv_loader import CSVLoader
-      from osmnx_mapping.modules.network.networks.osmnx_network import OSMNxNetwork
-      from osmnx_mapping.modules.enricher import CreateEnricher
-      from osmnx_mapping.modules.visualiser.visualisers.static_visualiser import StaticVisualiser
-      mapping = oxm.OSMNxMapping()
-      pipeline = mapping.urban_pipeline([
-          ("loader", CSVLoader(file_path="city_data.csv")),
-          ("network", OSMNxNetwork(place_name="Manhattan, New York City, USA")),
-          ("enricher", CreateEnricher()
-              .with_data(group_by="nearest_node", values_from="traffic")
-              .aggregate_with(method="sum", edge_method="average", output_column="total_traffic")
-              .build()),
-          ("visual", StaticVisualiser())
-      ])
-      pipeline.compose("lat", "lon")
-      fig = pipeline.visualise("total_traffic", colormap="Blues")
-      ```
+### **`transform()`**
+- **Purpose**: Executes the pipeline after `compose()` has been called, processing the data and returning the results.  
+- **Parameters**: None (requires prior `compose()` call).  
+- **Returns**: A tuple (`GeoDataFrame`, `MultiDiGraph`, `GeoDataFrame`, `GeoDataFrame`) containing the processed data, network graph, nodes, and edges, respectively.  
+- **Example**:  
+  ```python
+  data, graph, nodes, edges = pipeline.transform()
+  ```
 
-- **`save(filepath)`** / **`load(filepath)`**
-    - **Purpose**: Save or load the pipeline to/from a file.
-    - **Parameters**:
-        - `filepath` (str): Path to the file (e.g., "my_pipeline.joblib").
-    - **Example**:
-      ```python
-      import osmnx_mapping as oxm
-      from osmnx_mapping.modules.loader.loaders.csv_loader import CSVLoader
-      from osmnx_mapping.modules.network.networks.osmnx_network import OSMNxNetwork
-      mapping = oxm.OSMNxMapping()
-      pipeline = mapping.urban_pipeline([
-          ("loader", CSVLoader(file_path="city_data.csv")),
-          ("network", OSMNxNetwork(place_name="Manhattan, New York City, USA"))
-      ])
-      pipeline.compose("lat", "lon")
-      pipeline.save("my_pipeline.joblib")
-      loaded_pipeline = mapping.urban_pipeline.load("my_pipeline.joblib")
-      ```
+### **`compose_transform(latitude_column_name, longitude_column_name)`**
+- **Purpose**: Combines configuration and execution into a single step, configuring the pipeline and immediately processing the data.  
+- **Parameters**:  
+  - `latitude_column_name` (str): Name of the latitude column.  
+  - `longitude_column_name` (str): Name of the longitude column.  
+- **Returns**: A tuple (`GeoDataFrame`, `MultiDiGraph`, `GeoDataFrame`, `GeoDataFrame`) of processed data, graph, nodes, and edges.  
+- **Example**:  
+  ```python
+  data, graph, nodes, edges = pipeline.compose_transform("lat", "lon")
+  ```
 
-- **Additional Features** (scikit-learn style):
-    - `named_steps`: Access steps like `pipeline.named_steps["loader"]`.
-    - `get_step_names()`: List all step names.
-    - `get_step(name)`: Retrieve a step by name.
-    - `get_params(deep=True)`: View all parameters (not implemented yet).
-    - `set_params(**kwargs)`: Update parameters (not implemented yet).
+### **`visualise(result_columns, **kwargs)`**
+- **Purpose**: Visualises the pipeline’s output using the configured `VisualiserBase` step (if present).  
+- **Parameters**:  
+  - `result_columns` (str or list of str): Column(s) to visualise. Use a single string (e.g., `"total_traffic"`) for static visualisers (e.g., `StaticVisualiser`). Use a list of strings (e.g., `["total_traffic", "incident_count"]`) for interactive visualisers (e.g., `InteractiveVisualiser`) supporting multi-layer singular visualisation.  
+  - `**kwargs`: Additional visualisation options (e.g., `colormap="Blues"`, `tile_provider="CartoDB positron"`).  
+- **Returns**: A plot (e.g., Matplotlib figure) for static visualisers or an interactive map for interactive visualisers.  
+- **Note**: Passing a list to `result_columns` with a static visualiser will raise an error. Ensure the type matches the visualiser used.  
+- **Example**:  
+  ```python
+  # For a static visualiser
+  fig = pipeline.visualise("total_traffic", colormap="Blues")
+  # For an interactive visualiser
+  fmap = pipeline.visualise(["total_traffic", "incident_count"], colormap="Greens", tile_provider="CartoDB positron")
+  ```
+
+### **`save(filepath)` / `load(filepath)`**
+- **Purpose**: Saves the pipeline to a file or loads a previously saved pipeline for reuse.  
+- **Parameters**:  
+  - `filepath` (str): Path to the file (e.g., `"my_pipeline.joblib"`).  
+- **Example**:  
+  ```python
+  pipeline.save("my_pipeline.joblib")
+  loaded_pipeline = UrbanPipeline.load("my_pipeline.joblib")
+  ```
+
+### **Additional Features** (scikit-learn style)
+- **`named_steps`**: Access pipeline steps by name, e.g., `pipeline.named_steps["loader"]`.  
+- **`get_step_names()`**: Returns a list of all step names in the pipeline.  
+- **`get_step(name)`**: Retrieves a specific step by its name.  
+- **`get_params(deep=True)`**: Intended to return all pipeline parameters (not yet implemented).  
+- **`set_params(**kwargs)`**: Intended to update pipeline parameters (not yet implemented).  
+
+> [!NOTE]  
+> The `get_params` and `set_params` methods are planned features and are not functional in the current release.
 
 </details>
 
