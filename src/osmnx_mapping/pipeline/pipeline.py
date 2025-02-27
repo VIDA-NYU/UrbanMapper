@@ -73,8 +73,8 @@ class UrbanPipeline:
         )
 
     @beartype
-    def visualise(self, result_column: str, **kwargs: Any) -> Any:
-        return self.executor.visualise(result_column, **kwargs)
+    def visualise(self, result_columns: Union[str, List[str]], **kwargs: Any) -> Any:
+        return self.executor.visualise(result_columns, **kwargs)
 
     @beartype
     def save(self, filepath: str) -> None:

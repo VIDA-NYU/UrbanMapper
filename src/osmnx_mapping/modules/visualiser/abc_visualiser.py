@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Union, List
 import geopandas as gpd
 import networkx as nx
 from beartype import beartype
@@ -18,20 +18,25 @@ class VisualiserBase(ABC):
         self,
         graph: nx.MultiDiGraph,
         edges: gpd.GeoDataFrame,
-        result_column: str,
+        result_columns: Union[str, List[str]],
         **kwargs,
     ) -> Any: ...
 
     @require_arguments_not_none(
         "graph", error_msg="Graph cannot be None while rendering."
     )
-    @require_dynamic_columns("edges", lambda args: [args["result_column"]])
+    @require_dynamic_columns(
+        "edges",
+        lambda args: args["result_columns"]
+        if isinstance(args["result_columns"], list)
+        else [args["result_columns"]],
+    )
     @beartype
     def render(
         self,
         graph: nx.MultiDiGraph,
         edges: gpd.GeoDataFrame,
-        result_column: str,
+        result_columns: Union[str, List[str]],
         **kwargs,
     ) -> Any:
-        return self._render(graph, edges, result_column, **kwargs)
+        return self._render(graph, edges, result_columns, **kwargs)

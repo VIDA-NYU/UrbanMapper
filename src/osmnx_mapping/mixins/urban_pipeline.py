@@ -1,4 +1,4 @@
-from typing import Tuple, Any, List, Optional, Dict
+from typing import Tuple, Any, List, Optional, Dict, Union
 import geopandas as gpd
 import networkx as nx
 from beartype import beartype
@@ -71,8 +71,8 @@ class UrbanPipelineMixin:
 
     @beartype
     @require_attributes(["_pipeline"])
-    def visualise(self, result_column: str, **kwargs: Any) -> Any:
-        return self._pipeline.visualise(result_column, **kwargs)
+    def visualise(self, result_columns: Union[str, List[str]], **kwargs: Any) -> Any:
+        return self._pipeline.visualise(result_columns, **kwargs)
 
     @beartype
     @require_attributes(["_pipeline"])
