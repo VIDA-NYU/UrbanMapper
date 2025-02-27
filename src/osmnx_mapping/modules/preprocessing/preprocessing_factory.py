@@ -33,8 +33,8 @@ class PreprocessingFactory:
     def with_imputer(
         self,
         imputer_type: str,
-        latitude_column_name: str,
-        longitude_column_name: str,
+        latitude_column_name: Optional[str] = None,
+        longitude_column_name: Optional[str] = None,
         **extra_params: Any,
     ) -> "PreprocessingFactory":
         self._preprocessor_type = imputer_type

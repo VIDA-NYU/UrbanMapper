@@ -31,8 +31,8 @@ class PreprocessingMixin:
     def with_imputer(
         self,
         imputer_type: str,
-        latitude_column_name: str,
-        longitude_column_name: str,
+        latitude_column_name: Optional[str] = None,
+        longitude_column_name: Optional[str] = None,
         **extra_params: Any,
     ) -> "PreprocessingMixin":
         self.preprocessor_instance = (
@@ -53,7 +53,9 @@ class PreprocessingMixin:
     )
     @beartype
     def with_default_imputer(
-        self, latitude_column_name: str, longitude_column_name: str
+        self,
+        latitude_column_name: Optional[str] = None,
+        longitude_column_name: Optional[str] = None,
     ) -> "PreprocessingMixin":
         self.preprocessor_instance = (
             CreatePreprocessor()
