@@ -19,10 +19,9 @@
 
 ![OSMNxMapping Cover](public/resources/osmnx_mapping_cover.png)
 
-> [!NOTE]
-> The following project is fully python-typed safe and uses the great [@beartype](https://github.com/beartype/beartype)!
-> 
-> The following project is under active development and is not yet stable. Expect bugs & changes!
+> [!IMPORTANT]
+> 1) We highly recommend to explore the `/example` folder for Jupyter Notebook-based tutorials 🎉
+> 2) The following library is under active-development and is not yet _stable_. Expect bugs & frequent changes!
 
 ## 🌆 OSMNxMapping –– In a Nutshell
 
@@ -336,6 +335,9 @@ Voila! 🥐 Whether you prefer the fine-grained control of the step-by-step appr
 
 ## 🗺️ Roadmap / Future Work
 
+> [!NOTE]  
+> For more about future works, explore the `issues` tab above!
+
 1) From labs to more general communities, we want to advance `OSMNxMapping` by attaining large unit-test coverage,
    integrating
    routines via `G.Actions`, and producing thorough documentation for users all around.
@@ -353,18 +355,15 @@ We'd be welcome to see more `loader`, `geo imputer` and `geo filter` primitives 
 
 ## 🌁 API
 
+> [!IMPORTANT]
+> The following project is fully python-typed safe and uses the great [@beartype](https://github.com/beartype/beartype)! It should reduce side effects and better library usability on the user end side.
+
 Users familiar with `data pipelines` will find the modular, `scikit-learn-inspired` design of the `OSMNxMapping` library
 clear-cut. For others, believe us it is the way to go!
 
 We offer a set of **mixins** that simplify difficult chores including `data loading`, `road network building`,
 `preprocessing`, `enrichment`, and `visualising` of enriched graph data. Your main interface is these mixins, which
-neatly wrap
-the underlying modules for a flawless performance.
-
-> [!IMPORTANT]  
-> Mixins are the recommended starting point, offering a high-level, user-friendly API. The inner modules (e.g.,
-`loader`, `network`, `enricher` and more) handle the heavy lifting but are abstracted away for simplicity. Feel free to
-> explore them for more advanced / fine-grained use cases.
+neatly wrap the underlying modules for a flawless performance.
 
 <details>
 <summary><strong>LoaderMixin</strong> – Load Your Urban Data</summary>
@@ -930,13 +929,8 @@ The `UrbanPipelineMixin` enables you to chain multiple steps into a single, repr
 
 </details>
 
----
-
-> **Tip**: Start with the mixins for a smooth experience—they’re designed to be intuitive and handle complexity for you.
-> For more control, dive into the inner modules as needed.
-> Full documentation is forthcoming; Hence, expect some breaking changes in the API – Bare wth us a doc is cooking-up!
-> ⚠️
-
+> [!IMPORTANT]  
+> Full documentation is forthcoming; Hence, expect some breaking changes in the API – Bare wth us a doc is cooking-up! ⚠️
 
 ---
 
