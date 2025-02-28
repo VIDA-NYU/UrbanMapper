@@ -22,28 +22,41 @@ class EnricherConfig:
         return self
 
     def aggregate_with(
-        self, method: str, edge_method: str = "average", output_column: str = None
+        self,
+        method: str,
+        edge_method: str = "average",
+        output_column: str = None,
+        target: str = "edges",
     ) -> "EnricherConfig":
         if not self.values_from:
             raise ValueError("Aggregation requires 'values_from'")
+        if target not in ["nodes", "edges", "both"]:
+            raise ValueError("target must be 'nodes', 'edges', or 'both'")
         self.action = "aggregate"
         self.aggregator_config = {"method": method}
         self.enricher_config = {
             "edge_method": edge_method,
             "output_column": output_column or f"{method}_{self.values_from[0]}",
+            "target": target,
         }
         return self
 
     def count_by(
-        self, edge_method: str = "sum", output_column: str = None
+        self,
+        edge_method: str = "sum",
+        output_column: str = None,
+        target: str = "edges",
     ) -> "EnricherConfig":
         if self.values_from:
             raise ValueError("Counting does not use 'values_from'")
+        if target not in ["nodes", "edges", "both"]:
+            raise ValueError("target must be 'nodes', 'edges', or 'both'")
         self.action = "count"
         self.aggregator_config = {}
         self.enricher_config = {
             "edge_method": edge_method,
             "output_column": output_column or "counted_value",
+            "target": target,
         }
         return self
 

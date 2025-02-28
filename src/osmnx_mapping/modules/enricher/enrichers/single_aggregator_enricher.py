@@ -18,11 +18,13 @@ class SingleAggregatorEnricher(EnricherBase):
         aggregator: BaseAggregator,
         output_column: str = "street_count",
         edge_method: str | Callable[[pd.Series, pd.Series], float] = "average",
+        target: str = "edges",
         config: Optional[EnricherConfig] = None,
     ) -> None:
         super().__init__(config)
         self.aggregator = aggregator
         self.output_column = output_column
+        self.target = target
         self.config = config or EnricherConfig()
         self._set_edge_method(edge_method)
 
@@ -55,9 +57,15 @@ class SingleAggregatorEnricher(EnricherBase):
 
         aggregated_series = self.aggregator.aggregate(data)
 
-        updated_edges[self.output_column] = updated_edges.apply(
-            lambda row: self.edge_method(row, aggregated_series), axis=1
-        ).fillna(0)
+        if self.target in ["nodes", "both"]:
+            updated_nodes[self.output_column] = updated_nodes.index.map(
+                aggregated_series
+            ).fillna(0)
+
+        if self.target in ["edges", "both"]:
+            updated_edges[self.output_column] = updated_edges.apply(
+                lambda row: self.edge_method(row, aggregated_series), axis=1
+            ).fillna(0)
 
         updated_edges = self.ensure_multiindex(updated_edges)
         updated_graph = osmnx.graph_from_gdfs(updated_nodes, updated_edges)

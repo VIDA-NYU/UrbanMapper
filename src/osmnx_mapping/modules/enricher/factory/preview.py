@@ -38,6 +38,7 @@ class PreviewBuilder:
         if self.config.action:
             if self.config.action == "aggregate":
                 method = self.config.aggregator_config.get("method", "<Not Set>")
+                target = self.config.enricher_config.get("target", "<Not Set>")
                 steps.extend(
                     [
                         "│   ├── Type: Aggregate",
@@ -45,16 +46,19 @@ class PreviewBuilder:
                         f"│   ├── Method: {method} (Available: {', '.join(AGGREGATION_FUNCTIONS.keys())})",
                         f"│   ├── Edge Method: {self.config.enricher_config.get('edge_method', '<Not Set>')} "
                         f"(Available: {', '.join(self.edge_methods.keys())})",
+                        f"│   ├── Target: {target}",
                         f"│   └── Output Column: {self.config.enricher_config.get('output_column', '<Not Set>')}",
                     ]
                 )
             elif self.config.action == "count":
+                target = self.config.enricher_config.get("target", "<Not Set>")
                 steps.extend(
                     [
                         "│   ├── Type: Count",
                         "│   ├── Aggregator: CountAggregator",
                         f"│   ├── Edge Method: {self.config.enricher_config.get('edge_method', '<Not Set>')} "
                         f"(Available: {', '.join(self.edge_methods.keys())})",
+                        f"│   ├── Target: {target}",
                         f"│   └── Output Column: {self.config.enricher_config.get('output_column', '<Not Set>')}",
                     ]
                 )
