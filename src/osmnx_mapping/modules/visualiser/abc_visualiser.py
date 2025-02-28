@@ -17,8 +17,10 @@ class VisualiserBase(ABC):
     def _render(
         self,
         graph: nx.MultiDiGraph,
+        nodes: gpd.GeoDataFrame,
         edges: gpd.GeoDataFrame,
         result_columns: Union[str, List[str]],
+        target: str = "edges",
         **kwargs,
     ) -> Any: ...
 
@@ -30,13 +32,23 @@ class VisualiserBase(ABC):
         lambda args: args["result_columns"]
         if isinstance(args["result_columns"], list)
         else [args["result_columns"]],
+        condition=lambda args: args["target"] in ["edges", "both"],
+    )
+    @require_dynamic_columns(
+        "nodes",
+        lambda args: args["result_columns"]
+        if isinstance(args["result_columns"], list)
+        else [args["result_columns"]],
+        condition=lambda args: args["target"] in ["nodes", "both"],
     )
     @beartype
     def render(
         self,
         graph: nx.MultiDiGraph,
+        nodes: gpd.GeoDataFrame,
         edges: gpd.GeoDataFrame,
         result_columns: Union[str, List[str]],
+        target: str = "edges",
         **kwargs,
     ) -> Any:
-        return self._render(graph, edges, result_columns, **kwargs)
+        return self._render(graph, nodes, edges, result_columns, target, **kwargs)
