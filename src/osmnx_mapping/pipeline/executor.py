@@ -35,82 +35,85 @@ class PipelineExecutor:
         self.edges: Optional[gpd.GeoDataFrame] = None
         self._composed: bool = False
 
-    def _inject_dependencies(self, instance: Any) -> None:
-        if (
-            hasattr(instance, "nodes")
-            and getattr(instance, "nodes", None) is None
-            and self.nodes is not None
-        ):
+    def _inject_network_dependencies(self, instance: Any) -> None:
+        if hasattr(instance, "nodes") and getattr(instance, "nodes", None) is None:
             setattr(instance, "nodes", self.nodes)
-        if (
-            hasattr(instance, "graph")
-            and getattr(instance, "graph", None) is None
-            and self.graph is not None
-        ):
+        if hasattr(instance, "graph") and getattr(instance, "graph", None) is None:
             setattr(instance, "graph", self.graph)
-        if (
-            hasattr(instance, "edges")
-            and getattr(instance, "edges", None) is None
-            and self.edges is not None
-        ):
+        if hasattr(instance, "edges") and getattr(instance, "edges", None) is None:
             setattr(instance, "edges", self.edges)
+
+    def _inject_latitude_longitude_columns(
+        self, instance: Any, latitude_column_name: str, longitude_column_name: str
+    ) -> None:
+        if (
+            hasattr(instance, "latitude_column_name")
+            and getattr(instance, "latitude_column_name", None) is None
+        ):
+            setattr(instance, "latitude_column_name", latitude_column_name)
+        if (
+            hasattr(instance, "longitude_column_name")
+            and getattr(instance, "longitude_column_name", None) is None
+        ):
+            setattr(instance, "longitude_column_name", longitude_column_name)
 
     @beartype
     def compose(self, latitude_column_name: str, longitude_column_name: str) -> None:
-        if not any(isinstance(step, NetworkBase) for _, step in self.steps):
-            raise ValueError("Pipeline must include at least one NetworkBase step.")
-
-        for name, step in self.steps:
-            if hasattr(step, "latitude_column_name"):
-                setattr(step, "latitude_column_name", latitude_column_name)
-            if hasattr(step, "longitude_column_name"):
-                setattr(step, "longitude_column_name", longitude_column_name)
-
-        data = None
         network_step = next(
             (name, step) for name, step in self.steps if isinstance(step, NetworkBase)
         )
+        if not network_step:
+            raise ValueError("Pipeline must include a NetworkBase step.")
+        network_name, network_instance = network_step
 
-        network_step_name, network_instance = network_step
-        graph, nodes, edges = network_instance.build_network(render=False)
-        self.data, self.graph, self.nodes, self.edges = data, graph, nodes, edges
+        self.graph, self.nodes, self.edges = network_instance.build_network(
+            render=False
+        )
+
+        for name, step in self.steps:
+            self._inject_latitude_longitude_columns(
+                instance=step,
+                latitude_column_name=latitude_column_name,
+                longitude_column_name=longitude_column_name,
+            )
 
         for current_step_name, current_instance in [
             (step_name, step_instance)
             for step_name, step_instance in self.steps
-            if step_name != network_step_name
+            if step_name != network_name
         ]:
-            self.data, self.graph, self.nodes, self.edges = data, graph, nodes, edges
-            self._inject_dependencies(current_instance)
+            self._inject_network_dependencies(current_instance)
 
             if isinstance(current_instance, LoaderBase):
-                data = current_instance.load_data_from_file()
+                self.data = current_instance.load_data_from_file()
             elif isinstance(current_instance, (GeoImputerBase, GeoFilterBase)):
-                if data is None:
-                    raise ValueError(
-                        f"Step '{current_step_name}' requires data, but no data is available yet."
+                if self.data is None:
+                    raise ValueError(f"Step '{current_step_name}' requires data.")
+                self.data = current_instance.transform(self.data)
+
+        if self.data is not None and network_instance.mappings:
+            for mapping in network_instance.mappings:
+                mapping_type = mapping["type"]
+                lon_column = mapping["lon"]
+                lat_column = mapping["lat"]
+                output_column = mapping["output"]
+                if mapping_type == "node":
+                    self.data = network_instance.map_nearest_nodes(
+                        self.data, lon_column, lat_column, output_column
                     )
-                data = current_instance.transform(data)
-            elif isinstance(current_instance, EnricherBase):
-                if data is None or graph is None or nodes is None or edges is None:
-                    raise ValueError(
-                        f"Step '{current_step_name}' requires data, graph, nodes, and edges, but some are missing."
+                elif mapping_type == "edge":
+                    self.data = network_instance.map_nearest_edges(
+                        self.data, lon_column, lat_column, output_column
                     )
 
-                if network_instance is not None:
-                    data = network_instance.map_nearest_nodes(
-                        data,
-                        output_column="nearest_node",
-                        reset_output_column=True,
-                        longitude_column=longitude_column_name,
-                        latitude_column=latitude_column_name,
-                    )
-
-                data, graph, nodes, edges = current_instance.enrich(
-                    data, graph, nodes, edges
+        for name, step in self.steps:
+            if isinstance(step, EnricherBase):
+                if self.data is None or self.graph is None:
+                    raise ValueError(f"Step '{name}' requires data and graph.")
+                self.data, self.graph, self.nodes, self.edges = step.enrich(
+                    self.data, self.graph, self.nodes, self.edges
                 )
 
-        self.data, self.graph, self.nodes, self.edges = data, graph, nodes, edges
         self._composed = True
 
     @beartype
@@ -142,4 +145,10 @@ class PipelineExecutor:
         )
         if not visualiser:
             raise ValueError("No VisualiserBase step defined.")
-        return visualiser.render(self.graph, self.edges, result_columns, **kwargs)
+        return visualiser.render(
+            graph=self.graph,
+            nodes=self.nodes,
+            edges=self.edges,
+            result_columns=result_columns,
+            **kwargs,
+        )

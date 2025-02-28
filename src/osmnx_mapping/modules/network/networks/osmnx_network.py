@@ -1,4 +1,4 @@
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 import geopandas as gpd
 import networkx as nx
 import osmnx as ox
@@ -20,6 +20,7 @@ class OSMNxNetwork(NetworkBase):
         self.network_type = network_type
         self.latitude_column_name = latitude_column_name
         self.longitude_column_name = longitude_column_name
+        self.mappings = []
 
     @beartype
     def build_network(
@@ -32,13 +33,11 @@ class OSMNxNetwork(NetworkBase):
         final_network_type = (
             network_type if network_type is not None else self.network_type
         )
-
         if final_place_name is None or final_network_type is None:
             raise ValueError(
                 "Both 'place_name' and 'network_type' must be provided either at initialisation "
                 "or as arguments to build_network."
             )
-
         self.graph = ox.graph_from_place(
             final_place_name, network_type=final_network_type
         )
@@ -66,4 +65,22 @@ class OSMNxNetwork(NetworkBase):
             Y=dataframe[latitude_column].values,
             **osmnx_kwargs,
         )
+        return dataframe
+
+    def _map_nearest_edges(
+        self,
+        data: gpd.GeoDataFrame,
+        longitude_column: str,
+        latitude_column: str,
+        output_column: str = "nearest_edge",
+        **osmnx_kwargs,
+    ) -> gpd.GeoDataFrame:
+        dataframe = data.copy()
+        nearest_edges = ox.distance.nearest_edges(
+            self.graph,
+            X=dataframe[longitude_column].values,
+            Y=dataframe[latitude_column].values,
+            **osmnx_kwargs,
+        )
+        dataframe[output_column] = [tuple(edge) for edge in nearest_edges]
         return dataframe

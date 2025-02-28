@@ -7,7 +7,7 @@ from .preprocessing import (
     BoundingBoxFilter,
     CreatePreprocessor,
 )
-from .network import NetworkBase, OSMNxNetwork
+from .network import NetworkBase, OSMNxNetwork, CreateNetwork
 from .enricher import (
     EnricherBase,
     BaseAggregator,
@@ -30,6 +30,7 @@ __all__ = [
     "CreatePreprocessor",
     "NetworkBase",
     "OSMNxNetwork",
+    "CreateNetwork",
     "EnricherBase",
     "BaseAggregator",
     "SimpleAggregator",

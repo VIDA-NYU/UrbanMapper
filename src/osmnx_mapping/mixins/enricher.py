@@ -23,12 +23,16 @@ class EnricherMixin:
         output_column: str = "aggregated_value",
         method: str = "mean",
         edge_method: str = "average",
+        target: str = "edges",
     ) -> "EnricherMixin":
         self.enricher = (
             CreateEnricher()
             .with_data(group_by=group_by_column, values_from=values_from_column)
             .aggregate_with(
-                method=method, edge_method=edge_method, output_column=output_column
+                method=method,
+                edge_method=edge_method,
+                output_column=output_column,
+                target=target,
             )
             .build()
         )

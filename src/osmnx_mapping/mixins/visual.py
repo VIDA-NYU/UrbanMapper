@@ -1,4 +1,4 @@
-from typing import Optional, Any
+from typing import Optional, Any, Union, List
 import geopandas as gpd
 import networkx as nx
 from beartype import beartype
@@ -24,8 +24,12 @@ class VisualMixin:
     def visualise(
         self,
         graph: nx.MultiDiGraph,
+        nodes: gpd.GeoDataFrame,
         edges: gpd.GeoDataFrame,
-        result_column: str,
+        result_columns: Union[str, List[str]],
+        target: str = "edges",
         **kwargs: Any,
     ) -> Any:
-        return self.visualiser_instance.render(graph, edges, result_column, **kwargs)
+        return self.visualiser_instance.render(
+            graph, nodes, edges, result_columns, target, **kwargs
+        )

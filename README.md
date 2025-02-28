@@ -420,7 +420,7 @@ further analysis.
 <details>
 <summary><strong>NetworkMixin</strong> – Build and Map Road Networks</summary>
 
-The `NetworkMixin` lets you query road networks from OpenStreetMap and map data points to the nearest street nodes.
+The `NetworkMixin` lets you query road networks from OpenStreetMap and map data points to the nearest street nodes or edges.
 
 - **`network_from_place(place_name, network_type="drive", render=False)`**
     - **Purpose**: Queries a road network for a specified place.
@@ -428,8 +428,7 @@ The `NetworkMixin` lets you query road networks from OpenStreetMap and map data 
         - `place_name` (str): Location (e.g., "Manhattan, New York City, USA").
         - `network_type` (str, default="drive"): Type of network ("drive", "walk", "bike").
         - `render` (bool, default=False): If True, displays a plot of the network.
-    - **Returns**: A tuple (`networkx.MultiDiGraph`, `geopandas.GeoDataFrame`, `geopandas.GeoDataFrame`) of the graph,
-      nodes, and edges.
+    - **Returns**: A tuple (`networkx.MultiDiGraph`, `geopandas.GeoDataFrame`, `geopandas.GeoDataFrame`) of the graph, nodes, and edges.
     - **Example**:
       ```python
       import osmnx_mapping as oxm
@@ -437,9 +436,7 @@ The `NetworkMixin` lets you query road networks from OpenStreetMap and map data 
       graph, nodes, edges = mapping.network.network_from_place("Manhattan, New York City, USA")
       ```
 
-- **
-  `map_nearest_street(data, longitude_column, latitude_column, output_column="nearest_node", reset_output_column=False, **kwargs)`
-  **
+- **`map_nearest_street(data, longitude_column, latitude_column, output_column="nearest_node", reset_output_column=False, **kwargs)`**
     - **Purpose**: Maps data points to the nearest street nodes in the network.
     - **Parameters**:
         - `data` (geopandas.GeoDataFrame): Input data with lat/lon.
@@ -456,6 +453,9 @@ The `NetworkMixin` lets you query road networks from OpenStreetMap and map data 
       # Assuming data is a GeoDataFrame from previous steps (e.g., LoaderMixin)
       mapped_data = mapping.network.map_nearest_street(data, "lon", "lat")
       ```
+
+> [!NOTE]  
+> When using the pipeline, it is recommended to configure the network using the `CreateNetwork` factory, which allows specifying mappings for nearest nodes or edges. See the [UrbanPipelineMixin](#urbanpipelinemixin--chain-your-workflow) section for details and examples.
 
 </details>
 
@@ -552,58 +552,48 @@ the [UrbanPipelineMixin](#urbanpipelinemixin--chain-your-workflow) section for m
 <details>
 <summary><strong>EnricherMixin</strong> – Enrich Your Network with Data</summary>
 
-The `EnricherMixin` is the core component of the library, empowering you to aggregate urban data (e.g., traffic counts,
-building heights) and map it onto a road network's edges. It's designed for flexibility with advanced customization
-through the `CreateEnricher` factory, while also offering a simpler default setup for standard use cases.
+The `EnricherMixin` is the core component of the library, empowering you to aggregate urban data (e.g., traffic counts, building heights) and map it onto a road network's nodes, edges, or both. It's designed for flexibility with advanced customization through the `CreateEnricher` factory, while also offering a simpler default setup for standard use cases.
 
 > [!NOTE]  
 > **How the Enricher Works**:  
-> The enricher processes data in two key steps:
-> 1. **Aggregation**: It groups your data by a specified column that connects with the graph (e.g., `nearest_node`
-     following `map_nearest_street(.)`) and applies an aggregation method like `mean`, `sum`, or `count` to compute
-     values for each group. For example, it could sum traffic volumes per node.
-> 2. **Edge Mapping**: These aggregated values are then assigned to the network's edges (streets) using a method like
-     `average`, `sum`, `max`, or `min`, based on the values at the edge's connected nodes.  
-     > This process transforms raw data into meaningful insights mapped onto the road network, making it ideal for urban
-     analysis tasks like traffic studies or accident mapping.
+> The enricher processes data in two key steps:  
+> 1. **Aggregation**: It groups your data by a specified column that connects with the graph (e.g., `nearest_node` following `map_nearest_street(.)`) and applies an aggregation method like `mean`, `sum`, or `count` to compute values for each group. For example, it could sum traffic volumes per node.  
+> 2. **Mapping**: These aggregated values are then assigned to the network's nodes, edges, or both, based on the `target` parameter. For edges, a method like `average`, `sum`, `max`, or `min` is used to compute values from the connected nodes' values.  
+> This process transforms raw data into meaningful insights mapped onto the road network, making it ideal for urban analysis tasks like traffic studies or accident mapping.
 
 ---
 
 ### Configuring Enrichers with `CreateEnricher` (Recommended Approach)
 
-The `CreateEnricher` factory (an alias for `EnricherFactory`) is the primary and recommended way to configure enrichers.
-It offers a flexible, step-by-step approach to define how data is aggregated and mapped to the network, giving you full
-control over the enrichment process.
+The `CreateEnricher` factory (an alias for `EnricherFactory`) is the primary and recommended way to configure enrichers. It offers a flexible, step-by-step approach to define how data is aggregated and mapped to the network, giving you full control over the enrichment process.
 
 - **Key Methods**:
     - **`with_data(group_by, values_from=None)`**:
-        - **Purpose**: Specifies the column to group data by (e.g., `"nearest_node"`) and, optionally, the column
-          containing values to aggregate (e.g., `"traffic"`).
+        - **Purpose**: Specifies the column to group data by (e.g., `"nearest_node"`) and, optionally, the column containing values to aggregate (e.g., `"traffic"`).
         - **Example**:
           ```python  
           enricher_factory = CreateEnricher().with_data(group_by="nearest_node", values_from="traffic")  
           ```
-    - **`aggregate_with(method, edge_method='average', output_column=None)`**:
-        - **Purpose**: Configures the aggregation method (e.g., `"sum"`, `"mean"`) and how aggregated values are mapped
-          to edges.
+    - **`aggregate_with(method, edge_method='average', output_column=None, target='edges')`**:
+        - **Purpose**: Configures the aggregation method (e.g., `"sum"`, `"mean"`) and how aggregated values are mapped to the network.
         - **Parameters**:
             - `method` (str): Aggregation method (e.g., `"mean"`, `"sum"`, `"median"`, `"min"`, `"max"`).
-            - `edge_method` (str, optional, default="average"): Method to compute edge values (e.g., `"average"`,
-              `"sum"`, `"max"`, `"min"`).
-            - `output_column` (str, optional): Name of the output column in the edges GeoDataFrame.
+            - `edge_method` (str, optional, default="average"): Method to compute edge values (e.g., `"average"`, `"sum"`, `"max"`, `"min"`). Only applicable if `target` includes edges.
+            - `output_column` (str, optional): Name of the output column in the target GeoDataFrame(s).
+            - `target` (str, optional, default="edges"): Specifies where to apply the enrichment: `"nodes"`, `"edges"`, or `"both"`. If `"nodes"`, values are mapped directly to nodes; if `"edges"`, values are computed for edges using `edge_method`; if `"both"`, enrichment applies to both.
         - **Example**:
           ```python  
-          enricher_factory = enricher_factory.aggregate_with(method="sum", edge_method="average", output_column="total_traffic")  
+          enricher_factory = enricher_factory.aggregate_with(method="sum", edge_method="average", output_column="total_traffic", target="edges")  
           ```
-    - **`count_by(edge_method='sum', output_column=None)`**:
-        - **Purpose**: Configures a counting aggregation (e.g., counting accidents per node), without needing a
-          `values_from` column.
+    - **`count_by(edge_method='sum', output_column=None, target='edges')`**:
+        - **Purpose**: Configures a counting aggregation (e.g., counting accidents per node), without needing a `values_from` column.
         - **Parameters**:
-            - `edge_method` (str, optional, default="sum"): Method to map counts to edges.
+            - `edge_method` (str, optional, default="sum"): Method to map counts to edges (if `target` includes edges).
             - `output_column` (str, optional): Name of the output column.
+            - `target` (str, optional, default="edges"): Specifies where to apply the enrichment: `"nodes"`, `"edges"`, or `"both"`.
         - **Example**:
           ```python  
-          enricher_factory = CreateEnricher().with_data(group_by="nearest_node").count_by(edge_method="sum", output_column="accident_count")  
+          enricher_factory = CreateEnricher().with_data(group_by="nearest_node").count_by(edge_method="sum", output_column="accident_count", target="both")  
           ```
     - **`using_enricher(enricher_type)`**:
         - **Purpose**: Selects a specific enricher type (currently, only `"SingleAggregatorEnricher"` is available).
@@ -612,8 +602,7 @@ control over the enrichment process.
           enricher_factory = enricher_factory.using_enricher("SingleAggregatorEnricher")  
           ```
     - **`preview(format="ascii")`**:
-        - **Purpose**: Displays a summary of the current configuration, helping you verify settings before building the
-          enricher.
+        - **Purpose**: Displays a summary of the current configuration, helping you verify settings before building the enricher.
         - **Example**:
           ```python  
           print(enricher_factory.preview())  
@@ -630,26 +619,22 @@ control over the enrichment process.
   from osmnx_mapping.modules.enricher import CreateEnricher  
   enricher = (CreateEnricher()  
               .with_data(group_by="nearest_node", values_from="traffic")  
-              .aggregate_with(method="sum", edge_method="average", output_column="total_traffic")  
+              .aggregate_with(method="sum", edge_method="average", output_column="total_traffic", target="edges")  
               .build())  
   ```
 
 > [!TIP]
-> - Use `CreateEnricher` when you need full control over the enrichment process, such as experimenting with different
-    aggregation methods or counting occurrences without a value column.
+> - Use `CreateEnricher` when you need full control over the enrichment process, such as experimenting with different aggregation methods or counting occurrences without a value column.
 > - Call `preview()` before `build()` to verify your configuration and catch potential errors early.
+> - The `target` parameter determines whether the enrichment is applied to nodes, edges, or both. For `target="both"`, the aggregated values are assigned to both nodes and edges, with edges using the specified `edge_method`.
 
 ---
 
 ### Using `with_default` for Simplicity (Shortcut for Default Settings)
 
-If you do not need advanced customisation and prefer a quick setup with sensible defaults, the `with_default` method in
-`EnricherMixin` provides a convenient shortcut. It internally uses `CreateEnricher` with predefined settings, making it
-ideal for standard use cases.
+If you do not need advanced customisation and prefer a quick setup with sensible defaults, the `with_default` method in `EnricherMixin` provides a convenient shortcut. It internally uses `CreateEnricher` with predefined settings, making it ideal for standard use cases.
 
-- **
-  `with_default(group_by_column, values_from_column, output_column="aggregated_value", method="mean", edge_method="average")`
-  **
+- **`with_default(group_by_column, values_from_column, output_column="aggregated_value", method="mean", edge_method="average", target="edges")`**
     - **Purpose**: Quickly configures a default enricher using `CreateEnricher` with predefined settings.
     - **Parameters**:
         - `group_by_column` (str): Column to group by (e.g., `"nearest_node"`).
@@ -657,12 +642,13 @@ ideal for standard use cases.
         - `output_column` (str, optional): Name of the output column (default: `"aggregated_value"`).
         - `method` (str, optional): Aggregation method (default: `"mean"`).
         - `edge_method` (str, optional): Edge mapping method (default: `"average"`).
+        - `target` (str, optional): Specifies where to apply the enrichment (default: `"edges"`).
     - **Returns**: The `EnricherMixin` instance for method chaining.
     - **Example**:
       ```python  
       import osmnx_mapping as oxm  
       mapping = oxm.OSMNxMapping()  
-      mapping.enricher.with_default("nearest_node", "traffic", method="sum", edge_method="average")  
+      mapping.enricher.with_default("nearest_node", "traffic", method="sum", edge_method="average", target="both")  
       ```
 
 > [!TIP]
@@ -673,55 +659,52 @@ ideal for standard use cases.
 
 ### Applying the Enricher to the Network
 
-Once configured (using either `CreateEnricher` or `with_default`), the enricher can be applied to the network using the
-`enrich_network` method.
+Once configured (using either `CreateEnricher` or `with_default`), the enricher can be applied to the network using the `enrich_network` method.
 
 - **`enrich_network(input_data, input_graph, input_nodes, input_edges, **kwargs)`**
-    - **Purpose**: Applies the configured enricher to the road network, enriching edges with aggregated data.
+    - **Purpose**: Applies the configured enricher to the road network, enriching the specified target (nodes, edges, or both) with aggregated data.
     - **Parameters**:
         - `input_data` (geopandas.GeoDataFrame): Dataset to enrich with.
         - `input_graph` (networkx.MultiDiGraph): Road network graph.
         - `input_nodes` (geopandas.GeoDataFrame): Network nodes.
         - `input_edges` (geopandas.GeoDataFrame): Network edges.
         - `**kwargs`: Additional options for custom enrichers.
-    - **Returns**: A tuple (`GeoDataFrame`, `MultiDiGraph`, `GeoDataFrame`, `GeoDataFrame`) of enriched data, graph,
-      nodes, and edges.
+    - **Returns**: A tuple (`GeoDataFrame`, `MultiDiGraph`, `GeoDataFrame`, `GeoDataFrame`) of enriched data, updated graph, updated nodes, and updated edges. Depending on the `target`, the enrichment is applied to nodes, edges, or both.
     - **Example**:
       ```python  
       import osmnx_mapping as oxm  
       mapping = oxm.OSMNxMapping()  
       data = mapping.loader.load_from_file("city_data.csv", latitude_column="lat", longitude_column="lon")  
       graph, nodes, edges = mapping.network.network_from_place("Manhattan, New York City, USA")  
-      mapping.enricher.with_default("nearest_node", "traffic", method="sum", edge_method="average")  
+      mapping.enricher.with_default("nearest_node", "traffic", method="sum", edge_method="average", target="edges")  
       enriched_data, graph, nodes, edges = mapping.enricher.enrich_network(data, graph, nodes, edges)  
       ```
 
 > [!TIP]
-> - **Counting Occurrences**: Use `count_by` in `CreateEnricher` to count events (e.g., accidents) per group without
-    needing a `values_from` column.
-> - **Choosing Between Approaches**: Start with `with_default` for simplicity, but switch to `CreateEnricher` if you
-    need advanced customisation or encounter limitations.
+> - **Counting Occurrences**: Use `count_by` in `CreateEnricher` to count events (e.g., accidents) per group without needing a `values_from` column.
+> - **Choosing Between Approaches**: Start with `with_default` for simplicity, but switch to `CreateEnricher` if you need advanced customisation or encounter limitations.
+> - **Multiple Enrichers**: When using multiple enrichers in a pipeline, ensure each writes to a unique `output_column` to avoid overwriting data.
 
 </details>
 
 <details>
 <summary><strong>VisualMixin</strong> – Visualise Your Results</summary>
 
-The `VisualMixin` provides tools to visualise your enriched network. By default, it uses `StaticVisualiser` for static
-Matplotlib plots, but you can pass any `VisualiserBase` subclass (e.g., `InteractiveVisualiser` for interactive Folium
-maps) to the constructor for custom visualisations.
+The `VisualMixin` provides tools to visualise your enriched network. By default, it uses `StaticVisualiser` for static Matplotlib plots, but you can pass any `VisualiserBase` subclass (e.g., `InteractiveVisualiser` for interactive Folium maps) to the constructor for custom visualisations.
 
 > [!TIP]  
 > Available visualisers:
 > - `StaticVisualiser`: Generates a static Matplotlib plot of the network (default).
 > - `InteractiveVisualiser`: Creates an interactive Folium map for exploration in a browser.
 
-- **`visualise(graph, edges, result_columns, **kwargs)`**
+- **`visualise(graph, nodes, edges, result_columns, target="edges", **kwargs)`**
     - **Purpose**: Creates a visualisation of the enriched network using the configured visualiser.
     - **Parameters**:
         - `graph` (networkx.MultiDiGraph): The network graph.
-        - `edges` (geopandas.GeoDataFrame): Enriched edges.
+        - `nodes` (geopandas.GeoDataFrame): Network nodes.
+        - `edges` (geopandas.GeoDataFrame): Network edges.
         - `result_columns` (str or list of str): Column(s) to visualise. For static visualisers (e.g., `StaticVisualiser`), provide a single string (e.g., `"aggregated_value"`). For interactive visualisers (e.g., `InteractiveVisualiser`), provide a list of strings (e.g., `["column1", "column2"]`) to enable multi-layer visualisation with a dropdown selection.
+        - `target` (str, default="edges"): Specifies what to visualise: `"nodes"`, `"edges"`, or `"both"`. Determines whether the visualisation focuses on nodes, edges, or both, based on the enriched data in `result_columns`.
         - `**kwargs`: Visualisation parameters (e.g., `colormap="Blues"` for `StaticVisualiser`, or `tile_provider="CartoDB positron"` for `InteractiveVisualiser`).
     - **Returns**: A Matplotlib figure (for `StaticVisualiser`) or Folium map (for `InteractiveVisualiser`), depending on the visualiser.
     - **Example (Static Visualiser)**:
@@ -730,24 +713,24 @@ maps) to the constructor for custom visualisations.
       mapping = oxm.OSMNxMapping()
       data = mapping.loader.load_from_file("city_data.csv", latitude_column="lat", longitude_column="lon")
       graph, nodes, edges = mapping.network.network_from_place("Manhattan, New York City, USA")
-      mapping.enricher.with_default("nearest_node", "traffic", method="sum")
+      mapping.enricher.with_default("nearest_node", "traffic", method="sum", target="edges")
       enriched_data, graph, nodes, edges = mapping.enricher.enrich_network(data, graph, nodes, edges)
-      fig = mapping.visual.visualise(graph, edges, "aggregated_value", colormap="Blues")
+      fig = mapping.visual.visualise(graph, nodes, edges, "aggregated_value", target="edges", colormap="Blues")
       ```
-    - **Example (Interactive visualiser)**:
+    - **Example (Interactive Visualiser)**:
       ```python
-        import osmnx_mapping as oxm
-        from osmnx_mapping.modules.visualiser.visualisers.interactive_visualiser import InteractiveVisualiser
-        mapping = oxm.OSMNxMapping()
-        data = mapping.loader.load_from_file("city_data.csv", latitude_column="lat", longitude_column="lon")
-        graph, nodes, edges = mapping.network.network_from_place("Manhattan, New York City, USA")
-        mapping.enricher.with_default("nearest_node", "traffic", method="sum")
-        enriched_data, graph, nodes, edges = mapping.enricher.enrich_network(data, graph, nodes, edges)
-        # Use InteractiveVisualiser for multi-layer visualisation –– Note that here we assume "aggregated_value" and 
-        # "traffic_density" are columns in the enriched edges GeoDataFrame.
-        fmap = mapping.visual(InteractiveVisualiser()).visualise(
-            graph, edges, ["aggregated_value", "traffic_density"], colormap="Greens", tile_provider="CartoDB positron"
-        )
+      import osmnx_mapping as oxm
+      from osmnx_mapping.modules.visualiser.visualisers.interactive_visualiser import InteractiveVisualiser
+      mapping = oxm.OSMNxMapping()
+      data = mapping.loader.load_from_file("city_data.csv", latitude_column="lat", longitude_column="lon")
+      graph, nodes, edges = mapping.network.network_from_place("Manhattan, New York City, USA")
+      mapping.enricher.with_default("nearest_node", "traffic", method="sum", target="edges")
+      enriched_data, graph, nodes, edges = mapping.enricher.enrich_network(data, graph, nodes, edges)
+      # Use InteractiveVisualiser for multi-layer visualisation –– Note that here we assume "aggregated_value" and 
+      # "traffic_density" are columns in the enriched edges GeoDataFrame.
+      fmap = mapping.visual(InteractiveVisualiser()).visualise(
+          graph, nodes, edges, ["aggregated_value", "traffic_density"], target="edges", colormap="Greens", tile_provider="CartoDB positron"
+      )
       ```
 
 </details>
@@ -755,8 +738,7 @@ maps) to the constructor for custom visualisations.
 <details>
 <summary><strong>TableVisMixin</strong> – Interactive Data Exploration</summary>
 
-The `TableVisMixin` offers interactive table visualisations for your data within Jupyter notebooks using the great
-`Skrub` library.
+The `TableVisMixin` offers interactive table visualisations for your data within Jupyter notebooks using the great `Skrub` library.
 
 - **`interactive_display(dataframe, n_rows=10, order_by=None, title="Table Report", column_filters=None, verbose=1)`**
     - **Purpose**: Displays an interactive table for exploring your data.
@@ -781,11 +763,9 @@ The `TableVisMixin` offers interactive table visualisations for your data within
 <details>
 <summary><strong>AuctusSearchMixin</strong> – Discover (Urban) Datasets</summary>
 
-The `AuctusSearchMixin` integrates with [Auctus Search](https://github.com/VIDA-NYU/auctus_search), allowing you to discover, 
-profile, and load (urban) datasets directly into your OSMNxMapping workflow.
+The `AuctusSearchMixin` integrates with [Auctus Search](https://github.com/VIDA-NYU/auctus_search), allowing you to discover, profile, and load (urban) datasets directly into your OSMNxMapping workflow.
 
-For detailed usage and examples, please refer to the [Auctus Search README](https://github.com/VIDA-NYU/auctus_search/blob/main/README.md). 
-In the meantime, here are the key methods for using AuctusSearchMixin with OSMNxMapping:
+For detailed usage and examples, please refer to the [Auctus Search README](https://github.com/VIDA-NYU/auctus_search/blob/main/README.md). In the meantime, here are the key methods for using AuctusSearchMixin with OSMNxMapping:
 
 - **`explore_datasets_from_auctus(search_query, page=1, size=10, display_initial_results=False)`**
     - **Purpose**: Searches Auctus for datasets matching the query and optionally displays initial results.
@@ -816,6 +796,7 @@ In the meantime, here are the key methods for using AuctusSearchMixin with OSMNx
 
 </details>
 
+
 <details>
 <summary><strong>UrbanPipelineMixin</strong> – Chain Your Workflow</summary>
 
@@ -823,7 +804,7 @@ The `UrbanPipelineMixin` enables you to chain multiple steps into a single, repr
 
 > [!IMPORTANT]  
 > **Pipeline Restrictions (per configuration):**  
-> - **Exactly 1** `NetworkBase` step (e.g., `OSMNxNetwork`).  
+> - **Exactly 1** `NetworkBase` step (e.g., `OSMNxNetwork` or built using `CreateNetwork`).  
 > - **Exactly 1** `LoaderBase` step (e.g., `CSVLoader`).  
 > - **1 or more** `EnricherBase` steps (e.g., `SingleAggregatorEnricher`).  
 > - **0 or 1** `VisualiserBase` step.  
@@ -839,31 +820,31 @@ The `UrbanPipelineMixin` enables you to chain multiple steps into a single, repr
 ### **`urban_pipeline(steps)`**
 - **Purpose**: Constructs a pipeline from a list of (name, step) tuples, where each step is an instance of a supported base class.  
 - **Parameters**:  
-  - `steps` (list of tuples): Steps to include, e.g., `[("loader", CSVLoader(...)), ("network", OSMNxNetwork(...)), ("enricher", CreateEnricher().with_data(...).build())]`.  
+  - `steps` (list of tuples): Steps to include, e.g., `[("loader", CSVLoader(...)), ("network", CreateNetwork().with_place(...).build()), ("enricher", CreateEnricher().with_data(...).build())]`.  
 - **Returns**: An `UrbanPipeline` object.  
 - **Example**:  
   ```python
   import osmnx_mapping as oxm
   from osmnx_mapping.modules.loader.loaders.csv_loader import CSVLoader
-  from osmnx_mapping.modules.network.networks.osmnx_network import OSMNxNetwork
+  from osmnx_mapping.modules.network import CreateNetwork
   from osmnx_mapping.modules.enricher import CreateEnricher
   mapping = oxm.OSMNxMapping()
   pipeline = mapping.urban_pipeline([
       ("loader", CSVLoader(file_path="city_data.csv")),
-      ("network", OSMNxNetwork(place_name="Manhattan, New York City, USA")),
+      ("network", CreateNetwork().with_place("Manhattan, New York City, USA").with_mapping("node", "lon", "lat", "nearest_node").build()),
       ("enricher1", CreateEnricher()
           .with_data(group_by="nearest_node", values_from="traffic")
-          .aggregate_with(method="sum", output_column="total_traffic")
+          .aggregate_with(method="sum", output_column="total_traffic", target="edges")
           .build()),
       ("enricher2", CreateEnricher()
           .with_data(group_by="nearest_node", values_from="incidents")
-          .count_by(output_column="incident_count")
+          .count_by(output_column="incident_count", target="nodes")
           .build())
   ])
   ```
 
 ### **`compose(latitude_column_name, longitude_column_name)`**
-- **Purpose**: Configures the pipeline by setting latitude and longitude column names, which are propagated to all relevant steps (e.g., imputers, filters) requiring geographic data.  
+- **Purpose**: Configures the pipeline by setting latitude and longitude column names, which are propagated to all relevant steps (e.g., imputers, filters, network mappings) requiring geographic data.  
 - **Parameters**:  
   - `latitude_column_name` (str): Name of the latitude column in the input data.  
   - `longitude_column_name` (str): Name of the longitude column in the input data.  

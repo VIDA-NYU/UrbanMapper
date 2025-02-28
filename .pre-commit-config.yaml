@@ -1,9 +1,17 @@
 repos:
-- repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.9.6
-  hooks:
-    - id: ruff
-      types_or: [ python, pyi ]
-      args: [ --fix ]
-    - id: ruff-format
-      types_or: [ python, pyi ]
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.6
+    hooks:
+      - id: ruff
+        types_or: [ python, pyi ]
+        args: [ --fix ]
+      - id: ruff-format
+        types_or: [ python, pyi ]
+  - repo: local
+    hooks:
+      - id: jupyter-nb-clear-output
+        name: Clear Jupyter Notebook Outputs
+        files: \.ipynb$
+        stages: [ commit ]
+        language: system
+        entry: uv run jupyter nbconvert --clear-output './examples/*.ipynb'

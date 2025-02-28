@@ -29,13 +29,13 @@ class EnricherFactory:
         # Count taxi trips per street segment
         enricher = (EnricherFactory()
                     .with_data(group_by="nearest_node")
-                    .count_by(edge_method="sum", output_column="total_trips")
+                    .count_by(edge_method="sum", output_column="total_trips", target="edges")
                     .build())
 
-        # Aggregate number of floors per street segment
+        # Aggregate number of floors per node
         enricher = (EnricherFactory()
                     .with_data(group_by="nearest_node", values_from="numfloors")
-                    .aggregate_with("mean", edge_method="average")
+                    .aggregate_with("mean", edge_method="average", target="nodes")
                     .build())
     """
 
@@ -95,6 +95,7 @@ class EnricherFactory:
             aggregator=aggregator,
             output_column=self.config.enricher_config["output_column"],
             edge_method=self.config.enricher_config["edge_method"],
+            target=self.config.enricher_config["target"],
             config=self.config,
         )
 
