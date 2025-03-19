@@ -2,7 +2,7 @@ from typing import Callable
 import geopandas as gpd
 from beartype import beartype
 
-from osmnx_mapping.config import DEFAULT_CRS
+from urban_mapper.config import DEFAULT_CRS
 
 
 @beartype
