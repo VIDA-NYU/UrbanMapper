@@ -58,7 +58,7 @@ def _interpreter_name_version() -> tuple[str, str]:
     return "", "0.0.0"
 
 
-def get_version(dist: str = "osmnx-mapping") -> str:
+def get_version(dist: str = "urban-mapper") -> str:
     """Get version of the given distribution.
 
     Parameters:
@@ -80,10 +80,10 @@ def get_debug_info() -> Environment:
         Environment information.
     """
     py_name, py_version = _interpreter_name_version()
-    packages = ["osmnx-mapping"]
+    packages = ["urban-mapper"]
     variables = [
         "PYTHONPATH",
-        *[var for var in os.environ if var.startswith("OSMNX_MAPPING")],
+        *[var for var in os.environ if var.startswith("URBAN_MAPPER")],
     ]
     return Environment(
         interpreter_name=py_name,

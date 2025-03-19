@@ -5,11 +5,11 @@
 # You might be tempted to import things from `__main__` later,
 # but that will cause problems: the code will get executed twice:
 #
-# - When you run `python -m osmnx_mapping` python will execute
+# - When you run `python -m urban_mapper` python will execute
 #   `__main__.py` as a script. That means there won't be any
-#   `osmnx_mapping.__main__` in `sys.modules`.
+#   `urban_mapper.__main__` in `sys.modules`.
 # - When you import `__main__` it will get executed again (as a module) because
-#   there's no `osmnx_mapping.__main__` in `sys.modules`.
+#   there's no `urban_mapper.__main__` in `sys.modules`.
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ import argparse
 import sys
 from typing import Any
 
-from osmnx_mapping import debug
+from urban_mapper import debug
 
 
 class _DebugInfo(argparse.Action):
@@ -35,7 +35,7 @@ def get_parser() -> argparse.ArgumentParser:
     Returns:
         An argparse parser.
     """
-    parser = argparse.ArgumentParser(prog="osmnx-mapping")
+    parser = argparse.ArgumentParser(prog="urban-mapper")
     parser.add_argument(
         "-V", "--version", action="version", version=f"%(prog)s {debug.get_version()}"
     )
@@ -48,7 +48,7 @@ def get_parser() -> argparse.ArgumentParser:
 def main(args: list[str] | None = None) -> int:
     """Run the main program.
 
-    This function is executed when you type `osmnx-mapping` or `python -m osmnx_mapping`.
+    This function is executed when you type `urban-mapper` or `python -m urban_mapper`.
 
     Parameters:
         args: Arguments passed from the command line.

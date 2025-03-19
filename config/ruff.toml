@@ -71,7 +71,7 @@ docstring-quotes = "double"
 ban-relative-imports = "all"
 
 [lint.isort]
-known-first-party = ["osmnx_mapping"]
+known-first-party = ["urban_mapper"]
 
 [lint.pydocstyle]
 convention = "google"

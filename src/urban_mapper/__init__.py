@@ -1,5 +1,14 @@
-from .pipeline import UrbanPipeline
+from loguru import logger
 
+from .mixins import (
+    LoaderMixin,
+    EnricherMixin,
+    VisualMixin,
+    TableVisMixin,
+    AuctusSearchMixin,
+    PipelineGeneratorMixin,
+    UrbanPipelineMixin,
+)
 from .modules import (
     LoaderBase,
     CSVLoader,
@@ -8,10 +17,6 @@ from .modules import (
     GeoImputerBase,
     SimpleGeoImputer,
     AddressGeoImputer,
-    CreatePreprocessor,
-    NetworkBase,
-    OSMNxNetwork,
-    CreateNetwork,
     EnricherBase,
     BaseAggregator,
     SimpleAggregator,
@@ -20,20 +25,16 @@ from .modules import (
     VisualiserBase,
     StaticVisualiser,
     InteractiveVisualiser,
+    GPT4OPipelineGenerator,
+    PipelineGeneratorBase,
+    PipelineGeneratorFactory,
 )
 
-from .mixins import (
-    LoaderMixin,
-    PreprocessingMixin,
-    NetworkMixin,
-    EnricherMixin,
-    VisualMixin,
-    TableVisMixin,
-    AuctusSearchMixin,
-    UrbanPipelineMixin,
-)
+from .urban_mapper import UrbanMapper
 
-from .osmnx_maping import OSMNxMapping
+logger.level("DEBUG_LOW", no=5, color="<blue>", icon="🔍")
+logger.level("DEBUG_MID", no=10, color="<cyan>", icon="☂️")
+logger.level("DEBUG_HIGH", no=15, color="<green>", icon="🔬")
 
 __all__ = [
     "LoaderBase",
@@ -43,10 +44,6 @@ __all__ = [
     "GeoImputerBase",
     "SimpleGeoImputer",
     "AddressGeoImputer",
-    "CreatePreprocessor",
-    "NetworkBase",
-    "OSMNxNetwork",
-    "CreateNetwork",
     "EnricherBase",
     "BaseAggregator",
     "SimpleAggregator",
@@ -56,13 +53,14 @@ __all__ = [
     "StaticVisualiser",
     "InteractiveVisualiser",
     "LoaderMixin",
-    "PreprocessingMixin",
-    "NetworkMixin",
     "EnricherMixin",
     "VisualMixin",
     "TableVisMixin",
     "AuctusSearchMixin",
+    "PipelineGeneratorMixin",
+    "UrbanMapper",
+    "GPT4OPipelineGenerator",
+    "PipelineGeneratorBase",
+    "PipelineGeneratorFactory",
     "UrbanPipelineMixin",
-    "UrbanPipeline",
-    "OSMNxMapping",
 ]

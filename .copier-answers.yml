@@ -15,7 +15,7 @@ project_description: OSMNX Mapping leverages OSMNX and any external csv/shape fi
 project_name: OSMNX-mapping
 python_package_command_line_name: osmnx-mapping
 python_package_distribution_name: osmnx-mapping
-python_package_import_name: osmnx_mapping
+python_package_import_name: urban_mapper
 repository_name: osmnx-mapping
 repository_namespace: simonprovost
 repository_provider: github.com

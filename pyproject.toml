@@ -56,6 +56,9 @@ dependencies = [
     "dependency-injector>=4.45.0",
     "pyarrow>=19.0.1",
     "auctus-search",
+    "loguru>=0.7.3",
+    "thefuzz>=0.22.1",
+    "ell-ai[all]>=0.0.17",
 ]
 
 [project.urls]

@@ -1,0 +1,44 @@
+pipeline:
+  schema:
+    network:
+      class_path: urban_mapper.modules.urban_layer.UrbanLayerBase
+      min: 1
+      max: 1
+    loader:
+      class_path: urban_mapper.modules.loader.LoaderBase
+      min: 1
+      max: 1
+    geo_imputer:
+      class_path: urban_mapper.modules.imputer.GeoImputerBase
+      min: 0
+      max: null
+    geo_filter:
+      class_path: urban_mapper.modules.filter.GeoFilterBase
+      min: 0
+      max: null
+    enricher:
+      class_path: urban_mapper.modules.enricher.EnricherBase
+      min: 1
+      max: null
+    visualiser:
+      class_path: urban_mapper.modules.visualiser.VisualiserBase
+      min: 0
+      max: 1
+
+mixins:
+  loader: urban_mapper.mixins.loader.LoaderMixin
+  enricher: urban_mapper.mixins.enricher.EnricherMixin
+  visual: urban_mapper.mixins.visual.VisualMixin
+  table_vis: urban_mapper.mixins.interactive_table_vis.TableVisMixin
+  auctus: urban_mapper.mixins.auctus.AuctusSearchMixin
+  urban_pipeline: urban_mapper.mixins.urban_pipeline.UrbanPipelineMixin
+  urban_layer: urban_mapper.mixins.urban_layer.UrbanLayerMixin
+  imputer: urban_mapper.mixins.imputer.ImputerMixin
+  filter: urban_mapper.mixins.filter.FilterMixin
+  pipeline_generator: urban_mapper.mixins.pipeline_generator.PipelineGeneratorMixin
+
+namespaces:
+  enricher: urban_mapper.modules.enricher.enrichers
+
+defaults:
+  crs: EPSG:4326
