@@ -1,6 +1,9 @@
 from typing import Optional, List, Union, Dict, Any
+from beartype import beartype
+from urban_mapper import logger
 
 
+@beartype
 class EnricherConfig:
     def __init__(self):
         self.group_by: Optional[List[str]] = None
@@ -19,47 +22,44 @@ class EnricherConfig:
         self.values_from = (
             [values_from] if isinstance(values_from, str) else values_from
         )
+        logger.log(
+            "DEBUG_LOW",
+            f"WITH_DATA: Initialised EnricherConfig with "
+            f"group_by={self.group_by} and values_from={self.values_from}",
+        )
         return self
 
-    def aggregate_with(
-        self,
-        method: str,
-        edge_method: str = "average",
-        output_column: str = None,
-        target: str = "edges",
-    ) -> "EnricherConfig":
+    def aggregate_by(self, method: str, output_column: str = None) -> "EnricherConfig":
         if not self.values_from:
             raise ValueError("Aggregation requires 'values_from'")
-        if target not in ["nodes", "edges", "both"]:
-            raise ValueError("target must be 'nodes', 'edges', or 'both'")
         self.action = "aggregate"
         self.aggregator_config = {"method": method}
         self.enricher_config = {
-            "edge_method": edge_method,
-            "output_column": output_column or f"{method}_{self.values_from[0]}",
-            "target": target,
+            "output_column": output_column or f"{method}_{self.values_from[0]}"
         }
+        logger.log(
+            "DEBUG_LOW",
+            f"AGGREGATE_BY: Initialised EnricherConfig with "
+            f"method={method} and output_column={output_column}",
+        )
         return self
 
-    def count_by(
-        self,
-        edge_method: str = "sum",
-        output_column: str = None,
-        target: str = "edges",
-    ) -> "EnricherConfig":
+    def count_by(self, output_column: str = None) -> "EnricherConfig":
         if self.values_from:
             raise ValueError("Counting does not use 'values_from'")
-        if target not in ["nodes", "edges", "both"]:
-            raise ValueError("target must be 'nodes', 'edges', or 'both'")
         self.action = "count"
         self.aggregator_config = {}
-        self.enricher_config = {
-            "edge_method": edge_method,
-            "output_column": output_column or "counted_value",
-            "target": target,
-        }
+        self.enricher_config = {"output_column": output_column or "counted_value"}
+        logger.log(
+            "DEBUG_LOW",
+            f"COUNT_BY: Initialised EnricherConfig with output_column={output_column}",
+        )
         return self
 
-    def using_enricher(self, enricher_type: str) -> "EnricherConfig":
-        self.enricher_type = enricher_type
+    def with_type(self, primitive_type: str) -> "EnricherConfig":
+        self.enricher_type = primitive_type
+        logger.log(
+            "DEBUG_LOW",
+            f"WITH_TYPE: Initialised EnricherConfig with primitive_type={primitive_type}",
+        )
         return self

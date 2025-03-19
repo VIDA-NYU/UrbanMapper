@@ -1,8 +1,8 @@
 from __future__ import annotations
 from typing import Type, Dict
 from beartype import beartype
-from osmnx_mapping.modules.enricher.abc_enricher import EnricherBase
-from osmnx_mapping.modules.enricher.aggregator.abc_aggregator import BaseAggregator
+from urban_mapper.modules.enricher.abc_enricher import EnricherBase
+from urban_mapper.modules.enricher.aggregator.abc_aggregator import BaseAggregator
 
 ENRICHER_REGISTRY: Dict[str, Type[EnricherBase]] = {}
 AGGREGATOR_REGISTRY: Dict[str, Type[BaseAggregator]] = {}
