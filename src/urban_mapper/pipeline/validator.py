@@ -1,14 +1,13 @@
 from typing import List, Tuple, Union, Dict, Any, Type
 from beartype import beartype
-from osmnx_mapping.modules.loader import LoaderBase
-from osmnx_mapping.modules.preprocessing import (
-    GeoImputerBase,
-    GeoFilterBase,
-)
-from osmnx_mapping.modules.network import NetworkBase
-from osmnx_mapping.modules.enricher import EnricherBase
-from osmnx_mapping.modules.visualiser import VisualiserBase
-from osmnx_mapping.config.container import container
+
+from urban_mapper.modules.imputer import GeoImputerBase
+from urban_mapper.modules.filter import GeoFilterBase
+from urban_mapper.modules.loader import LoaderBase
+from urban_mapper.modules.enricher import EnricherBase
+from urban_mapper.modules.urban_layer.abc_urban_layer import UrbanLayerBase
+from urban_mapper.modules.visualiser import VisualiserBase
+from urban_mapper.config.container import container
 
 
 @beartype
@@ -19,7 +18,7 @@ class PipelineValidator:
             Tuple[
                 str,
                 Union[
-                    NetworkBase,
+                    UrbanLayerBase,
                     LoaderBase,
                     GeoImputerBase,
                     GeoFilterBase,
@@ -47,7 +46,7 @@ class PipelineValidator:
                 )
             unique_names.add(name)
 
-            cls = instance.__class__.__mro__[0]
+            cls = instance.__class__
             found = False
             for base_class in self.pipeline_schema.keys():
                 if issubclass(cls, base_class):
@@ -55,16 +54,12 @@ class PipelineValidator:
                     found = True
                     break
             if not found:
-                raise ValueError(
-                    f"Step '{name}' has invalid type {cls.__name__}. Must be one of: "
-                    f"{', '.join(cls.__name__ for cls in self.pipeline_schema.keys())}."
-                )
+                raise ValueError(f"Step '{name}' has invalid type {cls.__name__}.")
 
         for base_class, constraints in self.pipeline_schema.items():
             count = step_counts[base_class]
             min_count = constraints["min"]
             max_count = constraints["max"]
-
             if count < min_count:
                 raise ValueError(
                     f"At least {min_count} {base_class.__name__} step(s) required, got {count}."
