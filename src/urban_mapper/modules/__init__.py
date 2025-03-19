@@ -1,13 +1,13 @@
 from .loader import LoaderBase, CSVLoader, ShapefileLoader, ParquetLoader
-from .preprocessing import (
+from .imputer import (
     GeoImputerBase,
     SimpleGeoImputer,
     AddressGeoImputer,
+)
+from .filter import (
     GeoFilterBase,
     BoundingBoxFilter,
-    CreatePreprocessor,
 )
-from .network import NetworkBase, OSMNxNetwork, CreateNetwork
 from .enricher import (
     EnricherBase,
     BaseAggregator,
@@ -16,6 +16,21 @@ from .enricher import (
     CreateEnricher,
 )
 from .visualiser import VisualiserBase, StaticVisualiser, InteractiveVisualiser
+
+from .urban_layer import (
+    OSMNXStreets,
+    OSMNXIntersections,
+    Tile2NetSidewalks,
+    Tile2NetCrosswalks,
+    OSMFeatures,
+    UrbanLayerFactory,
+)
+
+from .pipeline_generator import (
+    GPT4OPipelineGenerator,
+    PipelineGeneratorBase,
+    PipelineGeneratorFactory,
+)
 
 __all__ = [
     "LoaderBase",
@@ -27,10 +42,6 @@ __all__ = [
     "AddressGeoImputer",
     "GeoFilterBase",
     "BoundingBoxFilter",
-    "CreatePreprocessor",
-    "NetworkBase",
-    "OSMNxNetwork",
-    "CreateNetwork",
     "EnricherBase",
     "BaseAggregator",
     "SimpleAggregator",
@@ -39,4 +50,13 @@ __all__ = [
     "VisualiserBase",
     "StaticVisualiser",
     "InteractiveVisualiser",
+    "OSMNXStreets",
+    "OSMNXIntersections",
+    "Tile2NetSidewalks",
+    "Tile2NetCrosswalks",
+    "OSMFeatures",
+    UrbanLayerFactory,
+    "GPT4OPipelineGenerator",
+    "PipelineGeneratorBase",
+    "PipelineGeneratorFactory",
 ]

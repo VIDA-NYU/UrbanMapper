@@ -1,0 +1,370 @@
+### Importing Modules
+
+To begin using the `urban_mapper` library, you need to import the core classes:
+
+```python
+from urban_mapper import UrbanMapper
+from urban_mapper.pipeline import UrbanPipeline
+```
+
+- **`UrbanMapper`**: The main entry point for creating pipeline components.
+- **`UrbanPipeline`**: The class used to assemble and execute a pipeline of components.
+
+Instantiate `UrbanMapper` to start building your pipeline:
+
+```python
+om = UrbanMapper(debug="HIGH")  # Optional: set debug level to "LOW", "MID", or "HIGH"
+```
+
+### Pipeline Components Overview
+
+The `urban_mapper` library provides a modular framework for processing urban data. Below is an overview of each module, its purpose, and its available chaining methods.
+
+#### Urban Layers
+- **Purpose**: Represent urban data layers such as streets, intersections, or open street map features, which can be loaded from places (some of them) or files (some of them) and mapped to input data.
+- **Available Types**:
+  - `streets_intersections` (`class OSMNXIntersections`): Street intersections from OSMnx.
+  - `streets_roads` (`class OSMNXStreets`): Street segments from OSMnx.
+  - `streets_sidewalks` (`class Tile2NetSidewalks`): Sidewalks from Tile2Net data.
+  - `streets_crosswalks` (`class Tile2NetCrosswalks`): Crosswalks from Tile2Net data.
+  - `streets_features` (`class OSMFeatures`): Generic OSM features (e.g., buildings, parks).
+- **Chaining Methods**:
+  - `.with_type(type)`: Specify the urban layer type (e.g., `"streets_intersections"`).
+  - `.with_mapping(longitude_column, latitude_column, output_column, threshold_distance=None, **kwargs)`: Define how to map data points to the urban layer based on geographic proximity.
+  - `.from_place(place_name, **kwargs)`: Load the layer from a place name (e.g., `"New York City"`). Supports OSMnx-specific kwargs like `network_type="drive"` or any other from the with_type primitive chosen. < Not supported for `Tile2NetSidewalks` and `Tile2NetCrosswalks` >
+  - `.from_file(file_path, **kwargs)`: Load the layer from a file < supported for `Tile2NetSidewalks` and `Tile2NetCrosswalks` only.
+  - `.from_address(address, **kwargs)`: Load from an address (OSMnx-based layers). < Supported for `OSMNXIntersections` and `OSMNXStreets`, as well as `OSMFeatures` only.
+  - `.from_bbox(bbox, **kwargs)`: Load from a bounding box (tuple of `(minx, miny, maxx, maxy)`). < Supported for `OSMNXIntersections` and `OSMNXStreets`, as well as `OSMFeatures` only.
+  - `.from_point(center_point, dist, **kwargs)`: Load from a point and distance. < Supported for `OSMNXIntersections` and `OSMNXStreets`, as well as `OSMFeatures` only.
+  - `.from_polygon(polygon, **kwargs)`: Load from a Shapely Polygon or MultiPolygon. < Supported for `OSMNXIntersections` and `OSMNXStreets`, as well as `OSMFeatures` only.
+  - `.from_xml(filepath, **kwargs)`: Load from an OSM XML file (OSMnx-based layers). < Supported for `OSMNXIntersections` and `OSMNXStreets`, as well as `OSMFeatures` only.
+  - `.build()`: Finalize and construct the urban layer component instance.
+ - **Complex Scenario**:
+  - When wanting more than one mapping. That means, you want to map the urban layer information to more than one pair of coordinates longitude latitude of your data, you can chain the `.with_mapping` method multiple times. This way, you can map the urban layer information to more than one pair of coordinates in your data.
+  - Nothing else can be chained multiple times, only the `.with_mapping` method.
+
+#### Loaders
+- **Purpose**: Load geospatial data from various file formats or DataFrames into a `GeoDataFrame`.
+- **Available Loaders**:
+  - `CSVLoader`: Loads from CSV files.
+  - `ShapefileLoader`: Loads from Shapefile (.shp) files.
+  - `ParquetLoader`: Loads from Parquet files.
+- **Chaining Methods**:
+  - `.from_file(file_path)`: Load data from a file (CSV, Shapefile, or Parquet). It automatically detects the file type via its extension so no worries here.
+  - `.from_dataframe(dataframe)`: Load from a Pandas or GeoPandas DataFrame from previous potential studies.
+  - `.with_columns(longitude_column, latitude_column)`: Specify columns for longitude and latitude (required for CSV and Parquet).
+  - `.with_crs(crs)`: Set the coordinate reference system (defaults to `EPSG:4326`).
+  - `.build()`: Finalize and construct the loader component.
+- **Complex Scenario**:
+  - When wanting more than data of interest, it is not yet supported. You can make more than one Urban pipeline.
+  - You cannot chain anything here such as `.with_columns` or `.with_crs` multiple times. You can only chain them once. Meaning that if more than one pair of coordinates longitude latitude are in your data, you cannot load them all at once. You can only load one pair of coordinates longitude latitude at a time. We believe only pick the first pair for the with_columns mehtod.
+
+#### Imputers
+- **Purpose**: Handle missing geographic data in the input dataset.
+- **Available Types**:
+  - `SimpleGeoImputer`: Drops rows with missing latitude or longitude.
+  - `AddressGeoImputer`: Imputes coordinates using address data that we geocode (requires an address column).
+- **Chaining Methods**:
+  - `.with_type(type)`: Specify the imputer type (e.g., `"SimpleGeoImputer"`).
+  - `.on_columns(longitude_column, latitude_column)`: Define the columns to impute.
+  - `.build()`: Finalize and construct the imputer component.
+- **Complex Scenario**:
+  - When wanting to impute more than one pair of coordinates longitude and latitude. That means, you want to impute more than one pair of coordinates longitude latitude of your data, you cannot chain `on_columns` multiple times. However, you can instantiate more than one imputer in the pipeline. So simply create more than one instance. e.g. `imputer1 = (om.imputer.with_type("SimpleGeoImputer").on_columns("longitude1", "latitude1").build())` and `imputer2 = (om.imputer.with_type("SimpleGeoImputer").on_columns("longitude2", "latitude2").build())`.
+
+#### Filters
+- **Purpose**: Filter input data based on geographic or other criteria. Meaning you have the data of an entire city, but focussing on a specific area that does not take the whole city. Some data is therefore not needed, let's filter it out.
+- **Available Types**:
+  - `BoundingBoxFilter`: Filters data to the bounding box of the urban layer.
+- **Chaining Methods**:
+  - `.with_type(type)`: Specify the filter type (e.g., `"BoundingBoxFilter"`).
+  - `.build()`: Finalize and construct the filter component.
+- **Complex Scenario**:
+  - When wanting more than one filter. That means, you want to filter more than one urban layer's information out of your data. You can have more than one filter in the pipeline. So simply create more than one instance.
+
+
+#### Enrichers
+- **Purpose**: Enrich the urban layer by aggregating or counting values from the input data.
+- **Available Actions**:
+  - `SingleAggregatorEnricher` (via `aggregate_by`): Aggregates values (e.g., mean, sum).
+  - `CountAggregatorEnricher` (via `count_by`): Counts occurrences.
+- **Chaining Methods**:
+  - `.with_data(group_by, values_from=None)`: Specify the column to group by and optionally the column to aggregate.
+  - `.aggregate_by(method, output_column)`: Aggregate values using a method (e.g., `"mean"`, `"sum"`, `"median"`, `"min"`, `"max"`) and name the output column.
+  - `.count_by(output_column)`: Count occurrences and name the output column.
+  - `.build()`: Finalize and construct the enricher component.
+- **Complex Scenario**:
+  - When wanting more than one enriching workflow. That means, you want to enrich your urban layer with more than one enriching workflow based one more than one pair of coordinates longitude latitude of your data, you cannot chain multiple times. However, you can have more than one enricher in the pipeline. So simply create more than one instance.
+
+
+#### Visualizers
+- **Purpose**: Visualize the enriched urban layer interactively or statically.
+- **Available Types**:
+  - `Interactive` (`InteractiveVisualiser`): Interactive maps using Folium.
+  - `Static` (`StaticVisualiser`): Static plots using Matplotlib.
+- **Chaining Methods**:
+  - `.with_type(type)`: Specify the visualizer type (e.g., `"Interactive"`).
+  - `.with_style(style_dict)`: Customize visualization (e.g., `{"tiles": "CartoDB dark_matter"}` for Interactive, `{"cmap": "viridis"}` for Static). Can be using any of the available styles for Folium or Matplotlib.
+  - `.build()`: Finalize and construct the visualizer component.
+- **Complex Scenario**:
+  - When wanting more than one visualizer. You cannot. It is not yet supported. You can make more than one Urban pipeline nonetheless.
+
+### Component Usage Examples
+
+Below are examples demonstrating how to configure each component.
+
+#### Urban Layer
+```python
+urban_layer = (
+    om.urban_layer
+    .with_type("streets_intersections")
+    .with_mapping(
+        longitude_column="longitude", # this is the column name in the input urban data
+        latitude_column="latitude", # this is the column name in the input urban data
+        output_column="nearest_intersection", # this is the column name that will be created in the input urban data, mapping / showing the index to the the nearest information from the urban layer.
+        threshold_distance=50 # this is the distance in meters / unit of the coordinate reference syste, to consider when mapping the input urban data to the urban layer.
+    )
+    .from_place("Downtown Brooklyn, New York City, USA", network_type="drive") # Network type is only available with OSMNX layers
+    .build()
+)
+```
+- Loads street intersections from Downtown Brooklyn and maps data points to the nearest intersection within 50 meters.
+
+#### Loader
+```python
+loader = (
+    om.loader
+    .from_file("./data/PLUTO/csv/pluto.csv")
+    .with_columns(longitude_column="longitude", latitude_column="latitude")
+    .build()
+)
+```
+- Loads a CSV file and specifies longitude and latitude columns for geopandas.
+
+#### Imputer
+```python
+imputer = (
+    om.imputer
+    .with_type("SimpleGeoImputer")
+    .on_columns("longitude", "latitude")
+    .build()
+)
+```
+- Drops rows with missing longitude or latitude values.
+
+#### Filter
+```python
+filter_step = (
+    om.filter
+    .with_type("BoundingBoxFilter")
+    .build()
+)
+```
+- Filters data to the urban layer’s bounding box.
+
+#### Enricher
+```python
+# Aggregate example
+enricher_agg = (
+    om.enricher
+    .with_data(group_by="nearest_intersection", values_from="numfloors")
+    .aggregate_by(method="mean", output_column="avg_floors")
+    .build()
+)
+
+# Count example
+enricher_count = (
+    om.enricher
+    .with_data(group_by="nearest_intersection")
+    .count_by(output_column="intersection_count")
+    .build()
+)
+```
+- `enricher_agg`: Computes the average number of floors per intersection.
+- `enricher_count`: Counts occurrences per intersection.
+
+#### Visualizer
+```python
+# Interactive
+visualiser_interactive = (
+    om.visual
+    .with_type("Interactive")
+    .with_style({"tiles": "CartoDB dark_matter"})
+    .build()
+)
+
+# Static
+visualiser_static = (
+    om.visual
+    .with_type("Static")
+    .with_style({"cmap": "viridis"})
+    .build()
+)
+```
+- `visualiser_interactive`: Creates an interactive map with a dark theme.
+- `visualiser_static`: Creates a static plot with a viridis colormap.
+
+### Full Pipeline Example
+
+Here’s a complete example showing how to assemble and execute a pipeline:
+
+```python
+from urban_mapper import UrbanMapper
+from urban_mapper.pipeline import UrbanPipeline
+
+# Initialize UrbanMapper
+om = UrbanMapper(debug="HIGH")
+
+# Define components
+urban_layer = (
+    om.urban_layer
+    .with_type("streets_intersections")
+    .with_mapping(
+        longitude_column="longitude",
+        latitude_column="latitude",
+        output_column="nearest_intersection",
+        threshold_distance=50,
+    )
+    .from_place("Downtown Brooklyn, New York City, USA", network_type="drive")
+    .build()
+)
+
+loader = (
+    om.loader
+    .from_file("./data/PLUTO/csv/pluto.csv")
+    .with_columns(longitude_column="longitude", latitude_column="latitude")
+    .build()
+)
+
+imputer = (
+    om.imputer
+    .with_type("SimpleGeoImputer")
+    .on_columns("longitude", "latitude")
+    .build()
+)
+
+filter_step = (
+    om.filter
+    .with_type("BoundingBoxFilter")
+    .build()
+)
+
+enricher = (
+    om.enricher
+    .with_data(group_by="nearest_intersection", values_from="numfloors")
+    .aggregate_by(method="mean", output_column="avg_floors")
+    .build()
+)
+
+visualiser = (
+    om.visual
+    .with_type("Interactive")
+    .with_style({"tiles": "CartoDB dark_matter"})
+    .build()
+)
+
+# Create the pipeline
+pipeline = UrbanPipeline([
+    ("urban_layer", urban_layer),
+    ("loader", loader),
+    ("imputer", imputer),
+    ("filter", filter_step),
+    ("enricher", enricher),
+    ("visualiser", visualiser),
+])
+
+# Preview the pipeline structure workflow
+pipeline.preview(format="ascii")
+
+# Compose the pipeline (validate and prepare for execution)
+pipeline.compose()
+
+# Transform the data
+mapped_data, enriched_layer = pipeline.transform()
+
+# Visualize the results
+fig = pipeline.visualise(["avg_floors"])
+fig  # Displays the interactive map in a Jupyter notebook
+```
+
+This pipeline:
+1. Loads street intersections from Downtown Brooklyn.
+2. Loads building data from a CSV file.
+3. Drops rows with missing coordinates.
+4. Filters data to the urban layer’s bounding box.
+5. Computes the average number of floors per intersection.
+6. Visualizes the enriched data interactively.
+
+### Pipeline Structure and Methods
+
+#### Pipeline Structure
+- The `UrbanPipeline` is constructed with a list of tuples, where each tuple contains:
+  - A step name (string, e.g., `"urban_layer"`).
+  - A component instance (e.g., `urban_layer`).
+- Example:
+  ```python
+  pipeline = UrbanPipeline([
+      ("urban_layer", urban_layer),
+      ("loader", loader),
+      # ... other steps
+  ])
+  ```
+
+#### Available Methods
+- **`preview(format="ascii")`**:
+  - Displays the pipeline’s configuration.
+  - Options: `"ascii"` (text output) or `"json"` (dictionary output).
+  - Example: `pipeline.preview(format="ascii")`
+
+- **`compose()`**:
+  - Validates and prepares the pipeline for execution.
+  - Example: `pipeline.compose()`
+
+- **`transform()`**:
+  - Executes the pipeline, returning a tuple of `(mapped_data, enriched_layer)`:
+    - `mapped_data`: The processed input data with mapped columns.
+    - `enriched_layer`: The urban layer with enriched data.
+  - Example: `mapped_data, enriched_layer = pipeline.transform()`
+
+- **`compose_transform()`**:
+  - Combines the `compose()` and `transform()` methods.
+  - Returns a tuple of `(mapped_data, enriched_layer)`.
+  - Example: `mapped_data, enriched_layer = pipeline.compose_transform()`
+
+- **`visualise(columns)`**:
+  - Visualizes the enriched urban layer using the specified columns.
+  - Returns a figure object (Folium map for Interactive, Matplotlib figure for Static).
+  - Example: `fig = pipeline.visualise(["avg_floors"])`
+
+- **`save(filepath)`**:
+  - Saves the pipeline configuration to a file for later use.
+  - Example: `pipeline.save("pipeline.joblib")`
+
+- **`load(filepath)`**:
+  - Loads a saved pipeline from a file.
+  - Example: `pipeline = UrbanPipeline.load("pipeline.joblib")`
+
+
+ #### OUTPUT Style For The User
+
+- 1) I would like all texts-based output to be like if it was a python script, hence starting with `#` and then the text.
+ This is to make it easier for the user to copy and paste the text into their python script.
+
+- 2) I would like the code to always breath enough, nothing too inliner-based.
+ This is to make it easier for the user to read the text and understand what is going on.
+
+- 3) I would like the code to always be between three backticks, so that the user can easily copy and paste the code into their python script.
+
+- 4) I would like no markdown or latex formatting in the text-based output. This is because jupyter notebook cell's output does not support markdown or latex formatting.
+
+- 5) Lastly, I would like you to always start the answer with the following header, without the backticks:
+
+##################### 🥐 WELCOME TO UrbanMapper 🥐 #####################
+
+# Here is the proposed pipeline for your urban data processing.
+# Feel free to copy and paste the code snippets into your next cell or script!
+
+< The rest of the text-based output here >
+
+####################################################################
+
+Cheers :)!
