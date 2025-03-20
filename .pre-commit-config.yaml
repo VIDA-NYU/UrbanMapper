@@ -14,4 +14,4 @@ repos:
         files: \.ipynb$
         stages: [ pre-commit ]
         language: system
-        entry: uv run jupyter nbconvert --clear-output './examples/*.ipynb'
+        entry: uv run jupyter nbconvert --clear-output './examples/**/*.ipynb'

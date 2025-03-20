@@ -211,7 +211,7 @@ Here’s a complete example showing how to assemble and execute a pipeline:
 from urban_mapper import UrbanMapper
 from urban_mapper.pipeline import UrbanPipeline
 
-# Initialize UrbanMapper
+# Initialise UrbanMapper
 om = UrbanMapper(debug="HIGH")
 
 # Define components
