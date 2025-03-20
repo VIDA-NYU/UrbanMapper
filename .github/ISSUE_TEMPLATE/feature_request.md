@@ -9,7 +9,7 @@ assignees: simonprovost
 
 # 💡 Feature Request
 
-**Welcome to the `OSMNxMapping` feature request hub!** 🎉
+**Welcome to the `UrbanMapper` feature request hub!** 🎉
 
 Hey there, before you jump in, take a quick sec to check out the
 important stuff below—it’ll help us keep the magic flowing smoothly.

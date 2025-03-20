@@ -10,7 +10,7 @@ Nothing easier!
 Fork and clone the repository, then:
 
 ```bash
-cd osmnx-mapping
+cd urban-mapper
 make setup
 ```
 
@@ -31,7 +31,7 @@ make setup
 
 You now have the dependencies installed.
 
-You can run the application with `make run osmnx-mapping [ARGS...]`.
+You can run the application with `make run urban-mapper [ARGS...]`.
 
 Run `make help` to see all the available actions!
 

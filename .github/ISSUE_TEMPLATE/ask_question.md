@@ -8,7 +8,7 @@ assignees: ''
 
 # ❓ Ask a Question
 
-**Welcome to the `OSMNxMapping` ask a question hub!** 🎉
+**Welcome to the `UrbanMapper` ask a question hub!** 🎉
 
 Got a question about the project? You’re in the right place! 😊 Before you start, please check these quick boxes to keep things running smoothly:
 

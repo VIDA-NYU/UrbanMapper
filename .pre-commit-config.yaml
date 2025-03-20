@@ -12,6 +12,6 @@ repos:
       - id: jupyter-nb-clear-output
         name: Clear Jupyter Notebook Outputs
         files: \.ipynb$
-        stages: [ commit ]
+        stages: [ pre-commit ]
         language: system
-        entry: uv run jupyter nbconvert --clear-output './examples/*.ipynb'
+        entry: uv run jupyter nbconvert --clear-output './examples/**/*.ipynb'

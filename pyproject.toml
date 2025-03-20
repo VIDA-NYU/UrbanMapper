@@ -3,7 +3,7 @@ requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
 [project]
-name = "osmnx-mapping"
+name = "urban-mapper"
 description = "OSMNX Mapping leverages OSMNX and any external csv/shape files to map them interchangeably. Say, a function f(x, y) where x=OSMNX and y=user_data. Hence, OSMNX Mapping allow for `y` to be playing with `x` and vice-versa."
 authors = [{name = "Provost Simon", email = "sgp9504@nyu.edu"}]
 license = {text = "MIT"}
@@ -56,16 +56,19 @@ dependencies = [
     "dependency-injector>=4.45.0",
     "pyarrow>=19.0.1",
     "auctus-search",
+    "loguru>=0.7.3",
+    "thefuzz>=0.22.1",
+    "ell-ai[all]>=0.0.17",
 ]
 
 [project.urls]
-Homepage = "https://simonprovost.github.io/osmnx-mapping"
-Documentation = "https://simonprovost.github.io/osmnx-mapping"
-Changelog = "https://simonprovost.github.io/osmnx-mapping/changelog"
-Repository = "https://github.com/simonprovost/osmnx-mapping"
-Issues = "https://github.com/simonprovost/osmnx-mapping/issues"
-Discussions = "https://github.com/simonprovost/osmnx-mapping/discussions"
-Gitter = "https://gitter.im/osmnx-mapping/community"
+Homepage = "https://simonprovost.github.io/urban-mapper"
+Documentation = "https://simonprovost.github.io/urban-mapper"
+Changelog = "https://simonprovost.github.io/urban-mapper/changelog"
+Repository = "https://github.com/simonprovost/urban-mapper"
+Issues = "https://github.com/simonprovost/urban-mapper/issues"
+Discussions = "https://github.com/simonprovost/urban-mapper/discussions"
+Gitter = "https://gitter.im/urban-mapper/community"
 Funding = "https://github.com/sponsors/simonprovost"
 
 [tool.pdm.build]

@@ -8,7 +8,7 @@ assignees: simonprovost
 
 # 🐛 Bug Report
 
-**Welcome to the `OSMNxMapping` bug report hub!** 🎉
+**Welcome to the `UrbanMapper` bug report hub!** 🎉
 
 Hey there, before you jump in, take a quick sec to check out the important stuff below—it’ll help us keep the magic flowing smoothly.
 
