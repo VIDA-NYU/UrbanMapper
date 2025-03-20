@@ -71,7 +71,8 @@ following [these instructions](https://docs.astral.sh/uv/getting-started/install
 
 1. Clone the `UrbanMapper` repository:
    ```bash
-   git clone https://github.com/yourusername/UrbanMapper.git
+   git clone git@github.com:VIDA-NYU/UrbanMapper.git
+   # git clone https://github.com/VIDA-NYU/UrbanMapper.git
    cd UrbanMapper
    ```
 2. Lock and sync dependencies with `uv`:
@@ -117,8 +118,8 @@ the hands-on examples in the `examples/` directory. These **Jupyter notebooks** 
 from loading and prepping data to enriching urban layers and visualising the results. Whether you are new to urban data
 or an experienced urban planner, these examples will help you realise `UrbanMapper`'s full potential.
 
-The `examples/` directory is organised into two main sections: `Basics/` and `End-to-End/`. Here’s a quick gander at 
-what each notebook covers:
+The `examples/` directory is organised into three main sections: `Basics/`, `End-to-End/` and `Study Cases`. 
+Here’s a quick gander at what each notebook covers:
 
 <details>
 <summary>
@@ -173,6 +174,40 @@ These notebooks showcase complete workflows, tying all the pieces together.
 - **[2] pipeline_way.ipynb**: Achieve the same results with an `urban pipeline`.
     - *What it does*: Streamlines the step-by-step workflow into a single `UrbanPipeline`, showcasing efficiency and
       reusability.
+</details>
+
+
+<details>
+<summary>
+
+### 📊 **Study Cases**
+
+</summary>
+
+Ready to see `UrbanMapper` tackle real urban challenges? These study cases apply the library to specific datasets, showing its power in action.
+
+#### 🚗 **Downtown BK Collisions Study**
+
+- **[1] Downtown_BK_Collisions_StepByStep.ipynb**: Get hands-on with collision data analysis.
+  - *What it does*: Step-by-step, you’ll load collision data, build an intersections layer, handle missing coordinates, filter to Downtown Brooklyn, map collisions to intersections, count them up, and visualize the hotspots.
+
+- **[2] Downtown_BK_Collisions_Pipeline.ipynb**: Simplify the process with a pipeline.
+  - *What it does*: Wraps the entire workflow into an `UrbanPipeline`, making it a breeze to run and reuse.
+
+- **[3] Downtown_BK_Collisions_Advanced_Pipeline.ipynb**: Take it up a notch with extra metrics.
+  - *What it does*: Adds total injuries and fatalities per intersection to the analysis, giving you a fuller picture of collision impacts.
+
+#### 🚖 **Downtown BK Taxi Trips Study**
+
+- **[1] Downtown_BK_Taxi_Trips_StepByStep.ipynb**: Dive into taxi trip data analysis.
+  - *What it does*: Manually load taxi data, create a streets layer, impute missing coordinates, filter to the area, map pickups and dropoffs to streets, count them, and visualize the busiest spots.
+
+- **[2] Downtown_BK_Taxi_Trips_Pipeline.ipynb**: Streamline your taxi trip analysis.
+  - *What it does*: Bundles all the steps into an `UrbanPipeline`, saving you time and effort.
+
+- **[3] Downtown_BK_Taxi_Trips_Advanced_Pipeline.ipynb**: Get more insights with additional enrichments.
+  - *What it does*: Adds average fare amount per pickup segment, helping you understand not just where taxis go, but how much they earn.
+
 </details>
 
 ---
