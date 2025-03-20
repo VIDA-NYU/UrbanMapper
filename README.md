@@ -106,12 +106,16 @@ Voila 🥐 ! You’re all set to explore `UrbanMapper` in Jupyter Lab.
 More will be added in the future, e.g `Subway`/`Tube` networks, `States`/`Provinces`, `Countries`/
 `Regions`, `Continents`, etc.
 
-## 🚀 Getting Started with UrbanMapper
+**References**
 
-Are you ready to dive into urban data analysis? The simplest approach to get started with UrbanMapper is to look through
-the hands-on examples in the 'examples/' directory. These **Jupyter notebooks** walk you through the library's features,
+- [OSMNx](https://osmnx.readthedocs.io/en/stable/) –– [Tile2Net](https://github.com/VIDA-NYU/tile2net) –– [OSM Cities Features](https://wiki.openstreetmap.org/wiki/Map_features)
+
+# 🚀 Getting Started with UrbanMapper
+
+Are you ready to dive into urban data analysis? The simplest approach to get started with `UrbanMapper` is to look through
+the hands-on examples in the `examples/` directory. These **Jupyter notebooks** walk you through the library's features,
 from loading and prepping data to enriching urban layers and visualising the results. Whether you are new to urban data
-or an experienced urban planner, these examples will help you realise UrbanMapper's full potential.
+or an experienced urban planner, these examples will help you realise `UrbanMapper`'s full potential.
 
 The `examples/` directory is organised into two main sections: `Basics/` and `End-to-End/`. Here’s a quick gander at 
 what each notebook covers:
@@ -119,7 +123,7 @@ what each notebook covers:
 <details>
 <summary>
 
-# 🧩 **Basics**
+### 🧩 **Basics**
 
 </summary>
 
@@ -156,7 +160,7 @@ what each notebook covers:
 <details>
 <summary>
 
-# 🔄 **End-to-End**
+### 🔄 **End-to-End**
 
 </summary>
 
