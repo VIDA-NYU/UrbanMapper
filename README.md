@@ -113,13 +113,14 @@ More will be added in the future, e.g `Subway`/`Tube` networks, `States`/`Provin
 
 # 🚀 Getting Started with UrbanMapper
 
-Are you ready to dive into urban data analysis? The simplest approach to get started with `UrbanMapper` is to look through
+Are you ready to dive into urban data analysis? The simplest approach to get started with `UrbanMapper` is to look
+through
 the hands-on examples in the `examples/` directory. These **Jupyter notebooks** walk you through the library's features,
 from loading and prepping data to enriching urban layers and visualising the results. Whether you are new to urban data
 or an experienced urban planner, these examples will help you realise `UrbanMapper`'s full potential.
 
-The `examples/` directory is organised into three main sections: `Basics/`, `End-to-End/` and `Study Cases`. 
-Here’s a quick gander at what each notebook covers:
+The `examples/` directory is organised into three main sections: `Basics/`, `End-to-End/`, `Study Cases` and
+`External Libraries Usages`. Here’s a quick gander at what each notebook covers:
 
 <details>
 <summary>
@@ -129,20 +130,21 @@ Here’s a quick gander at what each notebook covers:
 </summary>
 
 - **[1] loader.ipynb**: Learn how to `load urban data` from various formats into `UrbanMapper`.
-    - *What it does*: Demonstrates loading PLUTO (CSV), taxi trip (Parquet), and NYC Pluto buildings information 
-    (Shapefile) data, setting the stage for analysis.
+    - *What it does*: Demonstrates loading PLUTO (CSV), taxi trip (Parquet), and NYC Pluto buildings information
+      (Shapefile) data, setting the stage for analysis.
 
 - **[2] urban_layer.ipynb**: Discover how to create `urban layers` like `streets` or `intersections`.
     - *What it does*: Builds a streets layer for `Downtown Brooklyn` and previews it statically.
 
 - **[3] imputer.ipynb**: Handle missing geospatial data with ease.
     - *What it does*: Uses `SimpleGeoImputer` to fill in missing coordinates in PLUTO data.
-    Shows that there are more imputer techniques available and that more could be implemented.
+      Shows that there are more imputer techniques available and that more could be implemented.
 
 - **[4] filter.ipynb**: Focus your data on specific areas. Usecase: You have data for the entire _Big Apple_, but you
-    focus on `Downtown Brooklyn`. It does not make sense to keep the entire data that is not in `Downtown Brooklyn`, does it ?
+  focus on `Downtown Brooklyn`. It does not make sense to keep the entire data that is not in `Downtown Brooklyn`, does
+  it ?
     - *What it does*: Applies a `BoundingBoxFilter` to keep only data within `Downtown Brooklyn`.
-    Shows that there could be more filter techniques added.
+      Shows that there could be more filter techniques added.
 
 - **[5] enricher.ipynb**: Add valuable insights to your `urban layers` from your `urban data` information.
     - *What it does*: Enriches a `street intersections` layer with `average building floors` from `PLUTO data`.
@@ -155,7 +157,8 @@ Here’s a quick gander at what each notebook covers:
 
 - **[8] pipeline_generator.ipynb**: Let an `LLM` suggest a pipeline for you based on your user input.
     - *What it does*: Generates a pipeline from a description (e.g., mapping PLUTO data to intersections) using a given
-    `LLM` of interest from those available. For the example we use `gpt-4o`.
+      `LLM` of interest from those available. For the example we use `gpt-4o`.
+
 </details>
 
 <details>
@@ -168,12 +171,13 @@ Here’s a quick gander at what each notebook covers:
 These notebooks showcase complete workflows, tying all the pieces together.
 
 - **[1] step_by_step.ipynb**: Walk through the `UrbanMapper` workflow manually.
-    - *What it does*: `Loads` PLUTO data, creates an intersections `urban layer`, `imputes`, `filters`, `enriches` with 
-    average floors, and `visualises` it—all _step-by-step_.
+    - *What it does*: `Loads` PLUTO data, creates an intersections `urban layer`, `imputes`, `filters`, `enriches` with
+      average floors, and `visualises` it—all _step-by-step_.
 
 - **[2] pipeline_way.ipynb**: Achieve the same results with an `urban pipeline`.
     - *What it does*: Streamlines the step-by-step workflow into a single `UrbanPipeline`, showcasing efficiency and
       reusability.
+
 </details>
 
 
@@ -184,29 +188,57 @@ These notebooks showcase complete workflows, tying all the pieces together.
 
 </summary>
 
-Ready to see `UrbanMapper` tackle real urban challenges? These study cases apply the library to specific datasets, showing its power in action.
+Ready to see `UrbanMapper` tackle real urban challenges? These study cases apply the library to specific datasets,
+showing its power in action.
 
 #### 🚗 **Downtown BK Collisions Study**
 
 - **[1] Downtown_BK_Collisions_StepByStep.ipynb**: Get hands-on with collision data analysis.
-  - *What it does*: Step-by-step, you’ll load collision data, build an intersections layer, handle missing coordinates, filter to Downtown Brooklyn, map collisions to intersections, count them up, and visualize the hotspots.
+    - *What it does*: Step-by-step, you’ll load collision data, build an intersections layer, handle missing
+      coordinates, filter to Downtown Brooklyn, map collisions to intersections, count them up, and visualize the
+      hotspots.
 
 - **[2] Downtown_BK_Collisions_Pipeline.ipynb**: Simplify the process with a pipeline.
-  - *What it does*: Wraps the entire workflow into an `UrbanPipeline`, making it a breeze to run and reuse.
+    - *What it does*: Wraps the entire workflow into an `UrbanPipeline`, making it a breeze to run and reuse.
 
 - **[3] Downtown_BK_Collisions_Advanced_Pipeline.ipynb**: Take it up a notch with extra metrics.
-  - *What it does*: Adds total injuries and fatalities per intersection to the analysis, giving you a fuller picture of collision impacts.
+    - *What it does*: Adds total injuries and fatalities per intersection to the analysis, giving you a fuller picture
+      of collision impacts.
 
 #### 🚖 **Downtown BK Taxi Trips Study**
 
 - **[1] Downtown_BK_Taxi_Trips_StepByStep.ipynb**: Dive into taxi trip data analysis.
-  - *What it does*: Manually load taxi data, create a streets layer, impute missing coordinates, filter to the area, map pickups and dropoffs to streets, count them, and visualize the busiest spots.
+    - *What it does*: Manually load taxi data, create a streets layer, impute missing coordinates, filter to the area,
+      map pickups and dropoffs to streets, count them, and visualize the busiest spots.
 
 - **[2] Downtown_BK_Taxi_Trips_Pipeline.ipynb**: Streamline your taxi trip analysis.
-  - *What it does*: Bundles all the steps into an `UrbanPipeline`, saving you time and effort.
+    - *What it does*: Bundles all the steps into an `UrbanPipeline`, saving you time and effort.
 
 - **[3] Downtown_BK_Taxi_Trips_Advanced_Pipeline.ipynb**: Get more insights with additional enrichments.
-  - *What it does*: Adds average fare amount per pickup segment, helping you understand not just where taxis go, but how much they earn.
+    - *What it does*: Adds average fare amount per pickup segment, helping you understand not just where taxis go, but
+      how much they earn.
+
+</details>
+
+<details>
+<summary>
+
+### 🔗 **External Libraries Usage**
+
+</summary>
+
+UrbanMapper doesn’t work in isolation—it plays nicely with other powerful tools to make your user journey experience
+even more pleasing. To showcase these integrations, we’ve prepared a few notebooks that demonstrate how to use the
+mixins that bridge UrbanMapper with other libraries.
+
+- **[1] auctus_search.ipynb**: Find and load datasets with `Auctus` from https://auctus.vida-nyu.org/.
+    - *What it does*: Demonstrates searching for urban datasets (like PLUTO) using `Auctus`, a data discovery tool. You’ll
+      learn to profile datasets and load them directly into UrbanMapper for analysis.
+    See further in https://github.com/VIDA-NYU/auctus_search.
+
+- **[2] interactive_table_vis.ipynb**: Visualise data interactively with `Skrub` from https://skrub-data.org/.
+    - *What it does*: Loads a CSV file and uses Skrub’s interactive table visualisation to explore the data. This
+      integration allows you to sort, filter, and inspect your urban datasets dynamically.
 
 </details>
 
