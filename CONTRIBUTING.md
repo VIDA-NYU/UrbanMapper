@@ -34,13 +34,6 @@ dependencies due to its speed and simplicity, though other package managers like
 
 - **Install `uv`**: Follow the [official instructions](https://docs.astral.sh/uv/getting-started/installation/) to
   install `uv`.
-- **Clone Auctus**: For alpha development, clone the [Auctus repository](https://github.com/VIDA-NYU/auctus_search) into
-  the same parent directory as UrbanMapper:
-  ```bash
-  git clone git@github.com:VIDA-NYU/auctus_search.git
-  ```
-  This ensures `auctus_search` is built from source during installation. Future releases will make this available on
-  PyPi, simplifying the process.
 
 ### Steps to Set Up
 
