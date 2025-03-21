@@ -8,7 +8,7 @@ description = "OSMNX Mapping leverages OSMNX and any external csv/shape files to
 authors = [{name = "Provost Simon", email = "sgp9504@nyu.edu"}]
 license = {text = "MIT"}
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 keywords = []
 dynamic = ["version"]
 classifiers = [
@@ -81,7 +81,7 @@ source-includes = [
 ]
 
 [tool.uv.sources]
-auctus-search = { path = "../auctus_search" }
+auctus-search = { git = "https://github.com/VIDA-NYU/auctus_search.git", branch = "main" }
 
 [dependency-groups]
 dev = [

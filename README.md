@@ -7,9 +7,12 @@
       <img src="https://img.shields.io/static/v1?label=UV&message=compliant&color=2196F3&style=for-the-badge&logo=UV&logoColor=white" alt="UV compliant">
       <img src="https://img.shields.io/static/v1?label=RUFF&message=compliant&color=9C27B0&style=for-the-badge&logo=RUFF&logoColor=white" alt="RUFF compliant">
       <img src="https://img.shields.io/badge/Jupyter-F37626?style=for-the-badge&logo=jupyter&logoColor=white" alt="Jupyter">
-      <img src="https://img.shields.io/static/v1?label=Python&message=3.9%2B&color=3776AB&style=for-the-badge&logo=python&logoColor=white" alt="Python 3.9+">
+      <img src="https://img.shields.io/static/v1?label=Python&message=3.10%2B&color=3776AB&style=for-the-badge&logo=python&logoColor=white" alt="Python 3.10+">
+      <img src="https://img.shields.io/github/actions/workflow/status/VIDA-NYU/UrbanMapper/compile.yaml?style=for-the-badge&label=Compilation&logo=githubactions&logoColor=white" alt="Compilation Status">
    </p>
 </div>
+
+
 
 ![UrbanMapper Cover](public/resources/urban_mapper_cover.png)
 
@@ -50,22 +53,10 @@ It is also the fastest known to date on the OSS market and manages dependencies 
 activation (Biggest flex!). If you do not want to use `uv`, there are no issues, but we will cover it in the upcoming
 documentation – not as follows.
 
-First, ensure `uv` is installed on your machine by
-following [these instructions](https://docs.astral.sh/uv/getting-started/installation/).
-
 ### Prerequisites
 
-- Install `uv` as described above.
-- Clone `Auctus` (required for alpha development) into the same parent directory as `UrbanMapper`. Use:
-  ```bash
-  git clone git@github.com:VIDA-NYU/auctus_search.git
-  ```
-  This step ensures `pyproject.toml` builds `auctus_search` from source during installation, though we plan for
-  `auctus_search` to become a PyPi package (`uv add auctus_search` or `pip install auctus_search`) in future releases.
-
-> [!NOTE]  
-> Future versions will simplify this process: `auctus_search` will move to PyPi, removing the need for manual cloning,
-> and Jupyter extensions will auto-install via `pyproject.toml` configuration.
+- First, ensure `uv` is installed on your machine by
+following [these instructions](https://docs.astral.sh/uv/getting-started/installation/).
 
 ### Steps
 
