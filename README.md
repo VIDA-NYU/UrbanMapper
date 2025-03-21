@@ -58,6 +58,15 @@ documentation – not as follows.
 - First, ensure `uv` is installed on your machine by
 following [these instructions](https://docs.astral.sh/uv/getting-started/installation/).
 
+- Second, make sure you install at least `python` 3.10+. If you are not sure:
+
+```bash
+uv python install 3.10
+uv python pin 3.10
+```
+
+And you are ready to go! 🎉
+
 ### Steps
 
 1. Clone the `UrbanMapper` repository:

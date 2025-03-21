@@ -13,7 +13,7 @@ from urban_mapper.pipeline import UrbanPipeline
 Instantiate `UrbanMapper` to start building your pipeline:
 
 ```python
-om = UrbanMapper(debug="HIGH")  # Optional: set debug level to "LOW", "MID", or "HIGH"
+um = UrbanMapper()  # Optional: set debug level to "LOW", "MID", or "HIGH"
 ```
 
 ### Pipeline Components Overview
@@ -69,7 +69,7 @@ The `urban_mapper` library provides a modular framework for processing urban dat
   - `.on_columns(longitude_column, latitude_column)`: Define the columns to impute.
   - `.build()`: Finalize and construct the imputer component.
 - **Complex Scenario**:
-  - When wanting to impute more than one pair of coordinates longitude and latitude. That means, you want to impute more than one pair of coordinates longitude latitude of your data, you cannot chain `on_columns` multiple times. However, you can instantiate more than one imputer in the pipeline. So simply create more than one instance. e.g. `imputer1 = (om.imputer.with_type("SimpleGeoImputer").on_columns("longitude1", "latitude1").build())` and `imputer2 = (om.imputer.with_type("SimpleGeoImputer").on_columns("longitude2", "latitude2").build())`.
+  - When wanting to impute more than one pair of coordinates longitude and latitude. That means, you want to impute more than one pair of coordinates longitude latitude of your data, you cannot chain `on_columns` multiple times. However, you can instantiate more than one imputer in the pipeline. So simply create more than one instance. e.g. `imputer1 = (um.imputer.with_type("SimpleGeoImputer").on_columns("longitude1", "latitude1").build())` and `imputer2 = (um.imputer.with_type("SimpleGeoImputer").on_columns("longitude2", "latitude2").build())`.
 
 #### Filters
 - **Purpose**: Filter input data based on geographic or other criteria. Meaning you have the data of an entire city, but focussing on a specific area that does not take the whole city. Some data is therefore not needed, let's filter it out.
@@ -115,7 +115,7 @@ Below are examples demonstrating how to configure each component.
 #### Urban Layer
 ```python
 urban_layer = (
-    om.urban_layer
+    um.urban_layer
     .with_type("streets_intersections")
     .with_mapping(
         longitude_column="longitude", # this is the column name in the input urban data
@@ -132,7 +132,7 @@ urban_layer = (
 #### Loader
 ```python
 loader = (
-    om.loader
+    um.loader
     .from_file("./data/PLUTO/csv/pluto.csv")
     .with_columns(longitude_column="longitude", latitude_column="latitude")
     .build()
@@ -143,7 +143,7 @@ loader = (
 #### Imputer
 ```python
 imputer = (
-    om.imputer
+    um.imputer
     .with_type("SimpleGeoImputer")
     .on_columns("longitude", "latitude")
     .build()
@@ -154,7 +154,7 @@ imputer = (
 #### Filter
 ```python
 filter_step = (
-    om.filter
+    um.filter
     .with_type("BoundingBoxFilter")
     .build()
 )
@@ -165,7 +165,7 @@ filter_step = (
 ```python
 # Aggregate example
 enricher_agg = (
-    om.enricher
+    um.enricher
     .with_data(group_by="nearest_intersection", values_from="numfloors")
     .aggregate_by(method="mean", output_column="avg_floors")
     .build()
@@ -173,7 +173,7 @@ enricher_agg = (
 
 # Count example
 enricher_count = (
-    om.enricher
+    um.enricher
     .with_data(group_by="nearest_intersection")
     .count_by(output_column="intersection_count")
     .build()
@@ -186,7 +186,7 @@ enricher_count = (
 ```python
 # Interactive
 visualiser_interactive = (
-    om.visual
+    um.visual
     .with_type("Interactive")
     .with_style({"tiles": "CartoDB dark_matter"})
     .build()
@@ -194,7 +194,7 @@ visualiser_interactive = (
 
 # Static
 visualiser_static = (
-    om.visual
+    um.visual
     .with_type("Static")
     .with_style({"cmap": "viridis"})
     .build()
@@ -216,7 +216,7 @@ om = UrbanMapper(debug="HIGH")
 
 # Define components
 urban_layer = (
-    om.urban_layer
+    um.urban_layer
     .with_type("streets_intersections")
     .with_mapping(
         longitude_column="longitude",
@@ -229,34 +229,34 @@ urban_layer = (
 )
 
 loader = (
-    om.loader
+    um.loader
     .from_file("./data/PLUTO/csv/pluto.csv")
     .with_columns(longitude_column="longitude", latitude_column="latitude")
     .build()
 )
 
 imputer = (
-    om.imputer
+    um.imputer
     .with_type("SimpleGeoImputer")
     .on_columns("longitude", "latitude")
     .build()
 )
 
 filter_step = (
-    om.filter
+    um.filter
     .with_type("BoundingBoxFilter")
     .build()
 )
 
 enricher = (
-    om.enricher
+    um.enricher
     .with_data(group_by="nearest_intersection", values_from="numfloors")
     .aggregate_by(method="mean", output_column="avg_floors")
     .build()
 )
 
 visualiser = (
-    om.visual
+    um.visual
     .with_type("Interactive")
     .with_style({"tiles": "CartoDB dark_matter"})
     .build()
