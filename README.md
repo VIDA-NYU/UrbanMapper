@@ -205,6 +205,11 @@ showing its power in action.
     - *What it does*: Adds total injuries and fatalities per intersection to the analysis, giving you a fuller picture
       of collision impacts.
 
+- **[4] Downtown_BK_Collisions_Advanced_Pipeline_Extras.ipynb**: Get more insights with additional enrichments than [3].
+    - *What it does*: Adds more metrics than [3] by using the custom function from the enricher module allowing us more
+      flexibility but needed more coding.
+
+
 #### 🚖 **Downtown BK Taxi Trips Study**
 
 - **[1] Downtown_BK_Taxi_Trips_StepByStep.ipynb**: Dive into taxi trip data analysis.
@@ -217,6 +222,10 @@ showing its power in action.
 - **[3] Downtown_BK_Taxi_Trips_Advanced_Pipeline.ipynb**: Get more insights with additional enrichments.
     - *What it does*: Adds average fare amount per pickup segment, helping you understand not just where taxis go, but
       how much they earn.
+
+- **[4] Downtown_BK_Collisions_Advanced_Pipeline_Extras.ipynb**: Get more insights with additional enrichments than [3].
+    - *What it does*: Adds more metrics than [3] by using the custom function from the enricher module allowing us more
+      flexibility but needed more coding.
 
 </details>
 
