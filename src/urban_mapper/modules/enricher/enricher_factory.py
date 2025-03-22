@@ -6,7 +6,6 @@ from .factory.config import EnricherConfig
 from .factory.validation import (
     validate_group_by,
     validate_action,
-    validate_aggregation_method,
 )
 from .factory.registries import ENRICHER_REGISTRY, register_enricher
 from urban_mapper.modules.enricher.aggregator.aggregators.simple_aggregator import (
@@ -77,13 +76,19 @@ class EnricherFactory:
         validate_action(self.config)
 
         if self.config.action == "aggregate":
-            validate_aggregation_method(self.config.aggregator_config["method"])
+            method = self.config.aggregator_config["method"]
+            if isinstance(method, str):
+                if method not in AGGREGATION_FUNCTIONS:
+                    raise ValueError(f"Unknown aggregation method '{method}'")
+                aggregation_function = AGGREGATION_FUNCTIONS[method]
+            elif callable(method):
+                aggregation_function = method
+            else:
+                raise ValueError("Aggregation method must be a string or a callable")
             aggregator = SimpleAggregator(
                 group_by_column=self.config.group_by[0],
                 value_column=self.config.values_from[0],
-                aggregation_function=AGGREGATION_FUNCTIONS[
-                    self.config.aggregator_config["method"]
-                ],
+                aggregation_function=aggregation_function,
             )
         elif self.config.action == "count":
             aggregator = CountAggregator(
@@ -101,7 +106,7 @@ class EnricherFactory:
             output_column=self.config.enricher_config["output_column"],
             config=self.config,
         )
-        if self._preview is not None:
+        if self._preview:
             self.preview(format=self._preview["format"])
         return self._instance
 

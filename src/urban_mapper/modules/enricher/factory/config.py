@@ -1,4 +1,4 @@
-from typing import Optional, List, Union, Dict, Any
+from typing import Optional, List, Union, Dict, Any, Callable
 from beartype import beartype
 from urban_mapper import logger
 
@@ -29,19 +29,20 @@ class EnricherConfig:
         )
         return self
 
-    def aggregate_by(self, method: str, output_column: str = None) -> "EnricherConfig":
+    def aggregate_by(
+        self, method: Union[str, Callable], output_column: str = None
+    ) -> "EnricherConfig":
         if not self.values_from:
             raise ValueError("Aggregation requires 'values_from'")
         self.action = "aggregate"
         self.aggregator_config = {"method": method}
-        self.enricher_config = {
-            "output_column": output_column or f"{method}_{self.values_from[0]}"
-        }
-        logger.log(
-            "DEBUG_LOW",
-            f"AGGREGATE_BY: Initialised EnricherConfig with "
-            f"method={method} and output_column={output_column}",
-        )
+        if output_column:
+            self.enricher_config["output_column"] = output_column
+        else:
+            method_name = method if isinstance(method, str) else "custom"
+            self.enricher_config["output_column"] = (
+                f"{method_name}_{self.values_from[0]}"
+            )
         return self
 
     def count_by(self, output_column: str = None) -> "EnricherConfig":
