@@ -50,6 +50,11 @@ This study maps **taxi pickups and dropoffs** in **Downtown Brooklyn** to **stre
   - Enrichment with average fare per segment.
   - Visualization of multiple metrics (e.g., pickup counts, dropoff counts, fares).
 
+- **[4] Downtown_BK_Taxi_Trips_Advanced_Pipeline_Extras.ipynb**  
+  An advanced pipeline enriching the layer with multiple more metrics than [3] by using the custom function from the 
+  enricher module allowing us more flexibility but needed more coding.
+
+
 </details>
 
 ---

@@ -44,6 +44,10 @@ This study maps **Downtown Brooklyn motor vehicle collisions** to **street inter
 - **[3] Downtown_BK_Collisions_Advanced_Pipeline.ipynb**  
   An advanced pipeline enriching the layer with multiple metrics, like total injuries and fatalities per intersection.
 
+- **[4] Downtown_BK_Collisions_Advanced_Pipeline_Extras.ipynb**  
+  An advanced pipeline enriching the layer with multiple more metrics than [3] by using the custom function from the 
+  enricher module allowing us more flexibility but needed more coding.
+
 Each notebook is modular and easily adaptable to your own geospatial datasets!
 
 </details>

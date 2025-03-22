@@ -30,12 +30,17 @@ class PreviewBuilder:
         )
         steps.append("├── Step 2: Action")
         if self.config.action == "aggregate":
-            method = self.config.aggregator_config.get("method", "<Not Set>")
+            method = self.config.aggregator_config.get("method")
+            method_display = (
+                method
+                if isinstance(method, str)
+                else (method.__name__ if hasattr(method, "__name__") else "custom")
+            )
             steps.extend(
                 [
                     "│   ├── Type: Aggregate",
                     "│   ├── Aggregator: SimpleAggregator",
-                    f"│   ├── Method: {method}",
+                    f"│   ├── Method: {method_display}",
                     f"│   └── Output Column: {self.config.enricher_config.get('output_column', '<Not Set>')}",
                 ]
             )
@@ -44,11 +49,9 @@ class PreviewBuilder:
                 [
                     "│   ├── Type: Count",
                     "│   ├── Aggregator: CountAggregator",
-                    f"│   └── Output Column: {self.config.enricher_config.get('output_column', '<Not Set>')}",
+                    f"│   └── Output Column: {self.config.enricher_config.get('output_column', 'count')}",
                 ]
             )
-        else:
-            steps.append("│   ├── Type: <Not Set>")
         steps.append("└── Step 3: Enricher")
         steps.append(f"    ├── Type: {self.config.enricher_type}")
         status = "Ready" if self._is_config_complete() else "Incomplete"
