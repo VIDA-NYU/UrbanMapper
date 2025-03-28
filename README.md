@@ -20,8 +20,9 @@
 ___
 
 > [!IMPORTANT]
-> 1) We highly recommend exploring the `/example` folder for Jupyter Notebook-based examples 🎉
-> 2) The following library is under active development and is not yet _stable_. Expect bugs & frequent changes!
+> 1) We support [JupyterGIS](https://github.com/geojupyter/jupytergis) as a bridge to export your Urban Pipeline for collaborative exploration 🏂 Shout-out to @mfisher87 for his tremendous help.
+> 2) We highly recommend exploring the `/example` folder for Jupyter Notebook-based examples 🎉
+> 3) The following library is under active development and is not yet _stable_. Expect bugs & frequent changes!
 
 ## 🌆 UrbanMapper –– In a Nutshell
 
@@ -154,6 +155,7 @@ The `examples/` directory is organised into three main sections: `Basics/`, `End
 
 - **[7] urban_pipeline.ipynb**: Streamline your workflow with a pipeline. Save and Share!
     - *What it does*: Builds and runs an `urban pipeline` that `loads`, `processes`, `enriches`, and `visualises`.
+    - *Bonus*: We also show how to export your urban pipeline to [JupyterGIS](https://github.com/geojupyter/jupytergis).
 
 - **[8] pipeline_generator.ipynb**: Let an `LLM` suggest a pipeline for you based on your user input.
     - *What it does*: Generates a pipeline from a description (e.g., mapping PLUTO data to intersections) using a given

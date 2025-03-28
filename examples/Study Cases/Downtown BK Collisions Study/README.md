@@ -48,6 +48,9 @@ This study maps **Downtown Brooklyn motor vehicle collisions** to **street inter
   An advanced pipeline enriching the layer with multiple more metrics than [3] by using the custom function from the 
   enricher module allowing us more flexibility but needed more coding.
 
+  As a bonus, we also show how to export the pipeline to [JupyterGIS](https://github.com/geojupyter/jupytergis) 
+  for collaborative exploration and visualisation.
+
 Each notebook is modular and easily adaptable to your own geospatial datasets!
 
 </details>

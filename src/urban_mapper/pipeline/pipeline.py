@@ -1,5 +1,10 @@
 import json
-from typing import Tuple, Any, List, Union
+import os
+import uuid
+from pathlib import Path
+
+from urban_mapper import logger
+from typing import Tuple, Any, List, Union, Optional
 import geopandas as gpd
 from beartype import beartype
 from urban_mapper.modules.loader import LoaderBase
@@ -14,6 +19,8 @@ import joblib
 from sklearn.utils._bunch import Bunch
 
 from urban_mapper.utils import require_attributes_not_none
+
+from jupytergis import GISDocument
 
 
 @beartype
@@ -130,3 +137,136 @@ class UrbanPipeline:
             print(json.dumps(preview_data, indent=2, default=str))
         else:
             raise ValueError(f"Unsupported format '{format}'.")
+
+    @require_attributes_not_none("steps")
+    def to_jgis(
+        self,
+        filepath: str,
+        base_maps=None,
+        include_urban_layer: bool = True,
+        urban_layer_name: str = "Enriched Layer",
+        urban_layer_type: Optional[str] = None,
+        urban_layer_opacity: float = 1.0,
+        additional_layers=None,
+        zoom: int = 20,
+        raise_on_existing: bool = True,
+        **kwargs,
+    ) -> None:
+        if additional_layers is None:
+            additional_layers = []
+        if base_maps is None:
+            base_maps = [
+                {
+                    "url": "http://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+                    "attribution": "© OpenStreetMap contributors",
+                    "name": "Base Map",
+                    "opacity": 0.9,
+                }
+            ]
+        if GISDocument is None:
+            raise ImportError(
+                "jupytergis is required for this functionality. "
+                "Install it with `uv add jupytergis`."
+            )
+        if not self.executor._composed:
+            raise ValueError("Pipeline not composed. Call compose() first.")
+
+        if filepath and os.path.exists(filepath):
+            if raise_on_existing:
+                raise FileExistsError(
+                    f"File already exists: {filepath}. "
+                    f"Set raise_on_existing=False for less strictness or delete the file prior to running `to_jgis()`."
+                )
+            else:
+                path = Path(filepath)
+                stem = path.stem
+                suffix = path.suffix
+                random_str = uuid.uuid4().hex[:8]
+                new_stem = f"{stem}_{random_str}"
+                new_filepath = path.with_name(f"{new_stem}{suffix}")
+                original_filepath = filepath
+                filepath = str(new_filepath)
+                logger.log(
+                    "DEBUG_LOW",
+                    f"File exists: {original_filepath}. Using new filename: {filepath}",
+                )
+
+        enriched_layer = self.executor.urban_layer.layer
+        projection = self.executor.urban_layer.coordinate_reference_system
+        bbox = enriched_layer.total_bounds
+        extent = [bbox[0], bbox[1], bbox[2], bbox[3]]
+
+        doc = GISDocument(
+            path=None,
+            projection=projection,
+            extent=extent,
+            zoom=zoom,
+        )
+
+        for bm in base_maps:
+            doc.add_raster_layer(
+                url=bm["url"],
+                name=bm["name"],
+                attribution=bm.get("attribution", ""),
+                opacity=bm.get("opacity", 1.0),
+            )
+
+        if include_urban_layer:
+            if urban_layer_type is None:
+                geometry_type = enriched_layer.geometry.geom_type.iloc[0]
+                if geometry_type in ["Point", "MultiPoint"]:
+                    urban_layer_type = "circle"
+                elif geometry_type in ["LineString", "MultiLineString"]:
+                    urban_layer_type = "line"
+                elif geometry_type in ["Polygon", "MultiPolygon"]:
+                    urban_layer_type = "fill"
+                else:
+                    raise ValueError(f"Unsupported geometry type: {geometry_type}")
+            geojson_data = json.loads(enriched_layer.to_json())
+            doc.add_geojson_layer(
+                data=geojson_data,
+                name=urban_layer_name,
+                type=urban_layer_type,
+                opacity=urban_layer_opacity,
+                **kwargs,
+            )
+
+        for layer in additional_layers:
+            data = layer["data"]
+            if isinstance(data, gpd.GeoDataFrame):
+                data = json.loads(data.to_json())
+            elif not isinstance(data, dict):
+                raise ValueError(
+                    "Additional layer 'data' must be a GeoDataFrame or GeoJSON dict."
+                )
+            layer_type = layer.get("type")
+            if layer_type is None:
+                features = data["features"]
+                if not features:
+                    raise ValueError("Empty GeoJSON data in additional layer.")
+                geometry_type = features[0]["geometry"]["type"]
+                if geometry_type in ["Point", "MultiPoint"]:
+                    layer_type = "circle"
+                elif geometry_type in ["LineString", "MultiLineString"]:
+                    layer_type = "line"
+                elif geometry_type in ["Polygon", "MultiPolygon"]:
+                    layer_type = "fill"
+                else:
+                    raise ValueError(f"Unsupported geometry type: {geometry_type}")
+            doc.add_geojson_layer(
+                data=data,
+                name=layer["name"],
+                type=layer_type,
+                opacity=layer.get("opacity", 1.0),
+                **layer.get("kwargs", {}),
+            )
+
+        data = {
+            "layers": doc._layers.to_py(),
+            "sources": doc._sources.to_py(),
+            "options": doc._options.to_py(),
+            "layerTree": doc._layerTree.to_py(),
+            "metadata": doc._metadata.to_py(),
+        }
+        with open(filepath, "w") as f:
+            json.dump(data, f, indent=2)
