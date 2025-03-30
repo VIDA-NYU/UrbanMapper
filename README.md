@@ -20,7 +20,7 @@
 ___
 
 > [!IMPORTANT]
-> 1) We support [JupyterGIS](https://github.com/geojupyter/jupytergis) as a bridge to export your Urban Pipeline for collaborative exploration 🏂 Shout-out to @mfisher87 for his tremendous help.
+> 1) We support [JupyterGIS](https://github.com/geojupyter/jupytergis) as a bridge to export your Urban Pipeline for collaborative exploration 🏂 Shout-out to [@mfisher87](https://github.com/mfisher87) for his tremendous help.
 > 2) We highly recommend exploring the `/example` folder for Jupyter Notebook-based examples 🎉
 > 3) The following library is under active development and is not yet _stable_. Expect bugs & frequent changes!
 
