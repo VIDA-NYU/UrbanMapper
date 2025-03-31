@@ -92,6 +92,60 @@ And you are ready to go! 🎉
 
 Voila 🥐 ! You’re all set to explore `UrbanMapper` in Jupyter Lab.
 
+<details>
+
+<summary>
+🫣 Different ways to install UrbanMapper (e.g w/ pip)
+</summary>
+
+<br>
+
+> **Note on Alternative Dependency Management Methods**
+>
+> While we strongly recommend using `uv` for managing dependencies due to its superior speed and ease of use, 
+> alternative methods are available for those who prefer not to use `uv`. These alternatives are not as efficient, 
+> as they are slower and require more manual intervention.
+>
+> Please be aware that the following assumptions are made for these alternative methods:
+> - You have `pip` installed.
+> - You are working within a virtual environment or a conda environment.
+>
+> If you are not currently using a virtual or conda environment, we highly recommend setting one up to prevent 
+> potential conflicts and maintain a clean development workspace. For assistance, refer to the following resources:
+> - [Creating a Python virtual environment](https://docs.python.org/3/library/venv.html)
+> - [Managing conda environments](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)
+
+1. Clone the `UrbanMapper` repository:
+   ```bash
+    git clone git@github.com:VIDA-NYU/UrbanMapper.git
+    # git clone https://github.com/VIDA-NYU/UrbanMapper.git
+    cd UrbanMapper
+   ```
+2. Install `UrbanMapper` dependencies using `pip`:
+   ```bash
+    pip install -r requirements.txt
+   ```
+   
+3. Install `UrbanMapper`:
+   ```bash
+    pip install -e ./UrbanMapper
+    # or if you ensure you are in your virtual environment, cd UrbanMapper && pip install -e .
+    # Note that -e means "editable" mode, which allows you to make changes to the code and see them reflected.
+    # If you don't want to use editable mode, you can just run pip install ./UrbanMapper
+    ```
+   
+4. (Recommended) Install Jupyter extensions for interactive visualisations requiring Jupyter widgets:
+   ```bash
+    jupyter labextension install @jupyter-widgets/jupyterlab-manager
+   ```
+
+5. Launch Jupyter Lab to explore `UrbanMapper`:
+   ```bash
+    jupyter lab
+   ```
+   
+</details>
+
 # 🗺️ Urban Layers Currently Supported
 
 `UrbanMapper` currently supports the following urban layers:
