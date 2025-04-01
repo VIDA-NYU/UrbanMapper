@@ -217,6 +217,7 @@ The `examples/` directory is organised into three main sections: `Basics/`, `End
 
 - **[7] urban_pipeline.ipynb**: Streamline your workflow with a pipeline. Save and Share!
     - *What it does*: Builds and runs an `urban pipeline` that `loads`, `processes`, `enriches`, and `visualises`.
+    - *Beyond*: It shows how to `save` and `load` your pipeline for future use such as e.g ML-exploration, as one is being showcased.
     - *Bonus*: We also show how to export your urban pipeline to [JupyterGIS](https://github.com/geojupyter/jupytergis).
 
 - **[8] pipeline_generator.ipynb**: Let an `LLM` suggest a pipeline for you based on your user input.
