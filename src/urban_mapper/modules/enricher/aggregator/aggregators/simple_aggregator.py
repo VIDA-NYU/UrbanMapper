@@ -27,7 +27,8 @@ class SimpleAggregator(BaseAggregator):
         self.value_column = value_column
         self.aggregation_function = aggregation_function
 
-    def _aggregate(self, input_dataframe: pd.DataFrame) -> pd.Series:
+    def _aggregate(self, input_dataframe: pd.DataFrame) -> pd.DataFrame:
         grouped = input_dataframe.groupby(self.group_by_column)
         aggregated = grouped[self.value_column].agg(self.aggregation_function)
-        return aggregated
+        indices = grouped.apply(lambda g: list(g.index))
+        return pd.DataFrame({"value": aggregated, "indices": indices})

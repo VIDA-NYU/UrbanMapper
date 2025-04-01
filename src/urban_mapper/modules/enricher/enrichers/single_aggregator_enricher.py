@@ -21,6 +21,7 @@ class SingleAggregatorEnricher(EnricherBase):
         super().__init__(config)
         self.aggregator = aggregator
         self.output_column = output_column
+        self.debug = config.debug
 
     def _enrich(
         self,
@@ -28,10 +29,18 @@ class SingleAggregatorEnricher(EnricherBase):
         urban_layer: UrbanLayerBase,
         **kwargs,
     ) -> UrbanLayerBase:
-        aggregated_series = self.aggregator.aggregate(input_geodataframe)
-        urban_layer.layer[self.output_column] = urban_layer.layer.index.map(
-            aggregated_series
-        ).fillna(0)
+        aggregated_df = self.aggregator.aggregate(input_geodataframe)
+        enriched_values = (
+            aggregated_df["value"].reindex(urban_layer.layer.index).fillna(0)
+        )
+        urban_layer.layer[self.output_column] = enriched_values
+        if self.debug:
+            indices_values = (
+                aggregated_df["indices"]
+                .reindex(urban_layer.layer.index)
+                .apply(lambda x: x if isinstance(x, list) else [])
+            )
+            urban_layer.layer[f"DEBUG_{self.output_column}"] = indices_values
         return urban_layer
 
     def preview(self, format: str = "ascii") -> Any:
