@@ -29,6 +29,10 @@ class EnricherFactory:
         self.config.with_data(*args, **kwargs)
         return self
 
+    def with_debug(self, debug: bool = True) -> "EnricherFactory":
+        self.config.debug = debug
+        return self
+
     def aggregate_by(self, *args, **kwargs) -> "EnricherFactory":
         self.config.aggregate_by(*args, **kwargs)
         return self

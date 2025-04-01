@@ -12,6 +12,7 @@ class EnricherConfig:
         self.aggregator_config: Dict[str, Any] = {}
         self.enricher_type: str = "SingleAggregatorEnricher"
         self.enricher_config: Dict[str, Any] = {}
+        self.debug: bool = False
 
     def with_data(
         self,
