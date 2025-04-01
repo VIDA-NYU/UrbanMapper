@@ -54,6 +54,14 @@ It is also the fastest known to date on the OSS market and manages dependencies 
 activation (Biggest flex!). If you do not want to use `uv`, there are no issues, but we will cover it in the upcoming
 documentation – not as follows.
 
+> [!TIP]
+> **UV's readings recommendations:**
+> - [Python Packaging in Rust](https://astral.sh/blog/uv)
+> - [A Year of UV](https://www.bitecode.dev/p/a-year-of-uv-pros-cons-and-should)
+> - [UV Is All You Need](https://dev.to/astrojuanlu/python-packaging-is-great-now-uv-is-all-you-need-4i2d)
+> - [State of the Art Python 2024](https://4zm.org/2024/10/28/state-of-the-art-python-in-2024.html)
+> - [Data Scientist, From School to Work](https://towardsdatascience.com/data-scientist-from-school-to-work-part-i/)
+
 ### Prerequisites
 
 - First, ensure `uv` is installed on your machine by
