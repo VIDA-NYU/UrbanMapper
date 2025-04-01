@@ -2,25 +2,23 @@ import json
 import os
 import uuid
 from pathlib import Path
-
-from urban_mapper import logger
 from typing import Tuple, Any, List, Union, Optional
+
+import dill
 import geopandas as gpd
 from beartype import beartype
-from urban_mapper.modules.loader import LoaderBase
-from urban_mapper.modules.imputer import GeoImputerBase
-from urban_mapper.modules.filter import GeoFilterBase
+from jupytergis import GISDocument
+from sklearn.utils._bunch import Bunch
+from urban_mapper import logger
 from urban_mapper.modules.enricher import EnricherBase
+from urban_mapper.modules.filter import GeoFilterBase
+from urban_mapper.modules.imputer import GeoImputerBase
+from urban_mapper.modules.loader import LoaderBase
 from urban_mapper.modules.urban_layer.abc_urban_layer import UrbanLayerBase
 from urban_mapper.modules.visualiser import VisualiserBase
 from urban_mapper.pipeline.executor import PipelineExecutor
 from urban_mapper.pipeline.validator import PipelineValidator
-import joblib
-from sklearn.utils._bunch import Bunch
-
 from urban_mapper.utils import require_attributes_not_none
-
-from jupytergis import GISDocument
 
 
 @beartype
@@ -67,9 +65,7 @@ class UrbanPipeline:
         raise KeyError(f"Step '{name}' not found in pipeline.")
 
     @require_attributes_not_none("steps")
-    def compose(
-        self,
-    ) -> "UrbanPipeline":
+    def compose(self) -> "UrbanPipeline":
         self.executor.compose()
         return self
 
@@ -78,9 +74,7 @@ class UrbanPipeline:
         return self.executor.transform()
 
     @require_attributes_not_none("steps")
-    def compose_transform(
-        self,
-    ) -> Tuple[gpd.GeoDataFrame, UrbanLayerBase]:
+    def compose_transform(self) -> Tuple[gpd.GeoDataFrame, UrbanLayerBase]:
         return self.executor.compose_transform()
 
     @require_attributes_not_none("steps")
@@ -89,11 +83,23 @@ class UrbanPipeline:
 
     @require_attributes_not_none("steps")
     def save(self, filepath: str) -> None:
-        joblib.dump(self, filepath)
+        path = Path(filepath)
+        if path.suffix != ".dill":
+            raise ValueError("Filepath must have '.dill' extension.")
+        with open(filepath, "wb") as f:
+            dill.dump(self, f)
 
     @staticmethod
     def load(filepath: str) -> "UrbanPipeline":
-        return joblib.load(filepath)
+        with open(filepath, "rb") as f:
+            pipeline = dill.load(f)
+        if not pipeline.executor._composed:
+            print(
+                "WARNING: ",
+                "Loaded pipeline has not been composed. Make sure to call compose() "
+                "before using methods that require composition.",
+            )
+        return pipeline
 
     def __getitem__(self, key: str) -> Any:
         return self.get_step(key)
