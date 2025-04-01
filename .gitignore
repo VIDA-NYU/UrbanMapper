@@ -47,3 +47,4 @@ cache/
 
 # Model
 *.joblib
+*.dill

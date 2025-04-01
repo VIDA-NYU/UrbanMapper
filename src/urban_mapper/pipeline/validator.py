@@ -54,7 +54,11 @@ class PipelineValidator:
                     found = True
                     break
             if not found:
-                raise ValueError(f"Step '{name}' has invalid type {cls.__name__}.")
+                raise TypeError(
+                    f"Step '{name}' is not an instance of a valid step class."
+                    f"It is currently of type '{cls.__name__}'. "
+                    f"Did you forget to call .build() on this step?"
+                )
 
         for base_class, constraints in self.pipeline_schema.items():
             count = step_counts[base_class]
