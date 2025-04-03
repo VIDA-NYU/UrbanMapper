@@ -63,6 +63,12 @@ class Tile2NetSidewalks(UrbanLayerBase):
             distance_col="distance_to_sidewalk",
         )
         mapped_data[output_column] = mapped_data["feature_id"]
+
+        if _reset_layer_index:
+            self.layer = self.layer.reset_index()
+
+        mapped_data = mapped_data[~mapped_data.index.duplicated(keep="first")]
+
         return self.layer, mapped_data.drop(
             columns=["feature_id", "distance_to_sidewalk", "index_right"]
         )
