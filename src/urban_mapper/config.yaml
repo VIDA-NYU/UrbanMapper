@@ -36,6 +36,7 @@ mixins:
   imputer: urban_mapper.mixins.imputer.ImputerMixin
   filter: urban_mapper.mixins.filter.FilterMixin
   pipeline_generator: urban_mapper.mixins.pipeline_generator.PipelineGeneratorMixin
+  jupyter_gis: urban_mapper.mixins.jupyter_gis.JupyterGisMixin
 
 namespaces:
   enricher: urban_mapper.modules.enricher.enrichers
