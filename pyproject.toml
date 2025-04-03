@@ -58,8 +58,9 @@ dependencies = [
     "loguru>=0.7.3",
     "thefuzz>=0.22.1",
     "ell-ai[all]>=0.0.17",
-    "jupytergis>=0.4.2",
     "dill>=0.3.9",
+    "jupytergis==0.4.4",
+    "jupyter-resource-usage>=1.1.1",
 ]
 
 [project.urls]
