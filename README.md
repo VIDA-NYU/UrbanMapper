@@ -141,7 +141,7 @@ Voila 🥐 ! You’re all set to explore `UrbanMapper` in Jupyter Lab.
     # Note that -e means "editable" mode, which allows you to make changes to the code and see them reflected.
     # If you don't want to use editable mode, you can just run pip install ./UrbanMapper
     ```
-   
+
 4. (Recommended) Install Jupyter extensions for interactive visualisations requiring Jupyter widgets:
    ```bash
     jupyter labextension install @jupyter-widgets/jupyterlab-manager
@@ -151,7 +151,7 @@ Voila 🥐 ! You’re all set to explore `UrbanMapper` in Jupyter Lab.
    ```bash
     jupyter lab
    ```
-   
+
 </details>
 
 # 🗺️ Urban Layers Currently Supported
@@ -217,7 +217,8 @@ The `examples/` directory is organised into three main sections: `Basics/`, `End
 
 - **[7] urban_pipeline.ipynb**: Streamline your workflow with a pipeline. Save and Share!
     - *What it does*: Builds and runs an `urban pipeline` that `loads`, `processes`, `enriches`, and `visualises`.
-    - *Beyond*: It shows how to `save` and `load` your pipeline for future use such as e.g ML-exploration, as one is being showcased.
+    - *Beyond*: It shows how to `save` and `load` your pipeline for future use such as e.g ML-exploration, as one is
+      being showcased.
     - *Bonus*: We also show how to export your urban pipeline to [JupyterGIS](https://github.com/geojupyter/jupytergis).
 
 - **[8] pipeline_generator.ipynb**: Let an `LLM` suggest a pipeline for you based on your user input.
@@ -274,7 +275,6 @@ showing its power in action.
     - *What it does*: Adds more metrics than [3] by using the custom function from the enricher module allowing us more
       flexibility but needed more coding.
 
-
 #### 🚖 **Downtown BK Taxi Trips Study**
 
 - **[1] Downtown_BK_Taxi_Trips_StepByStep.ipynb**: Dive into taxi trip data analysis.
@@ -306,13 +306,20 @@ even more pleasing. To showcase these integrations, we’ve prepared a few noteb
 mixins that bridge UrbanMapper with other libraries.
 
 - **[1] auctus_search.ipynb**: Find and load datasets with `Auctus` from https://auctus.vida-nyu.org/.
-    - *What it does*: Demonstrates searching for urban datasets (like PLUTO) using `Auctus`, a data discovery tool. You’ll
+    - *What it does*: Demonstrates searching for urban datasets (like PLUTO) using `Auctus`, a data discovery tool.
+      You’ll
       learn to profile datasets and load them directly into UrbanMapper for analysis.
-    See further in https://github.com/VIDA-NYU/auctus_search.
+      See further in https://github.com/VIDA-NYU/auctus_search.
 
 - **[2] interactive_table_vis.ipynb**: Visualise data interactively with `Skrub` from https://skrub-data.org/.
     - *What it does*: Loads a CSV file and uses Skrub’s interactive table visualisation to explore the data. This
       integration allows you to sort, filter, and inspect your urban datasets dynamically.
+
+- **[3] Multi Urban Pipeline via Jupyter GIS**: Combines collisions, taxi trips, and 311 NYC sidewalk inquiries for a 
+  holistic view of urban dynamics. It showcases UrbanMapper’s capability to handle multiple urban pipeline and visualise
+  them on a single interactive and shareable collaborative map. 
+  This comprehensive approach allows for a deeper understanding of urban interactions, potentially uncovering 
+  correlations between traffic incidents, taxi usage, and public concerns.
 
 </details>
 
