@@ -4,6 +4,10 @@ from .urban_layers import (
     Tile2NetSidewalks,
     Tile2NetCrosswalks,
     OSMFeatures,
+    RegionCities,
+    RegionNeighborhoods,
+    RegionStates,
+    RegionCountries,
 )
 
 from .urban_layer_factory import UrbanLayerFactory
@@ -16,8 +20,11 @@ URBAN_LAYER_FACTORY = {
     "streets_sidewalks": Tile2NetSidewalks,
     "streets_crosswalks": Tile2NetCrosswalks,
     "streets_features": OSMFeatures,
+    "region_cities": RegionCities,
+    "region_neighborhoods": RegionNeighborhoods,
+    "region_states": RegionStates,
+    "region_countries": RegionCountries,
 }
-
 __all__ = [
     "UrbanLayerBase",
     "OSMNXStreets",
@@ -25,6 +32,10 @@ __all__ = [
     "Tile2NetSidewalks",
     "Tile2NetCrosswalks",
     "OSMFeatures",
+    "RegionCities",
+    "RegionNeighborhoods",
+    "RegionStates",
+    "RegionCountries",
     "URBAN_LAYER_FACTORY",
     "UrbanLayerFactory",
 ]

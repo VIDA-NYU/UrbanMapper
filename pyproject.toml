@@ -62,6 +62,7 @@ dependencies = [
     "jupytergis==0.4.4",
     "jupyter-resource-usage>=1.1.1",
     "nbstripout>=0.8.1",
+    "geopy>=2.4.1",
 ]
 
 [project.urls]
