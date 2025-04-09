@@ -64,7 +64,7 @@ This study maps **taxi pickups and dropoffs** in **Downtown Brooklyn** to **stre
 
 ## 🥐 Getting Started
 
-1. **Install UrbanMapper**: Follow the [installation guide](https://github.com/yourusername/UrbanMapper#installation).
+1. **Install UrbanMapper**: Follow the [installation guide](https://github.com/VIDA-NYU/UrbanMapper#installation).
 2. **Prepare Data**: Ensure your taxi trip data includes:
    - `pickup_longitude`, `pickup_latitude`
    - `dropoff_longitude`, `dropoff_latitude`
@@ -88,7 +88,7 @@ Your insights could shape better urban solutions!
 - **Extended Metrics**: Add trip distance or passenger counts.
 - **Scalability**: Adapt for larger regions or datasets.
 
-Have suggestions? Fork the repo or share ideas in [issues](https://github.com/yourusername/UrbanMapper/issues)!
+Have suggestions? Fork the repo or share ideas in [issues](https://github.com/VIDA-NYU/UrbanMapper/issues)!
 
 ---
 
@@ -100,4 +100,4 @@ Have suggestions? Fork the repo or share ideas in [issues](https://github.com/yo
 
 ## Licence
 
-Shared under the [MIT Licence](https://github.com/yourusername/UrbanMapper/blob/main/LICENCE).
+Shared under the [MIT Licence](https://github.com/VIDA-NYU/UrbanMapper/blob/main/LICENCE).
