@@ -277,15 +277,7 @@ class UrbanPipeline:
                 **layer.get("kwargs", {}),
             )
 
-        data = {
-            "layers": doc._layers.to_py(),
-            "sources": doc._sources.to_py(),
-            "options": doc._options.to_py(),
-            "layerTree": doc._layerTree.to_py(),
-            "metadata": doc._metadata.to_py(),
-        }
-        with open(filepath, "w") as f:
-            json.dump(data, f, indent=2)
+        doc.save_as(filepath)
 
     @staticmethod
     def serialize_value(value):
