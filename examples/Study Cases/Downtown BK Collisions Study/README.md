@@ -59,7 +59,7 @@ Each notebook is modular and easily adaptable to your own geospatial datasets!
 
 ## 🥐 Getting Started
 
-1. **Install UrbanMapper**: Follow the [installation guide](https://github.com/yourusername/UrbanMapper#installation) in the main repo.
+1. **Install UrbanMapper**: Follow the [installation guide](https://github.com/VIDA-NYU/UrbanMapper#installation) in the main repo.
 2. **Explore Notebooks**: Open the `/examples/Study Cases` folder in Jupyter to dive into collision data analysis.
 3. **Customize**: Tweak the pipelines to analyze collisions or other data in your city of choice!
 
@@ -79,7 +79,7 @@ Your analysis could help make streets safer!
 - **Time-Based Analysis**: Explore collision patterns by time of day or season.
 - **Factor Analysis**: Link collisions to road conditions, weather, or other variables.
 
-Got ideas? Fork the repo or suggest features in [issues](https://github.com/yourusername/UrbanMapper/issues)!
+Got ideas? Fork the repo or suggest features in [issues](https://github.com/VIDA-NYU/UrbanMapper/issues)!
 
 ---
 
@@ -91,4 +91,4 @@ Got ideas? Fork the repo or suggest features in [issues](https://github.com/your
 
 ## Licence
 
-This study is shared under the [MIT Licence](https://github.com/yourusername/UrbanMapper/blob/main/LICENCE).
+This study is shared under the [MIT Licence](https://github.com/VIDA-NYU/UrbanMapper/blob/main/LICENCE).

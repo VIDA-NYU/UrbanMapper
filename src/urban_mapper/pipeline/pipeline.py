@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 import uuid
@@ -6,6 +7,7 @@ from typing import Tuple, Any, List, Union, Optional
 
 import dill
 import geopandas as gpd
+import pandas as pd
 from beartype import beartype
 from jupytergis import GISDocument
 from sklearn.utils._bunch import Bunch
@@ -228,6 +230,14 @@ class UrbanPipeline:
                     urban_layer_type = "fill"
                 else:
                     raise ValueError(f"Unsupported geometry type: {geometry_type}")
+
+            enriched_layer = enriched_layer.replace({pd.NaT: None})
+            for col in enriched_layer.columns:
+                if enriched_layer[col].dtype == "object":
+                    enriched_layer[col] = enriched_layer[col].apply(
+                        self.serialize_value
+                    )
+
             geojson_data = json.loads(enriched_layer.to_json())
             doc.add_geojson_layer(
                 data=geojson_data,
@@ -267,12 +277,10 @@ class UrbanPipeline:
                 **layer.get("kwargs", {}),
             )
 
-        data = {
-            "layers": doc._layers.to_py(),
-            "sources": doc._sources.to_py(),
-            "options": doc._options.to_py(),
-            "layerTree": doc._layerTree.to_py(),
-            "metadata": doc._metadata.to_py(),
-        }
-        with open(filepath, "w") as f:
-            json.dump(data, f, indent=2)
+        doc.save_as(filepath)
+
+    @staticmethod
+    def serialize_value(value):
+        if isinstance(value, datetime.datetime) or isinstance(value, pd.Timestamp):
+            return value.isoformat()
+        return value
