@@ -166,6 +166,12 @@ Voila 🥐 ! You’re all set to explore `UrbanMapper` in Jupyter Lab.
    pedestrian infrastructure from aerial imagery.
 5) **Cities' Features** -- `Urban Mapper` can load OSM cities features such as buildings, parks, Bike Lanes etc. via
    `OSMNx` API.
+6) **Region Neighborhoods** –– `UrbanMapper` can load neighborhoods boundaries from `OpenStreetMap` (OSM) using `OSMNx` Features
+   module.
+7) **Region Cities** –– `UrbanMapper` can load cities boundaries from `OpenStreetMap` (OSM) using `OSMNx` Features module.
+8) **Region States** –– `UrbanMapper` can load states boundaries from `OpenStreetMap` (OSM) using `OSMNx` Features module.
+9) **Region Countries** –– `UrbanMapper` can load countries boundaries from `OpenStreetMap` (OSM) using `OSMNx`
+   Features module.
 
 More will be added in the future, e.g `Subway`/`Tube` networks, `States`/`Provinces`, `Countries`/
 `Regions`, `Continents`, etc.
@@ -196,8 +202,9 @@ The `examples/` directory is organised into three main sections: `Basics/`, `End
     - *What it does*: Demonstrates loading PLUTO (CSV), taxi trip (Parquet), and NYC Pluto buildings information
       (Shapefile) data, setting the stage for analysis.
 
-- **[2] urban_layer.ipynb**: Discover how to create `urban layers` like `streets` or `intersections`.
-    - *What it does*: Builds a streets layer for `Downtown Brooklyn` and previews it statically.
+- **[2] urban_layer.ipynb**: Discover how to create `urban layers` like `streets` or `intersections` and more!
+    - *What it does*: Builds a streets layer for `Downtown Brooklyn` and previews it statically. Does show more 
+      urban layers primitives and show them mostly statically, some interactively.
 
 - **[3] imputer.ipynb**: Handle missing geospatial data with ease.
     - *What it does*: Uses `SimpleGeoImputer` to fill in missing coordinates in PLUTO data.
@@ -291,6 +298,20 @@ showing its power in action.
 - **[4] Downtown_BK_Collisions_Advanced_Pipeline_Extras.ipynb**: Get more insights with additional enrichments than [3].
     - *What it does*: Adds more metrics than [3] by using the custom function from the enricher module allowing us more
       flexibility but needed more coding.
+
+#### 🚖 **Remarkable Trees Paris Study**
+
+- **[1] Paris_Remarquable_Trees_Pipeline.ipynb**: Explore the remarkable trees of Paris within its neighborhoods.
+    - *What it does*: This notebook demonstrates how to load the remarkable trees dataset, create a neighborhoods
+      layer, and enrich the neighborhoods with remarkable trees information. E.g, the count of them per neighborhood.
+      Another one may be the circumference of the trees on average per neighborhood. Etc.
+
+- **[2] Paris_Remarquable_Trees_Advanced_Pipeline.ipynb**:  Explore the remarkable trees of Paris within its neighborhoods.
+    - *What it does*: This notebook demonstrates how to load the remarkable trees dataset, create a neighborhoods
+      layer, and enrich the neighborhoods with remarkable trees information. E.g, the count of them per neighborhood.
+      Another one may be the circumference of the trees on average per neighborhood. Etc. As an extra, it 
+      LLM-compute a summary of the why the trees are remarkable and what is the impact of them on the neighborhoods.
+
 
 </details>
 
