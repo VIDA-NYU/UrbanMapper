@@ -7,11 +7,7 @@ repos:
         args: [ --fix ]
       - id: ruff-format
         types_or: [ python, pyi ]
-  - repo: local
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.8.1
     hooks:
-      - id: jupyter-nb-clear-output
-        name: Clear Jupyter Notebook Outputs
-        files: \.ipynb$
-        stages: [ pre-commit ]
-        language: system
-        entry: uv run jupyter nbconvert --clear-output './examples/**/*.ipynb'
+      - id: nbstripout
