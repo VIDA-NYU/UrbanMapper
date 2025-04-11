@@ -108,7 +108,9 @@ dependency-injector==4.46.0
 deprecated==1.2.18
     # via opentelemetry-api
 dill==0.3.9
-    # via ell-ai
+    # via
+    #   urban-mapper (pyproject.toml)
+    #   ell-ai
 distlib==0.3.9
     # via virtualenv
 distro==1.9.0
@@ -138,11 +140,15 @@ fonttools==4.56.0
     # via matplotlib
 fqdn==1.5.1
     # via jsonschema
+geographiclib==2.0
+    # via geopy
 geopandas==1.0.1
     # via
     #   urban-mapper (pyproject.toml)
     #   auctus-search
     #   osmnx
+geopy==2.4.1
+    # via urban-mapper (pyproject.toml)
 google-auth==2.38.0
     # via google-genai
 google-genai==1.8.0
@@ -220,9 +226,7 @@ jiter==0.9.0
     #   anthropic
     #   openai
 joblib==1.4.2
-    # via
-    #   urban-mapper (pyproject.toml)
-    #   scikit-learn
+    # via scikit-learn
 json5==0.10.0
     # via jupyterlab-server
 jsonpointer==3.0.0
@@ -247,7 +251,9 @@ jupyter-client==8.6.3
 jupyter-collaboration==3.1.0
     # via jupytergis
 jupyter-collaboration-ui==1.1.0
-    # via jupyter-collaboration
+    # via
+    #   jupyter-collaboration
+    #   jupytergis
 jupyter-console==6.6.3
     # via jupyter
 jupyter-contrib-core==0.4.2
@@ -271,7 +277,9 @@ jupyter-core==5.7.2
     #   nbformat
     #   notebook
 jupyter-docprovider==1.1.0
-    # via jupyter-collaboration
+    # via
+    #   jupyter-collaboration
+    #   jupytergis
 jupyter-events==0.12.0
     # via
     #   jupyter-server
@@ -283,10 +291,13 @@ jupyter-lsp==2.2.5
     # via jupyterlab
 jupyter-nbextensions-configurator==0.6.4
     # via jupyter-contrib-nbextensions
+jupyter-resource-usage==1.1.1
+    # via urban-mapper (pyproject.toml)
 jupyter-server==2.15.0
     # via
     #   jupyter-lsp
     #   jupyter-nbextensions-configurator
+    #   jupyter-resource-usage
     #   jupyter-server-fileid
     #   jupyter-server-ydoc
     #   jupytergis-qgis
@@ -301,24 +312,25 @@ jupyter-server-ydoc==1.1.0
     # via
     #   urban-mapper (pyproject.toml)
     #   jupyter-collaboration
+    #   jupytergis
 jupyter-ydoc==3.0.3
     # via
     #   jupyter-server-ydoc
     #   jupytergis-core
     #   jupytergis-lab
     #   jupytergis-qgis
-jupytergis==0.4.2
+jupytergis==0.4.4
     # via urban-mapper (pyproject.toml)
-jupytergis-core==0.4.2
+jupytergis-core==0.4.4
     # via
     #   urban-mapper (pyproject.toml)
     #   jupytergis
     #   jupytergis-lab
-jupytergis-lab==0.4.2
+jupytergis-lab==0.4.4
     # via
     #   jupytergis
     #   jupytergis-qgis
-jupytergis-qgis==0.4.2
+jupytergis-qgis==0.4.4
     # via
     #   urban-mapper (pyproject.toml)
     #   jupytergis
@@ -382,7 +394,10 @@ nbformat==5.10.4
     #   jupyter-server
     #   nbclient
     #   nbconvert
+    #   nbstripout
     #   notebook
+nbstripout==0.8.1
+    # via urban-mapper (pyproject.toml)
 nest-asyncio==1.6.0
     # via
     #   ipykernel
@@ -473,16 +488,18 @@ pre-commit==4.2.0
 prometheus-client==0.21.1
     # via
     #   datamart-profiler
+    #   jupyter-resource-usage
     #   jupyter-server
     #   notebook
 prompt-toolkit==3.0.50
     # via
     #   ipython
     #   jupyter-console
-psutil==7.0.0
+psutil==5.9.8
     # via
     #   ell-ai
     #   ipykernel
+    #   jupyter-resource-usage
 psygnal==0.12.0
     # via urban-mapper (pyproject.toml)
 ptyprocess==0.7.0
@@ -559,6 +576,7 @@ pyzmq==26.3.0
     #   ipykernel
     #   jupyter-client
     #   jupyter-console
+    #   jupyter-resource-usage
     #   jupyter-server
     #   notebook
 rapidfuzz==3.12.2
