@@ -7,6 +7,7 @@ from urban_mapper.modules.filter import GeoFilterBase
 from urban_mapper.modules.enricher import EnricherBase
 from urban_mapper.modules.urban_layer.abc_urban_layer import UrbanLayerBase
 from urban_mapper.modules.visualiser import VisualiserBase
+from alive_progress import alive_bar
 
 
 @beartype
@@ -59,27 +60,51 @@ class PipelineExecutor:
         if loader_step is None:
             raise ValueError("Pipeline must include exactly one LoaderBase step.")
         loader_name, loader_instance = loader_step
-        self.data = loader_instance.load_data_from_file()
 
-        for name, step in self.steps:
-            if isinstance(step, GeoImputerBase):
-                self.data = step.transform(self.data, urban_layer_instance)
+        num_imputers = sum(isinstance(step, GeoImputerBase) for _, step in self.steps)
+        num_filters = sum(isinstance(step, GeoFilterBase) for _, step in self.steps)
+        num_enrichers = sum(isinstance(step, EnricherBase) for _, step in self.steps)
+        total_steps = 2 + num_imputers + num_filters + num_enrichers
 
-        for name, step in self.steps:
-            if isinstance(step, GeoFilterBase):
-                self.data = step.transform(self.data, urban_layer_instance)
+        with alive_bar(
+            total_steps,
+            title="Pipeline Progress",
+            force_tty=True,
+            dual_line=False,
+        ) as bar:
+            bar()
+            bar.title = f"~> Loading {loader_name}..."
+            self.data = loader_instance.load_data_from_file()
 
-        _, mapped_data = urban_layer_instance.map_nearest_layer(
-            self.data,
-        )
-        self.data = mapped_data
+            for name, step in self.steps:
+                if isinstance(step, GeoImputerBase):
+                    bar()
+                    bar.title = f"~> Applying imputer: {name}..."
+                    self.data = step.transform(self.data, urban_layer_instance)
 
-        for name, step in self.steps:
-            if isinstance(step, EnricherBase):
-                urban_layer_instance = step.enrich(self.data, urban_layer_instance)
+            for name, step in self.steps:
+                if isinstance(step, GeoFilterBase):
+                    bar()
+                    bar.title = f"~> Applying filter: {name}..."
+                    self.data = step.transform(self.data, urban_layer_instance)
 
-        self.urban_layer = urban_layer_instance
-        self._composed = True
+            bar()
+            bar.title = (
+                f"~> Let's spatial join the {urban_layer_name} layer with the data..."
+            )
+            _, mapped_data = urban_layer_instance.map_nearest_layer(self.data)
+            self.data = mapped_data
+
+            for name, step in self.steps:
+                if isinstance(step, EnricherBase):
+                    bar()
+                    bar.title = f"~> Applying enricher: {name}..."
+                    urban_layer_instance = step.enrich(self.data, urban_layer_instance)
+
+            self.urban_layer = urban_layer_instance
+            self._composed = True
+            bar()
+            bar.title = f"🗺️ Successfully composed pipeline with {total_steps} steps!"
 
     def transform(self) -> Tuple[gpd.GeoDataFrame, UrbanLayerBase]:
         if not self._composed:
