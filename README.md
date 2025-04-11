@@ -183,13 +183,34 @@ More will be added in the future, e.g `Subway`/`Tube` networks, `States`/`Provin
 # 🚀 Getting Started with UrbanMapper
 
 Are you ready to dive into urban data analysis? The simplest approach to get started with `UrbanMapper` is to look
-through
-the hands-on examples in the `examples/` directory. These **Jupyter notebooks** walk you through the library's features,
-from loading and prepping data to enriching urban layers and visualising the results. Whether you are new to urban data
-or an experienced urban planner, these examples will help you realise `UrbanMapper`'s full potential.
+through the hands-on examples in the `examples/` directory. These **Jupyter notebooks** walk you through the library's 
+features, from `loading` and `prepping data` to `enriching` urban layers and `visualising` the results. 
+
+Whether you are new to urban data or an experienced urban planner, these examples will help you realise 
+`UrbanMapper`'s full potential. Whether you are new to urban data science or an experienced data scientist, these 
+examples will help you accelerate your urban data science workflow.
 
 The `examples/` directory is organised into three main sections: `Basics/`, `End-to-End/`, `Study Cases` and
 `External Libraries Usages`. Here’s a quick gander at what each notebook covers:
+
+> [!TIP]
+> You can download the public datasets used throughout all examples via two channels:
+>
+> - **Channel 1: Our Google Drive public folder**
+>   - **Option A:** Download all datasets at once using the command:
+>     ```bash
+>     # If you do not have gdown installed, install it first
+>     # brew install gdown or pip install gdown
+>     gdown https://drive.google.com/drive/folders/1n-5zkNqT97W-I9Dc7X_mG4kezskfVtlb -O ./data --folder
+>     ```
+>   - **Option B:** Manually download specific datasets from the same Google Drive folder on demand.
+>
+> - **Channel 2: Official data sources**
+>   - Follow the data source links provided in the various notebooks.
+>   - Download the datasets directly from their official channels.
+>   - Place the downloaded files in the `data/` folder or any other folder of your choice.
+> 
+> Voila! You are ready to go! 🎉
 
 <details>
 <summary>
