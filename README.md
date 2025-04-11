@@ -98,7 +98,7 @@ And you are ready to go! 🎉
    uv run --with jupyter jupyter lab
    ```
 
-Voila 🥐 ! You’re all set to explore `UrbanMapper` in Jupyter Lab.
+Voila 🥐 ! We'd recommend you explore next the # `Getting Started with UrbanMapper` section to see how to use the tool.
 
 <details>
 
