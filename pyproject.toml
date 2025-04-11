@@ -48,7 +48,6 @@ dependencies = [
     "jupytergis-core>=0.2.1",
     "jupytergis-qgis>=0.2.1",
     "millify>=0.1.1",
-    "beartype>=0.19.0",
     "pre-commit>=4.1.0",
     "osmnx>=2.0.1",
     "geopandas>=1.0.1",
