@@ -4,8 +4,11 @@ build-backend = "pdm.backend"
 
 [project]
 name = "urban-mapper"
-description = "OSMNX Mapping leverages OSMNX and any external csv/shape files to map them interchangeably. Say, a function f(x, y) where x=OSMNX and y=user_data. Hence, OSMNX Mapping allow for `y` to be playing with `x` and vice-versa."
-authors = [{name = "Provost Simon", email = "sgp9504@nyu.edu"}]
+description = "🗺️ Spatial Join & Enrich any urban layer given any external urban dataset of interest, streamline your urban analysis with Scikit-Learn-Like pipelines, and share your insights with the urban research community!"
+authors = [
+     {name = "Provost Simon", email = "sgp9504@nyu.edu"}, # First author & maintainer
+     {name = "New York University", email = "fairuse@nyu.edu"}, # Copyright holder
+]
 license = {text = "MIT"}
 readme = "README.md"
 requires-python = ">=3.10"
@@ -68,13 +71,11 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://simonprovost.github.io/urban-mapper"
-Documentation = "https://simonprovost.github.io/urban-mapper"
+Documentation = "https://github.com/VIDA-NYU/UrbanMapper#%EF%B8%8F-urban-layers-currently-supported"
 Changelog = "https://simonprovost.github.io/urban-mapper/changelog"
 Repository = "https://github.com/simonprovost/urban-mapper"
 Issues = "https://github.com/simonprovost/urban-mapper/issues"
 Discussions = "https://github.com/simonprovost/urban-mapper/discussions"
-Gitter = "https://gitter.im/urban-mapper/community"
-Funding = "https://github.com/sponsors/simonprovost"
 
 [tool.pdm.build]
 # Include as much as possible in the source distribution, to help redistributors.
