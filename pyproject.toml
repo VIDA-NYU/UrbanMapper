@@ -71,13 +71,11 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://simonprovost.github.io/urban-mapper"
-Documentation = "https://simonprovost.github.io/urban-mapper"
+Documentation = "https://github.com/VIDA-NYU/UrbanMapper#%EF%B8%8F-urban-layers-currently-supported"
 Changelog = "https://simonprovost.github.io/urban-mapper/changelog"
 Repository = "https://github.com/simonprovost/urban-mapper"
 Issues = "https://github.com/simonprovost/urban-mapper/issues"
 Discussions = "https://github.com/simonprovost/urban-mapper/discussions"
-Gitter = "https://gitter.im/urban-mapper/community"
-Funding = "https://github.com/sponsors/simonprovost"
 
 [tool.pdm.build]
 # Include as much as possible in the source distribution, to help redistributors.
