@@ -8,6 +8,7 @@ from .urban_layers import (
     RegionNeighborhoods,
     RegionStates,
     RegionCountries,
+    CustomUrbanLayer,
 )
 
 from .urban_layer_factory import UrbanLayerFactory
@@ -24,6 +25,7 @@ URBAN_LAYER_FACTORY = {
     "region_neighborhoods": RegionNeighborhoods,
     "region_states": RegionStates,
     "region_countries": RegionCountries,
+    "custom_urban_layer": CustomUrbanLayer,
 }
 __all__ = [
     "UrbanLayerBase",
@@ -38,4 +40,5 @@ __all__ = [
     "RegionCountries",
     "URBAN_LAYER_FACTORY",
     "UrbanLayerFactory",
+    "CustomUrbanLayer",
 ]

@@ -9,7 +9,7 @@ from .region_cities import RegionCities
 from .region_neighborhoods import RegionNeighborhoods
 from .region_states import RegionStates
 from .region_countries import RegionCountries
-
+from .custom_urban_layer import CustomUrbanLayer
 
 __all__ = [
     "AdminFeatures",
@@ -23,4 +23,5 @@ __all__ = [
     "RegionNeighborhoods",
     "RegionStates",
     "RegionCountries",
+    "CustomUrbanLayer",
 ]
