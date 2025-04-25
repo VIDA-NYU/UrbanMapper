@@ -70,12 +70,12 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://simonprovost.github.io/urban-mapper"
+Homepage = "https://github.com/VIDA-NYU/UrbanMapper"
 Documentation = "https://github.com/VIDA-NYU/UrbanMapper#%EF%B8%8F-urban-layers-currently-supported"
-Changelog = "https://simonprovost.github.io/urban-mapper/changelog"
-Repository = "https://github.com/simonprovost/urban-mapper"
-Issues = "https://github.com/simonprovost/urban-mapper/issues"
-Discussions = "https://github.com/simonprovost/urban-mapper/discussions"
+Changelog = "https://github.com/VIDA-NYU/UrbanMapper/blob/main/CHANGELOG.md"
+Repository = "https://github.com/VIDA-NYU/UrbanMapper"
+Issues = "https://github.com/VIDA-NYU/UrbanMapper/issues"
+Discussions = "https://github.com/VIDA-NYU/UrbanMapper/discussions"
 
 [tool.pdm.build]
 # Include as much as possible in the source distribution, to help redistributors.
