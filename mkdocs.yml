@@ -1,0 +1,166 @@
+site_name: UrbanMapper
+repo_name: VIDA-NYU/UrbanMapper
+
+repo_url: https://github.com/VIDA-NYU/UrbanMapper
+edit_uri: blob/main/docs/
+
+site_author: New York University
+copyright: Maintained by Simon Provost, © New York University 2025-present
+site_description: >
+  🗺️ Spatial Join & Enrich any urban layer given any external urban dataset of interest, streamline your urban analysis 
+  with Scikit-Learn-Like pipelines, and share your insights with the urban research community!
+
+remote_branch: main
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  font:
+    text: Roboto
+    code: Roboto Mono
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - toc.follow
+    - content.code.copy
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - announce.dismiss
+    - content.tabs.link
+    - content.code.copy
+    - content.code.select
+    - content.code.annotate
+    - navigation.tabs
+    - navigation.top
+    - search.suggest
+    - toc.follow
+    - content.tooltips
+  icon:
+    repo: fontawesome/brands/github
+  logo: public/resources/urban_mapper_logo.ico
+  favicon: public/resources/urban_mapper_logo.ico
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - abbr
+  - pymdownx.tilde
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.snippets:
+      base_path:
+        - docs
+      restrict_base_path: false
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.arithmatex:
+      generic: true
+
+plugins:
+  - search
+  - mkdocs-jupyter:
+      include_source: True
+  - mkdocstrings:
+      handlers:
+        python:
+          selection:
+            docstring_style: google
+          rendering:
+            show_source: true
+            heading_level: 3
+            show_root_heading: true
+            show_category_heading: true
+  - autorefs
+  - privacy
+  - social
+  - minify
+
+extra:
+  social:
+      - icon: fontawesome/brands/github-alt
+        link: https://github.com/VIDA-NYU
+      - icon: fontawesome/brands/github
+        link: https://github.com/simonprovost
+      - icon: fontawesome/brands/twitter
+        link: https://x.com/nyuvida
+      - icon: fontawesome/brands/linkedin
+        link: https://www.linkedin.com/school/nyutandonschoolofengineering/
+      - icon: fontawesome/solid/database
+        link: https://huggingface.co/datasets/oscur
+
+extra_css:
+  - private/custom_css/extra.css
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+
+
+nav:
+  - Home: "/"
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Getting Started Step-By-Step: getting-started/quick-start_step_by_step.md
+    - Getting Started W/ Pipeline: getting-started/quick-start_pipeline.md
+    - Urban Mapper's Examples: getting-started/examples.md
+  - User Guide:
+    - Overview: user-guide/overview.md
+    - 1 -> Loaders: user-guide/modules/1-loaders.md
+    - 2 -> Urban Layers: user-guide/modules/2-urban-layers.md
+    - 3 -> Imputers: user-guide/modules/3-imputers.md
+    - 4 -> Filters: user-guide/modules/4-filters.md
+    - 5 -> Enrichers: user-guide/modules/5-enrichers.md
+    - 6 -> Visualisers: user-guide/modules/6-visualisers.md
+    - 7 -> Pipelines: user-guide/modules/7-pipelines.md
+    - 8 -> Pipeline Generators: user-guide/modules/8-pipeline-generators.md
+  - API Reference:
+    - Loaders: api/loaders.md
+    - Urban Layers: api/urban_layers.md
+    - Imputers: api/imputers.md
+    - Filters: api/filters.md
+    - Enrichers: api/enrichers.md
+    - Visualisers: api/visualisers.md
+    - Pipelines: api/pipelines.md
+    - Pipeline Generators: api/pipeline_generators.md
+  - Contributing: ./CONTRIBUTING.md
+  - Releases: https://github.com/VIDA-NYU/UrbanMapper/releases
+  - Branding: ./BRANDING.md
+  - User Experience Design: ./USER_EXPERIENCE_DESIGN.md

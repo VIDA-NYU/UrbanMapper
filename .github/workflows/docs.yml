@@ -1,0 +1,49 @@
+name: Build and Deploy Documentation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - 'src/**/*.py'
+      - '.github/workflows/docs.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - 'src/**/*.py'
+      - '.github/workflows/docs.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install UV
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+      - name: Create virtual environment
+        run: uv venv
+      - name: Install dependencies
+        run: uv sync --dev
+      - name: Build documentation
+        run: uv run mkdocs build --strict
+      - name: Deploy to GitHub Pages (Main Branch)
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: uv run mkdocs gh-deploy --force
+      - name: Deploy Preview for Pull Request
+        if: github.event_name == 'pull_request'
+        run: |
+          PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
+          uv run mkdocs gh-deploy --force --site-dir site/pr-$PR_NUMBER
+          echo "Documentation preview available at: https://vida-nyu.github.io/UrbanMapper/pr-$PR_NUMBER/"
