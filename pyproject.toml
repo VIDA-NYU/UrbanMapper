@@ -95,7 +95,6 @@ dev = [
     "build>=1.2",
     "git-changelog>=2.5",
     "twine>=5.1",
-
     # ci
     "duty>=1.4",
     "ruff>=0.4",
@@ -106,7 +105,6 @@ dev = [
     "mypy>=1.10",
     "types-markdown>=3.6",
     "types-pyyaml>=6.0",
-
     # docs
     "black>=24.4",
     "markdown-callouts>=0.4",
@@ -116,9 +114,12 @@ dev = [
     "mkdocs-gen-files>=0.5",
     "mkdocs-git-revision-date-localized-plugin>=1.2",
     "mkdocs-literate-nav>=0.6",
-    "mkdocs-material>=9.5",
+    "mkdocs-material[imaging]>=9.5",
     "mkdocs-minify-plugin>=0.8",
     "mkdocstrings[python]>=0.25",
     # YORE: EOL 3.10: Remove line.
     "tomli>=2.0; python_version < '3.11'",
+    "mkdocstrings-python>=1.16.10",
+    "mkdocs-jupyter>=0.25.1",
+    "pymdown-extensions>=10.14.3",
 ]
