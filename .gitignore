@@ -39,7 +39,7 @@ data/
 # Jupyter
 .ipynb_checkpoints/
 cache/
-
+*.jupyter_ystore.db
 
 
 # UV / Python
@@ -48,3 +48,6 @@ cache/
 # Model
 *.joblib
 *.dill
+
+# CLAUDE
+CLAUDE.md
