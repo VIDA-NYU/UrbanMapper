@@ -25,6 +25,22 @@ def register_imputer(name: str, imputer_class: Type[GeoImputerBase]) -> None:
 
 @beartype
 class ImputerFactory:
+    """Factory for creating and configuring geographic imputers.
+
+    Offers a fluent chaining-methods-based API to instantiate imputers, configure settings, and apply them.
+
+    Attributes:
+        _imputer_type (str): Type of imputer to create.
+        _latitude_column (str): Column for latitude values.
+        _longitude_column (str): Column for longitude values.
+
+    Examples:
+        >>> import urban_mapper as um
+        >>> factory = um.UrbanMapper().imputer.with_type("SimpleGeoImputer")\
+        ...     .on_columns(longitude_column="lng", latitude_column="lat")
+        >>> gdf = factory.transform(data_gdf, urban_layer)
+    """
+
     def __init__(self):
         self._imputer_type: Optional[str] = None
         self._latitude_column: Optional[str] = None
@@ -35,6 +51,20 @@ class ImputerFactory:
 
     @reset_attributes_before(["_imputer_type", "_latitude_column", "_longitude_column"])
     def with_type(self, primitive_type: str) -> "ImputerFactory":
+        """Set the imputer type to instantiate.
+
+        Args:
+            primitive_type: Imputer type (e.g., "SimpleGeoImputer").
+
+        Returns:
+            ImputerFactory: Self for chaining.
+
+        Raises:
+            ValueError: If primitive_type is not in IMPUTER_REGISTRY.
+
+        !!! tip
+            Check IMPUTER_REGISTRY keys for valid imputer types.
+        """
         if self._imputer_type is not None:
             logger.log(
                 "DEBUG_MID",
@@ -62,6 +92,15 @@ class ImputerFactory:
     def on_columns(
         self, longitude_column: str, latitude_column: str
     ) -> "ImputerFactory":
+        """Configure latitude and longitude columns.
+
+        Args:
+            longitude_column: Column name for longitude.
+            latitude_column: Column name for latitude.
+
+        Returns:
+            ImputerFactory: Self for chaining.
+        """
         self._longitude_column = longitude_column
         self._latitude_column = latitude_column
         logger.log(
@@ -79,6 +118,21 @@ class ImputerFactory:
     def transform(
         self, input_geodataframe: gpd.GeoDataFrame, urban_layer: UrbanLayerBase
     ) -> gpd.GeoDataFrame:
+        """Apply the configured imputer to data.
+
+        Args:
+            input_geodataframe: `GeoDataFrame` to process.
+            urban_layer: Urban layer for context.
+
+        Returns:
+            GeoDataFrame: Imputed data.
+
+        Raises:
+            ValueError: If configuration is incomplete.
+
+        !!! note
+            Call with_type() and on_columns() before transform().
+        """
         imputer_class = IMPUTER_REGISTRY[self._imputer_type]
         self._instance = imputer_class(
             latitude_column=self._latitude_column,
@@ -88,6 +142,29 @@ class ImputerFactory:
         return self._instance.transform(input_geodataframe, urban_layer)
 
     def build(self) -> GeoImputerBase:
+        """Build and return an imputer instance without applying it.
+        
+        This method creates and returns an imputer instance without immediately applying
+        it to data. It is primarily intended for use in the `UrbanPipeline`, where the
+        actual imputation is deferred until pipeline execution.
+
+        !!! note "To Keep In Mind"
+            For most use cases outside of pipelines, using `transform()` is preferred as it
+            directly applies the imputer and returns the imputed data.
+
+        Returns:
+            A GeoImputerBase instance configured and ready to use.
+            
+        Raises:
+            ValueError: If the imputer type or latitude/longitude columns have not been specified.
+
+        Examples:
+            >>> # Creating a pipeline component
+            >>> imputer_component = um.UrbanMapper().imputer.with_type("SimpleGeoImputer")\
+            ...     .on_columns(longitude_column="lng", latitude_column="lat")\
+            ...     .build()
+            >>> pipeline.add_imputer(imputer_component)
+        """
         logger.log(
             "DEBUG_MID",
             "WARNING: build() should only be used in UrbanPipeline. In other cases, "
@@ -110,6 +187,35 @@ class ImputerFactory:
         return self._instance
 
     def preview(self, format: str = "ascii") -> None:
+        """Display a preview of the imputer configuration and settings.
+        
+        This method generates and displays a preview of the imputer, showing its
+        configuration, settings, and other metadata. The preview can be displayed
+        in different formats.
+        
+        Args:
+            format: The format to display the preview in (default: "ascii").
+
+                - [x] "ascii": Text-based format for terminal display
+                - [x] "json": JSON-formatted data for programmatic use
+                
+        Raises:
+            ValueError: If an unsupported format is specified.
+            
+        Note:
+            This method requires an imputer instance to be available. Call build()
+            or transform() first to create an instance.
+            
+        Examples:
+            >>> imputer = um.UrbanMapper().imputer.with_type("SimpleGeoImputer")\
+            ...     .on_columns(longitude_column="lng", latitude_column="lat")
+            >>> # Build the imputer instance
+            >>> imputer.build()
+            >>> # Display a preview
+            >>> imputer.preview()
+            >>> # Or in JSON format
+            >>> imputer.preview(format="json")
+        """
         if self._instance is None:
             print("No imputer instance available to preview. Call build() first.")
             return
@@ -125,6 +231,28 @@ class ImputerFactory:
             print("Preview not supported for this imputer instance.")
 
     def with_preview(self, format: str = "ascii") -> "ImputerFactory":
+        """Configure the factory to display a preview after building.
+        
+        This method configures the factory to automatically display a preview after
+        building an imputer with `build()`. It's a convenient way to inspect the imputer
+        configuration without having to call `preview()` separately.
+        
+        Args:
+            format: The format to display the preview in (default: "ascii").
+
+                - [x] "ascii": Text-based format for terminal display
+                - [x] "json": JSON-formatted data for programmatic use
+                
+        Returns:
+            The ImputerFactory instance for method chaining.
+            
+        Examples:
+            >>> # Auto-preview after building
+            >>> imputer_component = um.UrbanMapper().imputer.with_type("SimpleGeoImputer")\
+            ...     .on_columns(longitude_column="lng", latitude_column="lat")\
+            ...     .with_preview(format="json")\
+            ...     .build()
+        """
         self._preview = {"format": format}
         return self
 
@@ -146,4 +274,5 @@ def _initialise():
             raise ImportError(f"Failed to load imputers module {module_name}: {error}")
 
 
+# Initialise the imputer registry when the module is imported
 _initialise()

@@ -11,6 +11,42 @@ from urban_mapper.utils import require_attributes
 
 @beartype
 class ParquetLoader(LoaderBase):
+    """Loader for `Parquet` files containing spatial data.
+
+    This loader reads data from `Parquet` files and converts them to `GeoDataFrames`
+    with point geometries. It requires latitude and longitude columns to create
+    point geometries for each row.
+
+    Attributes:
+        file_path (Union[str, Path]): Path to the Parquet file to load.
+        latitude_column (Optional[str]): Name of the column containing latitude values. Default: `None`
+        longitude_column (Optional[str]): Name of the column containing longitude values. Default: `None`
+        coordinate_reference_system (str): The coordinate reference system to use. Default: `EPSG:4326`
+        engine (str): The engine to use for reading Parquet files. Default: `"pyarrow"`
+        columns (Optional[list[str]]): List of columns to read from the Parquet file. Default: `None`, which reads all columns.
+
+    Examples:
+        >>> from urban_mapper.modules.loader import ParquetLoader
+        >>>
+        >>> # Basic usage
+        >>> loader = ParquetLoader(
+        ...     file_path="data.parquet",
+        ...     latitude_column="lat",
+        ...     longitude_column="lon"
+        ... )
+        >>> gdf = loader.load_data_from_file()
+        >>>
+        >>> # With custom columns and engine
+        >>> loader = ParquetLoader(
+        ...     file_path="data.parquet",
+        ...     latitude_column="latitude",
+        ...     longitude_column="longitude",
+        ...     engine="fastparquet",
+        ...     columns=["latitude", "longitude", "value"]
+        ... )
+        >>> gdf = loader.load_data_from_file()
+    """
+
     def __init__(
         self,
         file_path: Union[str, Path],
@@ -31,6 +67,21 @@ class ParquetLoader(LoaderBase):
 
     @require_attributes(["latitude_column", "longitude_column"])
     def _load_data_from_file(self) -> gpd.GeoDataFrame:
+        """Load data from a `Parquet` file and convert it to a `GeoDataFrame`.
+
+        This method reads a `Parquet` file using `pandas`, validates the latitude and
+        longitude columns, and converts the data to a `GeoDataFrame` with point
+        geometries using the specified coordinate reference system.
+
+        Returns:
+            A `GeoDataFrame` containing the loaded data with point geometries
+            created from the latitude and longitude columns.
+
+        Raises:
+            ValueError: If `latitude_column` or `longitude_column` is `None`.
+            ValueError: If the specified latitude or longitude columns are not found in the Parquet file.
+            IOError: If the Parquet file cannot be read.
+        """
         dataframe = pd.read_parquet(
             self.file_path,
             engine=self.engine,
@@ -64,6 +115,22 @@ class ParquetLoader(LoaderBase):
         return geodataframe
 
     def preview(self, format: str = "ascii") -> Any:
+        """Generate a preview of this `Parquet` loader.
+
+        Creates a summary representation of the loader for quick inspection.
+
+        Args:
+            format: The output format for the preview. Options include:
+
+                - [x] "ascii": Text-based format for terminal display
+                - [x] "json": JSON-formatted data for programmatic use
+
+        Returns:
+            A string or dictionary representing the loader, depending on the format.
+
+        Raises:
+            ValueError: If an unsupported format is requested.
+        """
         cols = self.columns if self.columns else "All columns"
 
         if format == "ascii":

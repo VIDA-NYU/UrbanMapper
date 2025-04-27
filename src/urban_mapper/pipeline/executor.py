@@ -12,6 +12,32 @@ from alive_progress import alive_bar
 
 @beartype
 class PipelineExecutor:
+    """Executor for `Pipeline Steps` in `UrbanMapper Pipeline`.
+
+    Orchestrates the execution of pipeline `steps` in a `predefined order`, managing `data loading`,
+    `processing`, and `enrichment`. As a bonus, it also displays a progress bar during execution.
+
+    Attributes:
+        steps (List[Tuple[str, Union[UrbanLayerBase, LoaderBase, GeoImputerBase, GeoFilterBase, EnricherBase, VisualiserBase, Any]]]):
+            List of (name, component) tuples representing the pipeline steps.
+        data (Optional[gpd.GeoDataFrame]): Processed GeoDataFrame, populated after execution.
+        urban_layer (Optional[UrbanLayerBase]): Enriched urban layer instance, set after execution.
+        _composed (bool): Indicates if the pipeline has been composed.
+
+    Examples:
+        >>> import urban_mapper as um
+        >>> from urban_mapper.pipeline import UrbanPipeline
+        >>> mapper = um.UrbanMapper()
+        >>> steps = [
+        ...     ("loader", mapper.loader.from_file("data.csv").with_columns("lon", "lat").build()),
+        ...     ("streets", mapper.urban_layer.with_type("streets_roads").from_place("London, UK").build())
+        ... ]
+        >>> executor = UrbanPipeline(steps)
+        >>> executor.compose()
+        >>> data, layer = executor.transform()
+        >>> 👆 Hint: You can `compose_transform()` all in one go!
+    """
+
     def __init__(
         self,
         steps: List[
@@ -37,6 +63,21 @@ class PipelineExecutor:
     def compose(
         self,
     ) -> None:
+        """Compose and Execute Pipeline Steps.
+
+        !!! tip "Steps Execution Order"
+            - [x] Load data
+            - [x] Apply imputers
+            - [x] Apply filters
+            - [x] Map to urban layer
+            - [x] Enrich urban layer
+
+        Raises:
+            ValueError: If pipeline is already composed or lacks required steps (loader, urban layer).
+
+        Examples:
+            >>> executor.compose()  # Executes all steps with progress updates
+        """
         if self._composed:
             raise ValueError(
                 "Pipeline already composed. Please re instantiate your pipeline and its steps."
@@ -107,6 +148,19 @@ class PipelineExecutor:
             bar.title = f"🗺️ Successfully composed pipeline with {total_steps} steps!"
 
     def transform(self) -> Tuple[gpd.GeoDataFrame, UrbanLayerBase]:
+        """Retrieve Results of `Pipeline Execution`.
+
+        Returns processed data and enriched urban layer post-composition.
+
+        Returns:
+            Tuple[gpd.GeoDataFrame, UrbanLayerBase]: Processed data and urban layer.
+
+        Raises:
+            ValueError: If pipeline hasn’t been composed.
+
+        Examples:
+            >>> data, layer = executor.transform()
+        """
         if not self._composed:
             raise ValueError("Pipeline not composed. Call compose() first.")
         return self.data, self.urban_layer
@@ -114,10 +168,45 @@ class PipelineExecutor:
     def compose_transform(
         self,
     ) -> Tuple[gpd.GeoDataFrame, UrbanLayerBase]:
+        """Compose and Transform in One Step.
+
+        Combines compose and transform operations.
+
+        Returns:
+            Tuple[gpd.GeoDataFrame, UrbanLayerBase]: Processed data and urban layer.
+
+        Raises:
+            ValueError: If pipeline is already composed or lacks required steps.
+
+        Examples:
+            >>> data, layer = executor.compose_transform()
+        """
         self.compose()
         return self.transform()
 
     def visualise(self, result_columns: Union[str, List[str]], **kwargs: Any) -> Any:
+        """Visualise Pipeline Results.
+
+        Uses the pipeline’s visualiser to display results based on specified columns.
+
+        !!! note "If no visualiser is defined"
+            If no visualiser is defined in the pipeline, a ValueError will be raised.
+
+            Please make sure to include a visualiser step in your pipeline.
+
+        Args:
+            result_columns: Column(s) to visualise from the urban layer.
+            **kwargs: Additional arguments for the visualiser’s render method.
+
+        Returns:
+            Any: Visualisation output, type depends on visualiser.
+
+        Raises:
+            ValueError: If pipeline isn’t composed or lacks a visualiser.
+
+        Examples:
+            >>> executor.visualise(result_columns="count")
+        """
         if not self._composed:
             raise ValueError("Pipeline not composed. Call compose() first.")
         visualiser = next(

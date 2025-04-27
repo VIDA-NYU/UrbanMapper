@@ -23,6 +23,43 @@ FILE_LOADER_FACTORY = {
 
 @beartype
 class LoaderFactory:
+    """Factory class for creating and configuring data loaders.
+    
+    This class implements a fluent chaining methods-based interface for creating and configuring data loaders.
+
+    The factory manages the details of `loader instantiation`, `coordinate reference system`
+    conversion, `column mapping`, and other data loading concerns, providing a consistent
+    interface regardless of the underlying data source.
+    
+    Attributes:
+        source_type: The type of data source ("file" or "dataframe").
+        source_data: The actual data source (file path or dataframe).
+        latitude_column: The name of the column containing latitude values.
+        longitude_column: The name of the column containing longitude values.
+        crs: The coordinate reference system to use for the loaded data.
+        _instance: The underlying loader instance (internal use only).
+        _preview: Preview configuration (internal use only).
+        
+    Examples:
+        >>> from urban_mapper import UrbanMapper
+        >>> 
+        >>> # Initialise UrbanMapper
+        >>> mapper = UrbanMapper()
+        >>> 
+        >>> # Load data from a CSV file with coordinate columns
+        >>> gdf = (
+        ...         mapper.loader\\
+        ...         .from_file("your_file_path.csv")\\
+        ...         .with_columns(longitude_column="lon", latitude_column="lat")\\
+        ...         .load()
+        ...     )
+        >>>
+        >>> # Load data from a GeoDataFrame
+        >>> import geopandas as gpd
+        >>> existing_data = gpd.read_file("data/some_shapefile.shp")
+        >>> gdf = mapper.loader.from_dataframe(existing_data).load() # Concise inline manner
+    """
+
     def __init__(self):
         self.source_type: Optional[str] = None
         self.source_data: Optional[Union[str, pd.DataFrame, gpd.GeoDataFrame]] = None
@@ -36,6 +73,22 @@ class LoaderFactory:
         ["source_type", "source_data", "latitude_column", "longitude_column"]
     )
     def from_file(self, file_path: str) -> "LoaderFactory":
+        """Configure the factory to load data from a file.
+
+        This method sets up the factory to load data from a file path. The file format
+        is determined by the file extension. Supported formats include `CSV`, `shapefile`,
+        and `Parquet`.
+
+        Args:
+            file_path: Path to the data file to load.
+
+        Returns:
+            The LoaderFactory instance for method chaining.
+
+        Examples:
+            >>> loader = mapper.loader.from_file("data/points.csv")
+            >>> # Next steps would typically be to call with_columns() and load()
+        """
         self.source_type = "file"
         self.latitude_column = None
         self.longitude_column = None
@@ -49,6 +102,25 @@ class LoaderFactory:
     def from_dataframe(
         self, dataframe: Union[pd.DataFrame, gpd.GeoDataFrame]
     ) -> "LoaderFactory":
+        """Configure the factory to load data from an existing dataframe.
+
+        This method sets up the factory to load data from a pandas `DataFrame` or
+        geopandas `GeoDataFrame`. For `DataFrames` without geometry, you will need
+        to call `with_columns()` to specify the latitude and longitude columns.
+
+        Args:
+            dataframe: The pandas DataFrame or geopandas GeoDataFrame to load.
+
+        Returns:
+            The LoaderFactory instance for method chaining.
+
+        Examples:
+            >>> import pandas as pd
+            >>> df = pd.read_csv("data/points.csv")
+            >>> loader = mapper.loader.from_dataframe(df)
+            >>> # For regular DataFrames, you must specify coordinate columns:
+            >>> loader.with_columns(longitude_column="lon", latitude_column="lat")
+        """
         self.source_type = "dataframe"
         self.source_data = dataframe
         self.latitude_column = "None"
@@ -64,6 +136,23 @@ class LoaderFactory:
         longitude_column: str,
         latitude_column: str,
     ) -> "LoaderFactory":
+        """Specify the latitude and longitude columns in the data source.
+        
+        This method configures which columns in the data source contain the latitude
+        and longitude coordinates. This is required for `CSV` and `Parquet` files, as well
+        as for `pandas DataFrames` without geometry.
+        
+        Args:
+            longitude_column: Name of the column containing longitude values.
+            latitude_column: Name of the column containing latitude values.
+            
+        Returns:
+            The LoaderFactory instance for method chaining.
+            
+        Examples:
+            >>> loader = mapper.loader.from_file("data/points.csv")\
+            ...     .with_columns(longitude_column="lon", latitude_column="lat")
+        """
         self.latitude_column = latitude_column
         self.longitude_column = longitude_column
         logger.log(
@@ -74,6 +163,23 @@ class LoaderFactory:
         return self
 
     def with_crs(self, crs: str = DEFAULT_CRS) -> "LoaderFactory":
+        """Specify the coordinate reference system for the loaded data.
+        
+        This method configures the `coordinate reference system (CRS)` to use for the loaded
+        data. If the source data already has a `CRS`, it will be converted to the specified `CRS`.
+        
+        Args:
+            crs: The coordinate reference system to use, in any format accepted by geopandas
+                (default: `EPSG:4326`, which is standard `WGS84` coordinates).
+            
+        Returns:
+            The LoaderFactory instance for method chaining.
+            
+        Examples:
+            >>> loader = mapper.loader.from_file("data/points.csv")\
+            ...     .with_columns(longitude_column="lon", latitude_column="lat")\
+            ...     .with_crs("EPSG:3857")  # Use Web Mercator projection
+        """
         self.crs = crs
         logger.log(
             "DEBUG_LOW",
@@ -116,6 +222,32 @@ class LoaderFactory:
 
     @require_attributes(["source_type", "source_data"])
     def load(self, coordinate_reference_system: str = DEFAULT_CRS) -> gpd.GeoDataFrame:
+        """Load the data and return it as a `GeoDataFrame`.
+        
+        This method loads the data from the configured source and returns it as a
+        geopandas `GeoDataFrame`. It handles the details of loading from different
+        source types and formats.
+        
+        Args:
+            coordinate_reference_system: The coordinate reference system to use for the
+                loaded data (default: "EPSG:4326", which is standard WGS84 coordinates).
+                
+        Returns:
+            A GeoDataFrame containing the loaded data.
+            
+        Raises:
+            ValueError: If the source type is invalid, the file format is unsupported,
+                or required parameters (like latitude/longitude columns) are missing.
+                
+        Examples:
+            >>> # Load CSV data
+            >>> gdf = mapper.loader.from_file("data/points.csv")\
+            ...     .with_columns(longitude_column="lon", latitude_column="lat")\
+            ...     .load()
+            >>> 
+            >>> # Load shapefile data
+            >>> gdf = mapper.loader.from_file("data/boundaries.shp").load()
+        """
         if self.source_type == "file":
             file_ext = Path(self.source_data).suffix.lower()
             if file_ext not in FILE_LOADER_FACTORY:
@@ -147,6 +279,30 @@ class LoaderFactory:
             raise ValueError("Invalid source type.")
 
     def build(self) -> LoaderBase:
+        """Build and return a `loader` instance without loading the data.
+        
+        This method creates and returns a loader instance without immediately loading
+        the data. It is primarily intended for use in the `UrbanPipeline`, where the
+        actual loading is deferred until pipeline execution.
+        
+        Returns:
+            A LoaderBase instance configured to load the data when needed.
+            
+        Raises:
+            ValueError: If the source type is not supported, the file format is unsupported,
+                or required parameters (like latitude/longitude columns) are missing.
+                
+        Note:
+            For most use cases outside of pipelines, using load() is preferred as it
+            directly returns the loaded data.
+            
+        Examples:
+            >>> # Creating a pipeline component
+            >>> loader = mapper.loader.from_file("data/points.csv")\
+            ...     .with_columns(longitude_column="lon", latitude_column="lat")\
+            ...     .build()
+            >>> step_loader_for_pipeline = ("My Loader", loader) # Add this in the list of steps in the `UrbanPipeline`.
+        """
         logger.log(
             "DEBUG_MID",
             "WARNING: build() should only be used in UrbanPipeline. "
@@ -177,6 +333,34 @@ class LoaderFactory:
         return self._instance
 
     def preview(self, format="ascii") -> None:
+        """Display a preview of the `loader` configuration and settings.
+        
+        This method generates and displays a preview of the `loader`, showing its
+        `configuration`, `settings`, and `other metadata`. The preview can be displayed
+        in different formats.
+        
+        Args:
+            format: The format to display the preview in (default: "ascii").
+
+                - [x] "ascii": Text-based format for terminal display
+                - [x] "json": JSON-formatted data for programmatic use
+                
+        Raises:
+            ValueError: If an unsupported format is specified.
+            
+        Note:
+            This method requires a loader instance to be available. Call load()
+            or build() first to create an instance.
+            
+        Examples:
+            >>> loader = mapper.loader.from_file("data/points.csv")\
+            ...     .with_columns(longitude_column="lon", latitude_column="lat")
+            >>> # Preview after loading data
+            >>> loader.load()
+            >>> loader.preview()
+            >>> # Or JSON format
+            >>> loader.preview(format="json")
+        """
         if self._instance is None:
             logger.log(
                 "DEBUG_LOW",
@@ -196,6 +380,28 @@ class LoaderFactory:
             logger.log("DEBUG_LOW", "Preview not supported for this loader's instance.")
 
     def with_preview(self, format="ascii") -> "LoaderFactory":
+        """Configure the factory to display a preview after loading or building.
+        
+        This method configures the factory to automatically display a preview after
+        loading data with `load()` or building a loader with `build()`. It's a convenient
+        way to inspect the loader configuration and the loaded data.
+        
+        Args:
+            format: The format to display the preview in (default: "ascii").
+
+                - [x] "ascii": Text-based format for terminal display
+                - [x] "json": JSON-formatted data for programmatic use
+                
+        Returns:
+            The LoaderFactory instance for method chaining.
+            
+        Examples:
+            >>> # Auto-preview after loading
+            >>> gdf = mapper.loader.from_file("data/points.csv")\
+            ...     .with_columns(longitude_column="lon", latitude_column="lat")\
+            ...     .with_preview(format="json")\
+            ...     .load()
+        """
         self._preview = {
             "format": format,
         }

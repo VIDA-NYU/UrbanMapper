@@ -12,6 +12,31 @@ from urban_mapper.modules.enricher.factory.config import EnricherConfig
 
 @beartype
 class SingleAggregatorEnricher(EnricherBase):
+    """Enricher Using a `Single Aggregator` For `Urban Layers`.
+
+    Uses one aggregator to enrich `urban layers`, adding `results as a new column`.
+    The aggregator decides how input data is processed (e.g., `counted`, `averaged`).
+
+    Attributes:
+        config: Config object for the enricher.
+        aggregator: Aggregator computing stats or counts.
+        output_column: Column name for aggregated results.
+        debug: Whether to include debug info.
+
+    Examples:
+        >>> import urban_mapper as um
+        >>> mapper = um.UrbanMapper()
+        >>> streets = mapper.urban_layer.OSMNXStreets().from_place("London, UK")
+        >>> trips = mapper.loader.from_file("trips.csv")\
+        ...     .with_columns(longitude_column="lng", latitude_column="lat")\
+        ...     .load()
+        >>> enricher = mapper.enricher\
+        ...     .with_data(group_by="nearest_street")\
+        ...     .count_by(output_column="trip_count")\
+        ...     .build()
+        >>> enriched_streets = enricher.enrich(trips, streets)
+    """
+
     def __init__(
         self,
         aggregator: BaseAggregator,
@@ -29,6 +54,21 @@ class SingleAggregatorEnricher(EnricherBase):
         urban_layer: UrbanLayerBase,
         **kwargs,
     ) -> UrbanLayerBase:
+        """Enrich an `urban layer` with an `aggregator`.
+
+        Aggregates data from the input `GeoDataFrame` and adds it to the urban layer.
+
+        Args:
+            input_geodataframe: `GeoDataFrame` with enrichment data.
+            urban_layer: Urban layer to enrich.
+            **kwargs: Extra params for customisation.
+
+        Returns:
+            Enriched urban layer with new columns.
+
+        Raises:
+            ValueError: If aggregation fails.
+        """
         aggregated_df = self.aggregator.aggregate(input_geodataframe)
         enriched_values = (
             aggregated_df["value"].reindex(urban_layer.layer.index).fillna(0)
@@ -44,5 +84,15 @@ class SingleAggregatorEnricher(EnricherBase):
         return urban_layer
 
     def preview(self, format: str = "ascii") -> Any:
+        """Generate a preview of this enricher.
+
+        Creates a summary for quick inspection.
+
+        Args:
+            format: Output format—"ascii" (text) or "json" (dict).
+
+        Returns:
+            Preview in the requested format.
+        """
         preview_builder = PreviewBuilder(self.config, ENRICHER_REGISTRY)
         return preview_builder.build_preview(format=format)

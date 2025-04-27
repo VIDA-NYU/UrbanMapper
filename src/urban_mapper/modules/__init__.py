@@ -13,7 +13,7 @@ from .enricher import (
     BaseAggregator,
     SimpleAggregator,
     SingleAggregatorEnricher,
-    CreateEnricher,
+    EnricherFactory,
 )
 from .visualiser import VisualiserBase, StaticVisualiser, InteractiveVisualiser
 
@@ -47,7 +47,7 @@ __all__ = [
     "BaseAggregator",
     "SimpleAggregator",
     "SingleAggregatorEnricher",
-    "CreateEnricher",
+    "EnricherFactory",
     "VisualiserBase",
     "StaticVisualiser",
     "InteractiveVisualiser",

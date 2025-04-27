@@ -8,11 +8,40 @@ from urban_mapper.modules.enricher.aggregator.aggregators.simple_aggregator impo
 
 @beartype
 class PreviewBuilder:
+    """Builder For Previews of Enricher Configurations.
+
+    Generates readable previews of enricher setups—great for debugging / docs / sharing.
+
+    Attributes:
+        config: Enricher config to preview.
+        enricher_registry: Registry of enricher types.
+    """
+
     def __init__(self, config: EnricherConfig, enricher_registry: Dict[str, type]):
         self.config = config
         self.enricher_registry = enricher_registry
 
     def build_preview(self, format: str = "ascii") -> Any:
+        """Build a preview in the specified format.
+
+        Args:
+            format: "ascii" for text, "json" for a dict.
+
+        Returns:
+            String for "ascii", dict for "json".
+
+        Raises:
+            ValueError: If format isn’t "ascii" or "json".
+
+        Examples:
+            >>> import urban_mapper as um
+            >>> mapper = um.UrbanMapper()
+            >>> enricher = mapper.enricher\
+            ...     .with_data(group_by="street")\
+            ...     .count_by()\
+            ...     .build()
+            >>> enricher.preview()
+        """
         if format == "ascii":
             return self._build_ascii_preview()
         elif format == "json":
@@ -21,6 +50,15 @@ class PreviewBuilder:
             raise ValueError("Supported formats: 'ascii', 'json'")
 
     def _build_ascii_preview(self) -> str:
+        """Build an ASCII text preview of the enricher configuration.
+
+        This method creates a human-readable tree representation of the enricher
+        configuration, showing the data input, action (aggregate or count),
+        and enricher type, along with their settings.
+
+        Returns:
+            A string containing the ASCII preview.
+        """
         steps = ["Enricher Workflow:", "├── Step 1: Data Input"]
         steps.append(
             f"│   ├── Group By: {', '.join(self.config.group_by) if self.config.group_by else '<Not Set>'}"
@@ -59,6 +97,16 @@ class PreviewBuilder:
         return "\n".join(steps)
 
     def _build_json_preview(self) -> Dict[str, Any]:
+        """Build a JSON preview of the enricher configuration.
+
+        This method creates a machine-readable dictionary representation of the
+        enricher configuration, suitable for programmatic processing or serialization
+        to JSON. It includes all the configuration details as well as metadata
+        about available options.
+
+        Returns:
+            A dictionary containing the preview data.
+        """
         preview_data = {
             "workflow": {
                 "data_input": {
@@ -79,6 +127,15 @@ class PreviewBuilder:
         return preview_data
 
     def _is_config_complete(self) -> bool:
+        """Check if the enricher configuration is complete and ready to use.
+
+        This method validates that all required fields are set in the configuration,
+        depending on the action type. For example, aggregate actions require
+        values_from to be set, while all actions require group_by.
+
+        Returns:
+            True if the configuration is complete, False otherwise.
+        """
         return (
             bool(self.config.group_by)
             and bool(self.config.action)
