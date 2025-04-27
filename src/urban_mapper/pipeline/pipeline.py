@@ -25,6 +25,49 @@ from urban_mapper.utils import require_attributes_not_none
 
 @beartype
 class UrbanPipeline:
+    """`Scikit-Learn` Inspired `Pipeline` for `Urban Mapper`.
+
+    Constructs and manages pipelines integrating various urban mapper components into a cohesive workflow,
+    handling execution order and data flow. As a bonus, you can `save`, `share`, `export`, and `load pipelines`,
+    is not that great for reprodcuibility?
+
+    Representation of a pipeline using Mermaid:
+
+    ```mermaid
+    graph TD
+        A[Loader] --> B[Urban Layer]
+        B --> C[Imputers]
+        C --> D[Filters]
+        D --> E[Enrichers]
+        E --> F[Visualiser]
+    ```
+
+    !!! note
+        `Pipelines` must be `composed` before `transforming` or `visualising` data.
+        Use `compose()` or `compose_transform()`.
+
+    Attributes:
+        steps (List[Tuple[str, Union[UrbanLayerBase, LoaderBase, GeoImputerBase, GeoFilterBase, EnricherBase, VisualiserBase, Any]]]):
+            List of (name, component) tuples defining pipeline steps.
+        validator (PipelineValidator): Validates step compatibility.
+        executor (PipelineExecutor): Executes the pipeline steps.
+
+    Examples:
+        >>> import urban_mapper as um
+        >>> from urban_mapper.pipeline import UrbanPipeline
+        >>> mapper = um.UrbanMapper()
+        >>> steps = [
+        ...     ("loader", mapper.loader.from_file("taxi_data.csv").with_columns("lng", "lat").build()),
+        ...     ("streets", mapper.urban_layer.with_type("streets_roads").from_place("London, UK").build()),
+        ...     ("count_pickups", mapper.enricher.with_data(group_by="nearest_streets").count_by(output_column="pickup_count").build()),
+        ...     ("visualiser", mapper.visualiser.with_type("InteractiveVisualiser").build())
+        ... ]
+        >>> pipeline = UrbanPipeline(steps)
+        >>> data, layer = pipeline.compose_transform()
+        >>> pipeline.visualise(["pickup_count"])
+
+    """
+
     def __init__(
         self,
         steps: Union[
@@ -53,14 +96,57 @@ class UrbanPipeline:
     @require_attributes_not_none("steps")
     @property
     def named_steps(self) -> Bunch:
+        """Access steps by name using attribute syntax.
+
+        !!! note "Mimicking the following by Sckit-learn"
+            This property allows accessing pipeline steps using attribute-style access.
+            For example, `pipeline.named_steps.loader` returns the loader step.
+
+            See more in [named_steps of Sklearn](https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline.named_steps)
+
+        Returns:
+            Bunch: Object with step names as attributes.
+
+        Raises:
+            ValueError: If no steps are defined.
+
+        Examples:
+            >>> pipeline.named_steps.loader
+        """
         return Bunch(**dict(self.steps))
 
     @require_attributes_not_none("steps")
     def get_step_names(self) -> List[str]:
+        """List all step names in the pipeline.
+
+        Returns:
+            List[str]: Names of all steps.
+
+        Raises:
+            ValueError: If no steps are defined.
+
+        Examples:
+            >>> names = pipeline.get_step_names()
+        """
         return [name for name, _ in self.steps]
 
     @require_attributes_not_none("steps")
     def get_step(self, name: str) -> Any:
+        """Retrieve a step by its name.
+
+        Args:
+            name: Name of the step to retrieve.
+
+        Returns:
+            Any: The step’s component instance.
+
+        Raises:
+            KeyError: If step name doesn’t exist.
+            ValueError: If no steps are defined.
+
+        Examples:
+            >>> loader = pipeline.get_step("loader")
+        """
         for step_name, step_instance in self.steps:
             if step_name == name:
                 return step_instance
@@ -68,23 +154,99 @@ class UrbanPipeline:
 
     @require_attributes_not_none("steps")
     def compose(self) -> "UrbanPipeline":
+        """Prepare pipeline for execution without transforming.
+
+        Validates and sets up the pipeline for subsequent transformation.
+
+        Returns:
+            UrbanPipeline: Self for chaining.
+
+        Raises:
+            ValueError: If no steps or steps are invalid.
+
+        Examples:
+            >>> pipeline.compose()
+        """
         self.executor.compose()
         return self
 
     @require_attributes_not_none("steps")
     def transform(self) -> Tuple[gpd.GeoDataFrame, UrbanLayerBase]:
+        """Execute pipeline transformation.
+
+        Returns processed data and enriched urban layer after composition.
+
+        Returns:
+            Tuple[gpd.GeoDataFrame, UrbanLayerBase]: Processed data and urban layer.
+
+        Raises:
+            ValueError: If no steps or not composed.
+
+        Examples:
+            >>> data, layer = pipeline.transform()
+        """
         return self.executor.transform()
 
     @require_attributes_not_none("steps")
     def compose_transform(self) -> Tuple[gpd.GeoDataFrame, UrbanLayerBase]:
+        """Compose and transform in one step.
+
+        Combines composition and transformation into a single operation.
+
+        Returns:
+            Tuple[gpd.GeoDataFrame, UrbanLayerBase]: Processed data and urban layer.
+
+        Raises:
+            ValueError: If no steps or steps are invalid.
+
+        Examples:
+            >>> data, layer = pipeline.compose_transform()
+        """
         return self.executor.compose_transform()
 
     @require_attributes_not_none("steps")
     def visualise(self, result_columns: Union[str, List[str]], **kwargs: Any) -> Any:
+        """Visualise pipeline results.
+
+        Displays results using the pipeline’s visualiser.
+
+        Args:
+            result_columns: Column(s) to visualise. If more than one a widget is being displayed to select which one to visualise.
+            **kwargs: Additional arguments for the visualiser.
+
+        Returns:
+            Any: Visualisation output, type depends on visualiser.
+
+        Raises:
+            ValueError: If no steps, not composed, or no visualiser.
+
+        Examples:
+            >>> pipeline.visualise(result_columns="count")
+        """
         return self.executor.visualise(result_columns, **kwargs)
 
     @require_attributes_not_none("steps")
     def save(self, filepath: str) -> None:
+        """Save pipeline to a file.
+
+        Serialises the pipeline and its state using dill.
+
+        Explore more about [Dill, here](https://github.com/uqfoundation/dill).
+
+        !!! note "What if I have custom lambda functions in my own script/cell? How is that saved?"
+            If you have custom lambda functions, no worries Dill deals with them pretty neatly.
+            Obviously it could increase the size of the object.
+
+        Args:
+            filepath: Path to save file, must end with '.dill'.
+
+        Raises:
+            ValueError: If filepath lacks '.dill' or no steps.
+            IOError: If file cannot be written.
+
+        Examples:
+            >>> pipeline.save("my_pipeline.dill")
+        """
         path = Path(filepath)
         if path.suffix != ".dill":
             raise ValueError("Filepath must have '.dill' extension.")
@@ -93,6 +255,23 @@ class UrbanPipeline:
 
     @staticmethod
     def load(filepath: str) -> "UrbanPipeline":
+        """Load pipeline from a file.
+
+        Deserialises a previously saved pipeline. From another paper, a friend, a teammate.
+
+        Args:
+            filepath: Path to the saved pipeline file.
+
+        Returns:
+            UrbanPipeline: Loaded pipeline instance.
+
+        Raises:
+            FileNotFoundError: If file doesn’t exist.
+            IOError: If file cannot be read.
+
+        Examples:
+            >>> pipeline = um.UrbanPipeline.load("my_pipeline.dill")
+        """
         with open(filepath, "rb") as f:
             pipeline = dill.load(f)
         if not pipeline.executor._composed:
@@ -104,10 +283,35 @@ class UrbanPipeline:
         return pipeline
 
     def __getitem__(self, key: str) -> Any:
+        """Access step by name using dictionary syntax.
+
+        Args:
+            key: Name of the step.
+
+        Returns:
+            Any: Step’s component instance.
+
+        Raises:
+            KeyError: If step name doesn’t exist.
+
+        Examples:
+            >>> loader = pipeline["loader"]
+        """
         return self.get_step(key)
 
     @require_attributes_not_none("steps")
     def _preview(self, format: str = "ascii") -> Union[dict, str]:
+        """Generate a pipeline preview.
+
+        Creates a representation of the pipeline and its steps. Calling in cascade,
+        all steps' `.preview()` methods.
+
+        Args:
+            format: Output format ("ascii" or "json").
+
+        Returns:
+            Union[dict, str]: Preview as dictionary or string.
+        """
         if format == "json":
             preview_data = {
                 "pipeline": {
@@ -135,6 +339,20 @@ class UrbanPipeline:
 
     @require_attributes_not_none("steps")
     def preview(self, format: str = "ascii") -> None:
+        """Display pipeline preview.
+
+        Prints a summary of the pipeline and its steps.Calling in cascade,
+        all steps' `.preview()` methods.
+
+        Args:
+            format: Output format ("ascii" or "json").
+
+        Raises:
+            ValueError: If format is unsupported or no steps.
+
+        Examples:
+            >>> pipeline.preview()
+        """
         if not self.steps:
             print("No Steps available to preview.")
             return
@@ -160,6 +378,37 @@ class UrbanPipeline:
         raise_on_existing: bool = True,
         **kwargs,
     ) -> None:
+        """Export pipeline results to JupyterGIS document.
+
+        !!! question "What is JupyterGIS?"
+
+            JupyterGIS is a library that provides interactive & collaborative mapping capabilities in real time,
+            all throughout your Jupyter notebooks' workflow.
+
+            See [their documentation for further details](https://jupytergis.readthedocs.io/en/latest/).
+
+            Creates an interactive map visualisation saved as a `.jgis` file.
+
+        Args:
+            filepath: Path to save the .jgis file.
+            base_maps: List of base map configurations (default: None).
+            include_urban_layer: Include urban layer in output (default: True).
+            urban_layer_name: Name for urban layer (default: "Enriched Layer").
+            urban_layer_type: Visualisation type (default: None, auto-detected).
+            urban_layer_opacity: Layer opacity (default: 1.0).
+            additional_layers: Extra layers to include (default: None).
+            zoom: Initial map zoom level (default: 20).
+            raise_on_existing: Raise error if file exists (default: True).
+            **kwargs: Additional visualisation arguments.
+
+        Raises:
+            ValueError: If no steps or not composed.
+            ImportError: If JupyterGIS isn’t installed.
+            FileExistsError: If file exists and raise_on_existing is True.
+
+        Examples:
+            >>> pipeline.to_jgis("map.jgis")
+        """
         if additional_layers is None:
             additional_layers = []
         if base_maps is None:

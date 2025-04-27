@@ -14,6 +14,40 @@ from urban_mapper import logger
 
 @beartype
 class AdminRegions(OSMFeatures):
+    """Base class for `administrative regions` at `various levels`.
+
+    !!! warning "What to understand from this class?"
+        In a nutshell? You barely will be using this out at all, unless you create a new
+        `UrbanLayer` that needs to load `OpenStreetMap` features. If not, you can skip reading.
+
+    This abstract class provides shared functionality for `loading` and `processing`
+    `administrative boundaries` from `OpenStreetMap`. It's designed to be subclassed
+    for specific types of administrative regions (`neighborhoods`, `cities`, `states`, `countries`).
+
+    The class _intelligently_ handles the complexities of `OpenStreetMap's administrative
+    levels`, which vary across different `countries` and `regions`. It attempts to infer
+    the appropriate level based on the type of administrative division requested,
+    but also allows manual overriding of this inference.
+
+    Further can be read at: [OpenStreetMap Wiki](https://wiki.openstreetmap.org/wiki/Tag:boundary%3Dadministrative)
+    to understand why it is complex to infer the right `admin_level`.
+
+    Attributes:
+        division_type: The type of administrative division this layer represents
+            (e.g., "neighborhood", "city", "state", "country").
+        tags: OpenStreetMap tags used to filter boundary features.
+        layer: The GeoDataFrame containing the administrative boundary data (set after loading).
+
+    Examples:
+        >>> # This is an abstract class - use concrete implementations like:
+        >>> from urban_mapper import UrbanMapper
+        >>> mapper = UrbanMapper()
+        >>> # For neighborhoods:
+        >>> neighborhoods = mapper.urban_layer.region_neighborhoods().from_place("Paris, France")
+        >>> # For cities:
+        >>> cities = mapper.urban_layer.region_cities().from_place("Hérault, France")
+    """
+
     def __init__(self) -> None:
         super().__init__()
         self.division_type: str | None = None
@@ -22,6 +56,48 @@ class AdminRegions(OSMFeatures):
     def from_place(
         self, place_name: str, overwrite_admin_level: str | None = None, **kwargs
     ) -> None:
+        """Load `administrative regions` for a named place.
+
+        This method retrieves administrative boundaries for a specified place
+        name from `OpenStreetMap`. It filters for the appropriate `administrative
+        level` based on the division_type set for this layer, and can be manually
+        overridden if needed.
+
+        Args:
+            place_name: Name of the place to load administrative regions for
+                (e.g., "New York City", "Bavaria, Germany").
+            overwrite_admin_level: Manually specify the OpenStreetMap admin_level
+                to use instead of inferring it. Admin levels differ by region but
+                typically follow patterns like:
+
+                - [x] 2: Country
+                - [x] 4: State/Province
+                - [x] 6: County
+                - [x] 8: City/Municipality
+                - [x] 10: Neighborhood/Borough
+
+                Feel free to look into [OSM Wiki](https://wiki.openstreetmap.org/wiki/Tag:boundary%3Dadministrative).
+
+            **kwargs: Additional parameters passed to OSMnx's features_from_place.
+
+        Returns:
+            Self, for method chaining.
+
+        Raises:
+            ValueError: If division_type is not set or if no administrative
+                boundaries are found for the specified place.
+
+        Examples:
+            >>> # Get neighborhoods in Manhattan
+            >>> neighborhoods = AdminRegions()
+            >>> neighborhoods.division_type = "neighborhood"
+            >>> neighborhoods.from_place("Manhattan, New York")
+
+            >>> # Override admin level for more control
+            >>> cities = AdminRegions()
+            >>> cities.division_type = "city"
+            >>> cities.from_place("France", overwrite_admin_level="6")
+        """
         if self.division_type is None:
             raise ValueError("Division type not set for this layer.")
         warnings.warn(
@@ -106,6 +182,49 @@ class AdminRegions(OSMFeatures):
         overwrite_admin_level: str | None = None,
         **kwargs,
     ) -> None:
+        """Load `administrative regions` for a specific address.
+
+        This method retrieves administrative boundaries for a specified address
+        from `OpenStreetMap`. It filters for the appropriate `administrative
+        level` based on the division_type set for this layer, and can be manually
+        overridden if needed.
+
+        Args:
+            address: Address to load administrative regions for (e.g., "1600 Amphitheatre Parkway, Mountain View, CA").
+            dist: Distance in meters to search around the address. Consider this a radius.
+            overwrite_admin_level: Manually specify the OpenStreetMap admin_level
+                to use instead of inferring it. Admin levels differ by region but
+                typically follow patterns like:
+
+                - [x] 2: Country
+                - [x] 4: State/Province
+                - [x] 6: County
+                - [x] 8: City/Municipality
+                - [x] 10: Neighborhood/Borough
+
+                Feel free to look into [OSM Wiki](https://wiki.openstreetmap.org/wiki/Tag:boundary%3Dadministrative).
+
+            **kwargs: Additional parameters passed to OSMnx's features_from_address.
+
+        Returns:
+            Self, for method chaining.
+
+        Raises:
+            ValueError: If division_type is not set or if no administrative
+                boundaries are found for the specified address.
+
+        Examples:
+            >>> # Get neighborhoods around a specific address
+            >>> neighborhoods = AdminRegions()
+            >>> neighborhoods.division_type = "neighborhood"
+            >>> neighborhoods.from_address("1600 Amphitheatre Parkway, Mountain View, CA", dist=500)
+
+            >>> # Override admin level for more control
+            >>> cities = AdminRegions()
+            >>> cities.division_type = "city"
+            >>> cities.from_address("1600 Amphitheatre Parkway, Mountain View, CA", dist=500, overwrite_admin_level="6")
+        """
+
         if self.division_type is None:
             raise ValueError("Division type not set for this layer.")
         warnings.warn(
@@ -193,6 +312,53 @@ class AdminRegions(OSMFeatures):
         overwrite_admin_level: str | None = None,
         **kwargs,
     ) -> None:
+        """Load `administrative regions` for a specific polygon.
+        This method retrieves administrative boundaries for a specified polygon
+        from `OpenStreetMap`. It filters for the appropriate `administrative
+        level` based on the division_type set for this layer, and can be manually
+        overridden if needed.
+
+        Args:
+            polygon: Shapely Polygon or MultiPolygon to load administrative regions for.
+            overwrite_admin_level: Manually specify the OpenStreetMap admin_level
+                to use instead of inferring it. Admin levels differ by region but
+                typically follow patterns like:
+
+                - [x] 2: Country
+                - [x] 4: State/Province
+                - [x] 6: County
+                - [x] 8: City/Municipality
+                - [x] 10: Neighborhood/Borough
+
+                Feel free to look into [OSM Wiki](https://wiki.openstreetmap.org/wiki/Tag:boundary%3Dadministrative).
+
+            **kwargs: Additional parameters passed to OSMnx's features_from_polygon.
+
+        Returns:
+            Self, for method chaining.
+
+        Raises:
+            ValueError: If division_type is not set or if no administrative
+                boundaries are found for the specified polygon.
+
+        Examples:
+            >>> # Create a polygon out of an address for instance, with the help of geopy
+            >>> from geopy.geocoders import Nominatim
+            >>> geolocator = Nominatim(user_agent="urban_mapper")
+            >>> location = geolocator.geocode("1600 Amphitheatre Parkway, Mountain View, CA", geometry="wkt")
+            >>> polygon = loads(location.raw["geotext"])
+
+            >>> # Get neighborhoods within a specific polygon
+            >>> neighborhoods = AdminRegions()
+            >>> neighborhoods.division_type = "neighborhood"
+            >>> neighborhoods.from_polygon(polygon)
+
+            >>> # Override admin level for more control
+            >>> cities = AdminRegions()
+            >>> cities.division_type = "neighborhood"
+            >>> cities.from_polygon(polygon, overwrite_admin_level="8")
+        """
+
         if self.division_type is None:
             raise ValueError("Division type not set for this layer.")
         warnings.warn(
@@ -260,6 +426,47 @@ class AdminRegions(OSMFeatures):
         overwrite_admin_level: str | None = None,
         **kwargs,
     ) -> None:
+        """Load `administrative regions` for a specific bounding box.
+        This method retrieves administrative boundaries for a specified bounding
+        box from `OpenStreetMap`. It filters for the appropriate `administrative
+        level` based on the division_type set for this layer, and can be manually
+        overridden if needed.
+
+        Args:
+            bbox: Tuple of (left, bottom, right, top) coordinates defining the bounding box.
+            overwrite_admin_level: Manually specify the OpenStreetMap admin_level
+                to use instead of inferring it. Admin levels differ by region but
+                typically follow patterns like:
+
+                - [x] 2: Country
+                - [x] 4: State/Province
+                - [x] 6: County
+                - [x] 8: City/Municipality
+                - [x] 10: Neighborhood/Borough
+
+                Feel free to look into [OSM Wiki](https://wiki.openstreetmap.org/wiki/Tag:boundary%3Dadministrative).
+
+            **kwargs: Additional parameters passed to OSMnx's features_from_bbox.
+
+        Returns:
+            Self, for method chaining.
+
+        Raises:
+            ValueError: If division_type is not set or if no administrative
+                boundaries are found for the specified bounding box.
+
+        Examples:
+            >>> # Get neighborhoods within a specific bounding box
+            >>> bbox = (-73.935242, 40.730610, -73.925242, 40.740610)  # Example coordinates
+            >>> neighborhoods = AdminRegions()
+            >>> neighborhoods.division_type = "neighborhood"
+            >>> neighborhoods.from_bbox(bbox)
+
+            >>> # Override admin level for more control
+            >>> cities = AdminRegions()
+            >>> cities.division_type = "city"
+            >>> cities.from_bbox(bbox, overwrite_admin_level="8")
+        """
         if self.division_type is None:
             raise ValueError("Division type not set for this layer.")
         warnings.warn(
@@ -320,6 +527,48 @@ class AdminRegions(OSMFeatures):
         overwrite_admin_level: str | None = None,
         **kwargs,
     ) -> None:
+        """Load `administrative regions` for a specific point.
+        This method retrieves administrative boundaries for a specified point
+        from `OpenStreetMap`. It filters for the appropriate `administrative
+        level` based on the division_type set for this layer, and can be manually
+        overridden if needed.
+
+        Args:
+            lat: Latitude of the point to load administrative regions for.
+            lon: Longitude of the point to load administrative regions for.
+            dist: Distance in meters to search around the point. Consider this a radius.
+            overwrite_admin_level: Manually specify the OpenStreetMap admin_level
+                to use instead of inferring it. Admin levels differ by region but
+                typically follow patterns like:
+
+                - [x] 2: Country
+                - [x] 4: State/Province
+                - [x] 6: County
+                - [x] 8: City/Municipality
+                - [x] 10: Neighborhood/Borough
+
+                Feel free to look into [OSM Wiki](https://wiki.openstreetmap.org/wiki/Tag:boundary%3Dadministrative).
+
+            **kwargs: Additional parameters passed to OSMnx's features_from_point.
+
+        Returns:
+            Self, for method chaining.
+
+        Raises:
+            ValueError: If division_type is not set or if no administrative
+                boundaries are found for the specified point.
+
+        Examples:
+            >>> # Get neighborhoods around a specific point
+            >>> neighborhoods = AdminRegions()
+            >>> neighborhoods.division_type = "neighborhood"
+            >>> neighborhoods.from_point(40.730610, -73.935242, dist=500)
+
+            >>> # Override admin level for more control
+            >>> cities = AdminRegions()
+            >>> cities.division_type = "city"
+            >>> cities.from_point(40.730610, -73.935242, dist=500, overwrite_admin_level="8")
+        """
         if self.division_type is None:
             raise ValueError("Division type not set for this layer.")
         warnings.warn(
@@ -377,6 +626,41 @@ class AdminRegions(OSMFeatures):
     def infer_best_admin_level(
         self, boundaries: gpd.GeoDataFrame, division_type: str
     ) -> str:
+        """Infer the most appropriate `OpenStreetMap admin_level` for a division type.
+
+        This method uses heuristics to determine which `administrative level` in
+        `OpenStreetMap` best matches the requested division type (`neighborhood`, `city`,
+        `state`, or `country`). It accounts for both the number of regions at each level
+        and their spatial connectivity patterns.
+
+        The method calculates a score for each available admin_level based on:
+
+        - [x] The number of regions (higher for `neighborhoods`, lower for countries)
+        - [x] The connectivity between regions (how many `share boundaries`)
+        - [x] The specific division type requested, i.e., `neighborhood`, `city`, `state`, or `country`.
+
+        !!! note "Why is this heuristic?"
+            This method is intentionally heuristic because `OSM admin_levels` vary
+            across `regions` and `countries`. The scoring system prioritises different
+            factors based on the division type, as follows:
+
+            - [x] `Neighborhoods`: High region count, moderate connectivity
+            - [x] `Cities`: Moderate region count, high connectivity
+            - [x] `States`: Low region count, high connectivity
+            - [x] `Countries`: Very low region count, very high connectivity
+
+        Args:
+            boundaries: `GeoDataFrame` containing administrative boundaries with
+                an "admin_level" column.
+            division_type: The type of division to find the best level for
+                (`neighborhood`, `city`, `state`, or `country`).
+
+        Returns:
+            The `admin_level` string that best matches the requested division type.
+
+        Raises:
+            ValueError: If the division_type is not recogniseed.
+        """
         levels = boundaries["admin_level"].unique()
         metrics = {}
         for level in levels:
@@ -400,17 +684,62 @@ class AdminRegions(OSMFeatures):
                 f"connectivity={connectivity:.2f}%, "
                 f"score={score:.2f}",
             )
-        best_level = max(metrics, key=metrics.get)
-        return best_level
+        return max(metrics, key=metrics.get)
 
     def from_file(
         self, file_path: str | Path, overwrite_admin_level: str | None = None, **kwargs
     ) -> None:
+        """Load `administrative regions` from a file.
+
+        !!! warning "Not implemented"
+            This method is not implemented for this class. It raises a `NotImplementedError`
+            to indicate that loading administrative regions from a file is not supported.
+
+        Args:
+            file_path: Path to the file containing administrative regions data.
+            overwrite_admin_level: (Optional) Manually specify the OpenStreetMap admin_level
+                to use instead of inferring it. Admin levels differ by region but
+                typically follow patterns like:
+
+                - [x] 2: Country
+                - [x] 4: State/Province
+                - [x] 6: County
+                - [x] 8: City/Municipality
+                - [x] 10: Neighborhood/Borough
+
+            **kwargs: Additional parameters passed to OSMnx's features_from_file.
+
+
+        Raises:
+            NotImplementedError: This method is not implemented for this class.
+
+        Examples:
+            >>> # Load administrative regions from a file (not implemented)
+            >>> admin_regions = AdminRegions()
+            >>> admin_regions.from_file("path/to/file.geojson")
+        """
         raise NotImplementedError(
             "Loading administrative regions from file is not supported."
         )
 
     def preview(self, format: str = "ascii") -> Any:
+        """Preview the `urban layer` in a human-readable format.
+
+        This method provides a summary of the `urban layer` attributes, including
+        the division type, tags, coordinate reference system, and mappings.
+        It can return the preview in either ASCII or JSON format.
+
+        Args:
+            format: The format for the preview. Can be "ascii" or "json". Default is "ascii".
+
+        Returns:
+            A string or dictionary containing the preview of the urban layer.
+            If format is "ascii", returns a formatted string. If format is "json",
+            returns a dictionary.
+
+        Raises:
+            ValueError: If the specified format is not supported.
+        """
         mappings_str = (
             "\n".join(
                 "Mapping:\n"
@@ -440,6 +769,31 @@ class AdminRegions(OSMFeatures):
             raise ValueError(f"Unsupported format '{format}'")
 
     def _calculate_connectivity(self, gdf: gpd.GeoDataFrame) -> float:
+        """Calculate the `spatial connectivity` percentage for a set of polygons.
+
+        !!! note "What is spatial connectivity?"
+            Spatial connectivity refers to the degree to which polygons in a
+            geographic dataset are adjacent or overlapping with each other.
+
+            In the context of administrative boundaries, it indicates how
+            well-defined and interconnected the regions are. A high connectivity
+            percentage suggests that the polygons are closely related and
+            form a coherent administrative structure, while a low percentage
+            may indicate isolated or poorly defined regions.
+
+            Note that this method is not a strict measure of connectivity but rather
+            an approximation based on the number of polygons that share boundaries.
+
+            Lastly, note that this is also a `static` method, consider this as an helper to only
+            use within the class.
+
+        Args:
+            gdf: `GeoDataFrame` containing polygon geometries to analyze.
+
+        Returns:
+            Percentage (0-100) of polygons that touch or overlap with at least
+            one other polygon in the dataset.
+        """
         if len(gdf) < 2:
             return 0.0
         sindex = gdf.sindex

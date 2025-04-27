@@ -7,6 +7,38 @@ from urban_mapper.modules.visualiser.abc_visualiser import VisualiserBase
 
 @beartype
 class StaticVisualiser(VisualiserBase):
+    """A visualiser that creates static plots using Matplotlib.
+
+    This visualiser generates static visualisations of geographic data using
+    Matplotlib. It supports plotting a single column from the GeoDataFrame.
+
+    !!! tip "Available Style Options"
+        Common style keys for `StaticVisualiser` include:
+        - `figsize`: Figure size as a tuple (width, height).
+        - `cmap`: Colormap for numeric data.
+        - `color`: Colour for non-numeric data.
+        - `markersize`: Size of markers.
+        - `legend`: Whether to show a legend.
+        - `vmin`: Minimum value for color scaling.
+        - `vmax`: Maximum value for color scaling.
+
+    Attributes:
+        short_name (str): Short identifier for the visualiser.
+        allowed_style_keys (set): Valid style parameters that can be provided.
+        style (dict): Style parameters applied to the visualisation.
+
+    Examples:
+        >>> from urban_mapper.modules.visualiser import StaticVisualiser
+        >>> viz = StaticVisualiser()
+        >>> viz.render(
+        ...     urban_layer_geodataframe=streets_gdf,
+        ...     columns=["street_name"],
+        ...     figsize=(10, 8),
+        ...     cmap="viridis"
+        ... )
+
+    """
+
     short_name = "Static"
     allowed_style_keys = {
         "kind",
@@ -27,6 +59,25 @@ class StaticVisualiser(VisualiserBase):
     def _render(
         self, urban_layer_geodataframe: gpd.GeoDataFrame, columns: List[str], **kwargs
     ) -> Any:
+        """Render a static plot of the GeoDataFrame.
+
+        Creates a static Matplotlib plot for the specified column.
+
+        !!! note "To Keep in Mind"
+            Only supports visualisation of a single column at a time.
+
+        Args:
+            urban_layer_geodataframe (gpd.GeoDataFrame): The GeoDataFrame to visualise.
+            columns (List[str]): A list with a single column name to plot.
+            **kwargs: Additional parameters for customising the plot,
+                overriding any style parameters set during initialisation.
+
+        Returns:
+            Any: A Matplotlib figure object.
+
+        Raises:
+            ValueError: If more than one column is specified.
+        """
         if len(columns) > 1:
             raise ValueError("StaticVisualiser only supports a single column.")
         render_kwargs = {**self.style, **kwargs}
@@ -36,6 +87,24 @@ class StaticVisualiser(VisualiserBase):
         return ax.get_figure()
 
     def preview(self, format: str = "ascii") -> Any:
+        """Generate a preview of this static visualiser.
+
+        Provides a summary of the visualiser's configuration.
+
+        Args:
+            format (str): The output format ("ascii" or "json"). Defaults to "ascii".
+
+        Returns:
+            Any: A string (for "ascii") or dict (for "json") representing the visualiser.
+
+        Raises:
+            ValueError: If format is unsupported.
+
+        Examples:
+            >>> viz = StaticVisualiser()
+            >>> print(viz.preview())
+            Visualiser: StaticVisualiser using Matplotlib
+        """
         if format == "ascii":
             return "Visualiser: StaticVisualiser using Matplotlib"
         elif format == "json":

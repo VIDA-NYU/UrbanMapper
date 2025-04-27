@@ -12,6 +12,39 @@ from urban_mapper.config.container import container
 
 @beartype
 class PipelineValidator:
+    """Validator for Pipeline Steps.
+
+    !!! note "The Stricter The Better!"
+        To avoid side-effects, the validator is strict about the types of components
+        it accepts. The number of components of each type is also strictly enforced.
+
+
+        | Schema Key  | Component Type    | Class Path                                    | Min | Max       |
+        |-------------|-------------------|-----------------------------------------------|-----|-----------|
+        | urban_layer | Urban Layer       | `urban_mapper.modules.urban_layer.UrbanLayerBase` | 1   | 1         |
+        | loader      | Loader            | `urban_mapper.modules.loader.LoaderBase`         | 1   | 1         |
+        | geo_imputer | Geo Imputer       | `urban_mapper.modules.imputer.GeoImputerBase`    | 0   | unlimited |
+        | geo_filter  | Geo Filter        | `urban_mapper.modules.filter.GeoFilterBase`      | 0   | unlimited |
+        | enricher    | Enricher          | `urban_mapper.modules.enricher.EnricherBase`     | 1   | unlimited |
+        | visualiser  | Visualiser        | `urban_mapper.modules.visualiser.VisualiserBase` | 0   | 1         |
+
+        Information About The Table Above
+
+        - [x] **Min** and **Max** indicate the allowed number of components of each type in the pipeline.
+        - [x] A **Min** of `1` means the component is required; `0` means it’s optional.
+        - [x] **unlimited** in the Max column means you can include as many instances as needed—great for stacking multiple enrichers or filters to enhance your analysis.
+
+    Ensures pipeline steps comply with schema requirements, checking uniqueness, counts, and types.
+
+    Attributes:
+        steps (List[Tuple[str, Union[UrbanLayerBase, LoaderBase, GeoImputerBase, GeoFilterBase, EnricherBase, VisualiserBase, Any]]]):
+            List of (name, component) tuples to validate.
+        pipeline_schema (Dict[Type[Any], Dict[str, int]]): Schema defining step requirements.
+
+    Examples:
+        >>> validator = um.PipelineValidator(steps)  # Validation occurs on init
+    """
+
     def __init__(
         self,
         steps: List[
@@ -34,6 +67,14 @@ class PipelineValidator:
         self._validate_steps()
 
     def _validate_steps(self) -> None:
+        """Validate pipeline steps against schema.
+
+        Checks `uniqueness of names`, `valid types`, and `count constraints`.
+
+        Raises:
+            ValueError: If names are duplicated or counts don’t meet schema.
+            TypeError: If step type isn’t valid.
+        """
         step_counts: Dict[Type[Any], int] = {
             cls: 0 for cls in self.pipeline_schema.keys()
         }

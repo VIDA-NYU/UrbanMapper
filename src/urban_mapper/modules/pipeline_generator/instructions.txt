@@ -41,7 +41,7 @@ Below is an overview of each module, its purpose, and its available chaining met
 #   - .from_place(place_name, **kwargs): Load from place.
 #   - .from_file(file_path, **kwargs): Load from file. # Available for streets_sidewalks (Tile2Net inference), and streets_crosswalks (Tile2Net inference), as well as, custom_urban_layer.
 #   - Other from_* methods: .from_address, .from_bbox, .from_point, .from_polygon, .from_xml. –– Available for streets_intersections and streets_roads, as well as all region layers.
-#   - .build(): Finalize the component.
+#   - .build(): Finalise the component.
 # - Note: Multiple .with_mapping can be chained for multiple mappings.
 
 # Loaders
@@ -55,7 +55,7 @@ Below is an overview of each module, its purpose, and its available chaining met
 #   - .from_dataframe(dataframe): Load from DataFrame.
 #   - .with_columns(longitude_column, latitude_column): Specify coordinate columns.
 #   - .with_crs(crs): Set CRS.
-#   - .build(): Finalize the component.
+#   - .build(): Finalise the component.
 # - Note: Only one pair of coordinates can be loaded at a time.
 
 # Imputers
@@ -66,7 +66,7 @@ Below is an overview of each module, its purpose, and its available chaining met
 # - Chaining Methods:
 #   - .with_type(type): Specify imputer type.
 #   - .on_columns(longitude_column, latitude_column): Define columns to impute.
-#   - .build(): Finalize the component.
+#   - .build(): Finalise the component.
 # - Note: Multiple imputers can be instantiated for different coordinate pairs.
 
 # Filters
@@ -75,7 +75,7 @@ Below is an overview of each module, its purpose, and its available chaining met
 #   - BoundingBoxFilter: Filters to urban layer's bounding box.
 # - Chaining Methods:
 #   - .with_type(type): Specify filter type.
-#   - .build(): Finalize the component.
+#   - .build(): Finalise the component.
 # - Note: Multiple filters can be used.
 
 # Enrichers
@@ -87,19 +87,19 @@ Below is an overview of each module, its purpose, and its available chaining met
 #   - .with_data(group_by, values_from=None): Specify grouping and value columns.
 #   - .aggregate_by(method, output_column): Aggregate using method. Method can be "mean", "sum", "min", "max", as well as a custom-user-defined functions that receives a pandas Series and returns a single value.
 #   - .count_by(output_column): Count occurrences.
-#   - .build(): Finalize the component.
+#   - .build(): Finalise the component.
 # - Note: Multiple enrichers can be used.
 
-# Visualizers
-# - Purpose: Visualize enriched urban layer.
+# Visualisers
+# - Purpose: Visualise enriched urban layer.
 # - Available Types:
 #   - Interactive: Interactive maps using Folium.
 #   - Static: Static plots using Matplotlib.
 # - Chaining Methods:
-#   - .with_type(type): Specify visualizer type.
-#   - .with_style(style_dict): Customize visualization.
-#   - .build(): Finalize the component.
-# - Note: Only one visualizer per pipeline.
+#   - .with_type(type): Specify visualiser type.
+#   - .with_style(style_dict): Customise visualization.
+#   - .build(): Finalise the component.
+# - Note: Only one visualiser per pipeline.
 
 # Component Usage Examples
 
@@ -163,7 +163,7 @@ enricher = (
 )
 ```
 
-# Visualizer Example
+# Visualiser Example
 
 ```python
 visualiser = (
@@ -244,7 +244,7 @@ pipeline.compose()
 # Transform the data
 mapped_data, enriched_layer = pipeline.transform()
 
-# Visualize the results
+# Visualise the results
 fig = pipeline.visualise(["avg_floors"])
 fig  # Displays the interactive map
 ```
@@ -268,7 +268,7 @@ pipeline = UrbanPipeline([
 # - compose(): Validates and prepares the pipeline.
 # - transform(): Executes the pipeline, returning (mapped_data, enriched_layer).
 # - compose_transform(): Combines compose() and transform().
-# - visualise(columns): Visualizes the enriched layer.
+# - visualise(columns): Visualises the enriched layer.
 # - save(filepath): Saves the pipeline configuration.
 # - load(filepath): Loads a saved pipeline.
 

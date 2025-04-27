@@ -9,6 +9,8 @@ from .urban_layers import (
     RegionStates,
     RegionCountries,
     CustomUrbanLayer,
+    AdminFeatures,
+    AdminRegions,
 )
 
 from .urban_layer_factory import UrbanLayerFactory
@@ -40,5 +42,7 @@ __all__ = [
     "RegionCountries",
     "URBAN_LAYER_FACTORY",
     "UrbanLayerFactory",
+    "AdminFeatures",
+    "AdminRegions",
     "CustomUrbanLayer",
 ]
