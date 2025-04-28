@@ -1,4 +1,4 @@
-# Auctus Mixin
+# Jupyter GIS (JGIS) Mixin
 
 !!! tip "What is Jupyter GIS Mixin?"
     The `Jupyter GIS` mixin is responsible to deliver a way to explore your UrbanMapper's pipeline in a more
