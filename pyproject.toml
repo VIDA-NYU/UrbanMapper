@@ -114,7 +114,6 @@ dev = [
     "mkdocs-gen-files>=0.5",
     "mkdocs-git-revision-date-localized-plugin>=1.2",
     "mkdocs-literate-nav>=0.6",
-    "mkdocs-material[imaging]>=9.5",
     "mkdocs-minify-plugin>=0.8",
     "mkdocstrings[python]>=0.25",
     # YORE: EOL 3.10: Remove line.
@@ -122,4 +121,5 @@ dev = [
     "mkdocstrings-python>=1.16.10",
     "mkdocs-jupyter>=0.25.1",
     "pymdown-extensions>=10.14.3",
+    "mkdocs-material[emoji,imaging]>=9.6.11",
 ]
