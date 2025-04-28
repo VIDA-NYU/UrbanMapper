@@ -3,6 +3,7 @@ repo_name: VIDA-NYU/UrbanMapper
 
 repo_url: https://github.com/VIDA-NYU/UrbanMapper
 edit_uri: blob/main/docs/
+site_url: https://vida-nyu.github.io/UrbanMapper/
 
 site_author: New York University
 copyright: Maintained by Simon Provost, © New York University 2025-present
@@ -107,6 +108,10 @@ plugins:
             heading_level: 3
             show_root_heading: true
             show_category_heading: true
+          options:
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
   - autorefs
   - privacy
   - social
@@ -135,7 +140,7 @@ extra_javascript:
 
 
 nav:
-  - Home: "/"
+  - Home: index.md
   - Getting Started:
     - Installation: getting-started/installation.md
     - Getting Started Step-By-Step: getting-started/quick-start_step_by_step.md
@@ -160,6 +165,9 @@ nav:
     - Visualisers: api/visualisers.md
     - Pipelines: api/pipelines.md
     - Pipeline Generators: api/pipeline_generators.md
+    - Auctus Mixins: api/auctus.md
+    - Interactive Table VIS: api/interactive_table_vis.md
+    - JupyterGIS Mixins: api/jupyter_gis.md
   - Contributing: ./CONTRIBUTING.md
   - Releases: https://github.com/VIDA-NYU/UrbanMapper/releases
   - Branding: ./BRANDING.md

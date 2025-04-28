@@ -38,13 +38,12 @@ Mixins extend `UrbanMapper` by tapping into external libraries and APIs, adding 
 Looking ahead, imagine a mixin connecting to a `data lake API`—pulling in data faster than `Auctus Search`, which depends on
 manual steps like `searching` and `selecting`. More mixins are in the works, so `UrbanMapper`’s toolkit will keep expanding!
 
-!!! tips "Modules vs. Mixins: What’s the Difference?"
+!!! tip "Modules vs. Mixins: What’s the Difference?"
       - **Modules** are `UrbanMapper`’s homegrown tools—the core pieces built from scratch to handle the essentials of urban analysis, like `loading` data, `filling gaps`, `filtering`, `enriching`, and `visualising`. They’re the foundation of what makes `UrbanMapper` unique and are designed to work seamlessly within its framework.
       - **Mixins**, by contrast, are enhancements powered by external libraries and APIs. They bring in outside tools—like `Skrub` for interactive visuals, `JupyterGIS` for collaborative mapping, or `Auctus` for dataset searches—to extend `UrbanMapper`’s capabilities. While modules are the heart of the system, mixins are optional add-ons that tap into existing solutions to tackle specific urban challenges.
 
-
 !!! important "How To Understand How To Use The `External Libraries` Supported?"
-    The user guides focusses primarily the `UrbanMapper` modules. For the external libraries,
+    The user guides focuses primarily the `UrbanMapper` modules. For the external libraries,
     please refer to the `examples` folder in the `UrbanMapper` repository. They are shown in actions.
 
     [Open Examples :fontawesome-brands-python:](https://github.com/VIDA-NYU/UrbanMapper/tree/main/examples){ .md-button } [Open Examples Explainations :fontawesome-solid-compass:](../getting-started/examples.md){ .md-button }
@@ -53,11 +52,11 @@ manual steps like `searching` and `selecting`. More mixins are in the works, so 
 
 Dive into these sections to master `UrbanMapper`’s full potential:
 
-- **[1 - Loaders](loaders.md)**: Get your geospatial data loaded and primed for action.
-- **[2 -Urban Layers](urban-layers.md)**: Shape the spatial backbone of your analysis—streets, neighborhoods, and more.
-- **[3 -Imputers](imputers.md)**: Tackle missing data like a pro, keeping your analysis solid.
-- **[4 - Filters](filters.md)**: Zero in on the details—by bounding box.
-- **[5 - Enrichers](enrichers.md)**: Layer on insights, like counting trees per neighborhood.
-- **[6 - Visualisers](visualisers.md)**: Craft stunning maps and charts that tell the story.
-- **[7 - Pipelines](pipelines.md)**: Build reproducible, shareable workflows from start to finish.
-- **[8 - Pipeline Generators](pipeline-generators.md)**: Let LLMs whip up pipelines from your ideas.
+- **[1 - Loaders](modules/1-loaders.md)**: Get your geospatial data loaded and primed for action.
+- **[2 -Urban Layers](modules/2-urban-layers.md)**: Shape the spatial backbone of your analysis—streets, neighborhoods, and more.
+- **[3 -Imputers](modules/3-imputers.md)**: Tackle missing data like a pro, keeping your analysis solid.
+- **[4 - Filters](modules/4-filters.md)**: Zero in on the details—by bounding box.
+- **[5 - Enrichers](modules/5-enrichers.md)**: Layer on insights, like counting trees per neighborhood.
+- **[6 - Visualisers](modules/6-visualisers.md)**: Craft stunning maps and charts that tell the story.
+- **[7 - Pipelines](modules/7-pipelines.md)**: Build reproducible, shareable workflows from start to finish.
+- **[8 - Pipeline Generators](modules/8-pipeline-generators.md)**: Let LLMs whip up pipelines from your ideas.
