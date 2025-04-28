@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this library, please cite it as below 👇"
+authors:
+- family-names: "Provost"
+  given-names: "Simon"
+  orcid: "https://orcid.org/0000-0001-8402-5464"
+- family-names: "Rulff"
+  given-names: "Joao"
+  orcid: "https://orcid.org/0000-0003-3341-7059"
+- family-names: "Castelo Quispe"
+  given-names: "Sonia"
+  orcid: "https://orcid.org/0000-0001-6881-3006"
+- family-names: "Felix Dias"
+  given-names: "Fabio"
+  orcid: "https://orcid.org/0000-0003-2081-1233"
+- family-names: "Freire"
+  given-names: "Juliana"
+  orcid: "https://orcid.org/0000-0003-3915-7075"
+- family-names: "T. Silva"
+  given-names: "Claudio"
+  orcid: "https://orcid.org/0000-0003-2452-2295"
+title: "🗺️ Spatial Join & Enrich any urban layer given any external urban dataset of interest, streamline your urban analysis with Scikit-Learn-Like pipelines, and share your insights with the urban research community!"
+version: 0.0.1
+date-released: 2025-04-27
+url: "https://github.com/VIDA-NYU/UrbanMapper"
