@@ -1,15 +1,16 @@
-# 🤝 Contributing to  `UrbanMapper` 
+# 🤝 Contributing to `UrbanMapper`
 
-Welcome to the `contributing guide` for **UrbanMapper**!  We are excited to collaborate on developing a tool for urban
+Welcome to the `contributing guide` for **UrbanMapper**! We are excited to collaborate on developing a tool for urban
 data analysis that is both accessible and powerful. This guide will help you set up your environment, add new
-components, and submit contributions. Whether you are `fixing bugs`, `adding features`, or `improving documentation`, your
-work is important!
+components, and submit contributions. Whether you are `fixing bugs`, `adding features`, or `improving documentation`,
+your work is important!
 
-!!! important "Status of  `UrbanMapper` "
-     `UrbanMapper`  is actively evolving. Expect changes, and if you hit a snag, open a GitHub Issue—we’re here to help!
+!!! important "Status of `UrbanMapper`"
+    `UrbanMapper` is actively evolving. Expect changes, and if you hit a snag, open a GitHub Issue—we’re here to help!
 
 !!! tip "New Contributors"
-    Check out the [GitHub Issues](https://github.com/VIDA-NYU/UrbanMapper/issues) for good first tasks or reach out for guidance!
+    Check out the [GitHub Issues](https://github.com/VIDA-NYU/UrbanMapper/issues) for good first tasks or reach out for
+    guidance!
 
 ---
 
@@ -34,6 +35,8 @@ Get started by setting up your development environment. We recommend `uv` for it
    uv lock
    uv sync
    ```
+   **Note**: If you encounter errors related to 'cairo' during dependency installation, see
+   the [Troubleshooting](#troubleshooting) section.
 
 3. **(Optional) Add Jupyter Extensions** for visualizations:
    ```bash
@@ -95,7 +98,7 @@ Pre-commit hooks enforce standards by running checks (like `ruff`) before commit
 
 ## 🧩 How to Create New Components
 
- `UrbanMapper` ’s modular design makes extending it a breeze. Select the component type you want to add:
+`UrbanMapper`’s modular design makes extending it a breeze. Select the component type you want to add:
 
 === "Loader"
 
@@ -119,7 +122,6 @@ Pre-commit hooks enforce standards by running checks (like `ruff`) before commit
             df = pd.read_csv(self.file_path)  #(1)
             # Convert to GeoDataFrame...
             return gdf
-
     ```
 
     1. Reads the CSV file into a pandas DataFrame before geospatial conversion.
@@ -145,7 +147,6 @@ Pre-commit hooks enforce standards by running checks (like `ruff`) before commit
         def from_place(self, place_name: str, **kwargs) -> None:
             self.network = ox.graph_from_place(place_name, network_type="all")  # (1)
             self.layer = ox.graph_to_gdfs(self.network)[1].to_crs(self.coordinate_reference_system)
-
     ```
 
     1. Fetches street network data using OSMnx for the specified place.
@@ -285,7 +286,7 @@ Pre-commit hooks enforce standards by running checks (like `ruff`) before commit
 
 ## 🏗️ Pipeline Architecture
 
- `UrbanMapper` ’s pipeline flows like this:
+`UrbanMapper`’s pipeline flows like this:
 
 ```mermaid
 graph TD
@@ -309,20 +310,23 @@ First and foremost, thank you for your contribution! To generate documentation, 
    ```bash
    uv sync --dev
    ```
-   
+
 2. **Build Docs**:
    ```bash
    ./build_docs.sh
    ```
-   
+
 3. **Serve Docs**:
    ```bash
-    uv run mkdocs serve
-    ```
-   
-4. **Open in Browser**:
+   uv run mkdocs serve
+   ```
 
-    [Localhost :fontawesome-solid-paper-plane:](http://127.0.0.1:8000){ .md-button }
+4. **Open in Browser**:
+   [Localhost :fontawesome-solid-paper-plane:](http://127.0.0.1:8000){ .md-button }
+
+**Note**: During documentation generation, ensure your environment is correctly set up. If you encounter issues with
+dependencies like 'cairo', refer to the [Troubleshooting](#troubleshooting) section. If you’ve added new packages,
+update the requirements files as described in [Managing Dependencies](#managing-dependencies).
 
 ---
 
@@ -341,8 +345,14 @@ First and foremost, thank you for your contribution! To generate documentation, 
    ```
 - **Submit PR**:
     - Push and open a PR against `main`.
-    - **Note**: We suggest [Git Karma](https://example.com/git-karma) for commits/branches (e.g., `feat/add-loader`),
-      but it’s optional unless CI enforces it.
+    - **Note**: We highly encourage using [Git Karma](https://example.com/git-karma) for commits/branches (e.g., `feat/add-loader`).
+
+!!! warning "PR for the being are merge commits without squashing"
+    We are currently using merge commits without squashing. This may change when `UM` becomes more stable.
+    Therefore, make sure your history is clean enough and does not provide a spaghetti-style history.
+
+    Interested in further readings? Look [here](https://simonprovostdev.vercel.app/blog/fd082ab2-d5ca-4e09-b5d7-b8b808fbd639/an-excellent-technique-to-keep-a-git-branch-tidy-%F0%9F%A7%BC).
+
 
 ### Common Git Commands
 
@@ -357,13 +367,94 @@ First and foremost, thank you for your contribution! To generate documentation, 
 | `git rebase origin/main`   | Rebase your branch on top of main     |
 
 !!! tip "Git Hints"
-    Use `git rebase -i` to polish commits, but don’t rewrite shared history.
+    - [x] Use `git rebase -i` to polish commits, but don’t rewrite shared history.
+    - [x] We may request history rewritting for clarity. Beginner to fixup ? Read this nice article: https://github.com/TheAssemblyArmada/Thyme/wiki/Using-Fixup-Commits
+    - [x] Want to have a nice look at your logs? Use `Tig` to visualize your git history. Install it via `brew install tig` and run `tig` in your terminal.
 
 ---
 
 ## 🎉 Thank You!
 
-Thanks for contributing to  `UrbanMapper` ! Your efforts shape urban data analysis. Questions? Open an issue—we’ve got your
-back.
+Thanks for contributing to `UrbanMapper`! Your efforts shape urban data analysis. Questions? Open an issue—we’ve got
+your back.
 
 Happy mapping! 🌍
+
+---
+
+## Troubleshooting
+
+### Handling 'cairo' Dependency Issues
+
+!!! warning
+    On MacOS, if you encounter errors related to 'cairo', follow these steps:
+
+    Source: [https://github.com/squidfunk/mkdocs-material/issues/5121](https://github.com/squidfunk/mkdocs-material/issues/5121).
+
+    1. Install 'cairo' if not already installed:
+       ```bash
+       brew install cairo
+       ```
+    2. If already installed, try reinstalling:
+       ```bash
+       brew reinstall cairo
+       ```
+    3. If the symlink is broken, fix it:
+       ```bash
+       brew link cairo
+       ```
+       Or:
+       ```bash
+       brew unlink cairo && brew link cairo
+       ```
+    4. For MacOS with M2 and before (Intel included):
+       - Set the environment variable:
+         ```bash
+         export DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib
+         ```
+    4. For MacOS with M3 chip or later:
+       - Create a symbolic link:
+         ```bash
+         ln -s /opt/homebrew/lib/libcairo.2.dylib .
+         ```
+
+    **Note**: These steps have been tested on MacOS. For Windows or Linux, adapt accordingly or open a GitHub issue.
+
+---
+
+## Managing Dependencies
+
+When you add a new package to the project, update the requirements files as follows:
+
+1. **Update `requirements.txt`** –– Mainly for the people who are using `pip` or `conda` to install the dependencies.
+   ```bash
+   uv pip compile pyproject.toml -o requirements.txt
+   ```
+   Note that this step will vanish after the first release of UrbanMapper on PyPi.
+   Meanwhile, if you want to know more about why we should do that and, why not `UV` is automatically doing that:
+   [https://github.com/astral-sh/uv/issues/6007](https://github.com/astral-sh/uv/issues/6007). Happy reading 💪!
+
+   2. **Update `requirements-dev.txt`** –– Mainly for the newly generated documentation via ReadTheDoc.
+      ```bash
+      uv export --dev --no-hashes --no-header --no-annotate | awk '{print $1}' FS=' ;' > requirements-dev.txt
+      ```
+   
+      Then, manually adjust for platform-specific dependencies. Locate lines like:
+      ```
+      pywin32==310
+      pywin32-ctypes==0.2.3
+      pywinpty==2.0.15
+      ```
+   
+      Replace them with:
+      ```
+      pywin32==310; platform_system=="Windows"
+      pywin32-ctypes==0.2.3; platform_system=="Windows"
+      pywinpty==2.0.15; platform_system=="Windows"
+      ```
+   
+      Note that this manual adjustment is needed for Read The Docs, which does not yet support `uv`. See the ongoing
+      discussion at [https://github.com/astral-sh/uv/issues/10074](https://github.com/astral-sh/uv/issues/10074).
+
+3. **Commit and Push**:
+   After updating, commit and push the changes to the repository.
