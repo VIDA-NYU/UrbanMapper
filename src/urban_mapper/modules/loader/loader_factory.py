@@ -517,6 +517,12 @@ class LoaderFactory:
                     "DataFrame loading requires latitude and longitude columns. Call with_columns() with valid column names."
                 )
             loaded_data = self._load_from_dataframe(coordinate_reference_system)
+            if self._preview is not None:
+                logger.log(
+                    "DEBUG_LOW",
+                    "Note: Preview is not supported for DataFrame sources.",
+                )
+            return loaded_data
         elif self.source_type == "huggingface":
             if self.latitude_column == "None" or self.longitude_column == "None":
                 raise ValueError(
