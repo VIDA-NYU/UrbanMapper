@@ -2,6 +2,14 @@
 #    uv pip compile pyproject.toml -o requirements.txt
 about-time==4.2.1
     # via alive-progress
+aiohappyeyeballs==2.6.1
+    # via aiohttp
+aiohttp==3.11.18
+    # via
+    #   datasets
+    #   fsspec
+aiosignal==1.3.2
+    # via aiohttp
 alembic==1.15.2
     # via ell-ai
 alive-progress==3.2.0
@@ -39,6 +47,7 @@ async-lru==2.0.5
     # via jupyterlab
 attrs==25.3.0
     # via
+    #   aiohttp
     #   cattrs
     #   jsonschema
     #   referencing
@@ -101,6 +110,8 @@ datamart-profiler==0.11
     # via
     #   auctus-search
     #   data-profile-viewer
+datasets==3.5.0
+    # via urban-mapper (pyproject.toml)
 debugpy==1.8.14
     # via ipykernel
 decorator==5.2.1
@@ -111,10 +122,12 @@ dependency-injector==4.46.0
     # via urban-mapper (pyproject.toml)
 deprecated==1.2.18
     # via opentelemetry-api
-dill==0.3.9
+dill==0.3.7
     # via
     #   urban-mapper (pyproject.toml)
+    #   datasets
     #   ell-ai
+    #   multiprocess
 distlib==0.3.9
     # via virtualenv
 distro==1.9.0
@@ -137,13 +150,24 @@ fastapi-cli==0.0.7
 fastjsonschema==2.21.1
     # via nbformat
 filelock==3.18.0
-    # via virtualenv
+    # via
+    #   datasets
+    #   huggingface-hub
+    #   virtualenv
 folium==0.19.5
     # via urban-mapper (pyproject.toml)
 fonttools==4.57.0
     # via matplotlib
 fqdn==1.5.1
     # via jsonschema
+frozenlist==1.6.0
+    # via
+    #   aiohttp
+    #   aiosignal
+fsspec==2024.12.0
+    # via
+    #   datasets
+    #   huggingface-hub
 geographiclib==2.0
     # via geopy
 geopandas==1.0.1
@@ -167,6 +191,8 @@ h11==0.14.0
     # via
     #   httpcore
     #   uvicorn
+hf-xet==1.1.0
+    # via huggingface-hub
 httpcore==1.0.7
     # via httpx
 httptools==0.6.4
@@ -179,6 +205,8 @@ httpx==0.28.1
     #   groq
     #   jupyterlab
     #   openai
+huggingface-hub==0.31.1
+    # via datasets
 identify==2.6.9
     # via pre-commit
 idna==3.10
@@ -188,6 +216,7 @@ idna==3.10
     #   httpx
     #   jsonschema
     #   requests
+    #   yarl
 importlib-metadata==8.6.1
     # via opentelemetry-api
 ipykernel==6.29.5
@@ -385,6 +414,12 @@ millify==0.1.1
     #   auctus-search
 mistune==3.1.3
     # via nbconvert
+multidict==6.4.3
+    # via
+    #   aiohttp
+    #   yarl
+multiprocess==0.70.15
+    # via datasets
 mypy-extensions==1.0.0
     # via black
 nbclient==0.10.2
@@ -431,6 +466,7 @@ numpy==2.2.4
     #   contourpy
     #   data-profile-viewer
     #   datamart-profiler
+    #   datasets
     #   ell-ai
     #   folium
     #   geopandas
@@ -454,7 +490,9 @@ overrides==7.7.0
 packaging==24.2
     # via
     #   black
+    #   datasets
     #   geopandas
+    #   huggingface-hub
     #   ipykernel
     #   jupyter-events
     #   jupyter-server
@@ -468,6 +506,7 @@ pandas==2.2.3
     # via
     #   data-profile-viewer
     #   datamart-profiler
+    #   datasets
     #   geopandas
     #   mapclassify
     #   osmnx
@@ -501,6 +540,10 @@ prompt-toolkit==3.0.50
     # via
     #   ipython
     #   jupyter-console
+propcache==0.3.1
+    # via
+    #   aiohttp
+    #   yarl
 psutil==5.9.8
     # via
     #   ell-ai
@@ -515,7 +558,9 @@ ptyprocess==0.7.0
 pure-eval==0.2.3
     # via stack-data
 pyarrow==19.0.1
-    # via urban-mapper (pyproject.toml)
+    # via
+    #   urban-mapper (pyproject.toml)
+    #   datasets
 pyasn1==0.6.1
     # via
     #   pyasn1-modules
@@ -573,6 +618,8 @@ pytz==2025.2
     # via pandas
 pyyaml==6.0.2
     # via
+    #   datasets
+    #   huggingface-hub
     #   jupyter-events
     #   jupyter-nbextensions-configurator
     #   pre-commit
@@ -601,9 +648,11 @@ requests==2.32.3
     #   auctus-search
     #   datamart-geo
     #   datamart-profiler
+    #   datasets
     #   ell-ai
     #   folium
     #   google-genai
+    #   huggingface-hub
     #   jupytergis-lab
     #   jupyterlab-server
     #   osmnx
@@ -710,6 +759,8 @@ tornado==6.4.2
 tqdm==4.67.1
     # via
     #   urban-mapper (pyproject.toml)
+    #   datasets
+    #   huggingface-hub
     #   openai
 traitlets==5.9.0
     # via
@@ -746,6 +797,7 @@ typing-extensions==4.13.2
     #   fastapi
     #   google-genai
     #   groq
+    #   huggingface-hub
     #   openai
     #   pydantic
     #   pydantic-core
@@ -791,8 +843,12 @@ widgetsnbextension==4.0.14
     # via ipywidgets
 wrapt==1.17.2
     # via deprecated
+xxhash==3.5.0
+    # via datasets
 xyzservices==2025.1.0
     # via folium
+yarl==1.20.0
+    # via aiohttp
 yjs-widgets==0.4.0
     # via jupytergis-lab
 ypywidgets==0.9.7

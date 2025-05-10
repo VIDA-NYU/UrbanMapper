@@ -53,6 +53,7 @@
         members:
             - from_file 
             - from_dataframe
+            - from_huggingface
             - with_columns
             - with_crs
             - with_preview

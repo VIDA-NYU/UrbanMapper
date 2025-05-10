@@ -13,20 +13,22 @@ for `mapping`, `enrichment`, and `analysis`.
 `UrbanMapper` provides loaders for a variety of data formats, so you can bring in your data however it’s stored:
 
 - **CSV Loader**: Great for tabular data like spreadsheets. Tell it where your coordinates are, and it’ll handle the
-  rest.
+rest.
 - **Shapefile Loader**: A go-to for GIS pros—loads ESRI Shapefiles with all their spatial details intact. We automatically infer the coordinates based on the geometry of each records in the dataset.
 - **Parquet Loader**: Perfect for large datasets—reads efficient Parquet files while preserving geospatial info.
+- **Hugging Face Loader**: Seamlessly load datasets hosted on the Hugging Face Hub. Ideal for accessing curated datasets for urban analysis.
 
 And if your data’s already loaded by any means in your Python script or Notebook's cell:
 
 - **From (Geo)Pandas DataFrame**: Have a DataFrame ready? Load it up with `with_dataframe` instead of `from_file` and you're good to go.
 
 !!! question "Which Loader Should I Use?"
-    It does not really matter which loader you choose, as `UrbanMapper` will automatically infer the correct one based on the file extension. However, here are some guidelines:
+    It does not really matter which loader you choose, as `UrbanMapper` will automatically infer the correct one based on the file extension or source type. However, here are some guidelines:
         
     - **CSV**: For simple, tabular data (e.g., taxi trip logs).
     - **Shapefile**: For GIS-ready files with built-in geometry.
     - **Parquet**: For large, optimised datasets.
+    - **Hugging Face**: For accessing curated datasets directly from the Hugging Face Hub.
     - **DataFrames**: When your data’s already in memory from another process.
 
 ## 🏗️ Instantiating your first `Loader`
@@ -53,7 +55,7 @@ loader = (
   - `build()`: Locks it in, creating your loader.
 
 ### More Ways to Load Data
-UrbanMapper’s got options for a lot of scenario:
+UrbanMapper’s got options for a lot of scenarios:
 
 - **From a Shapefile**: For spatial data straight from GIS tools.
   ```python
@@ -69,6 +71,15 @@ UrbanMapper’s got options for a lot of scenario:
       um.loader
       .from_file("./data/taxi_trips.parquet")
       .with_columns(longitude_column="pickup_longitude", latitude_column="pickup_latitude")
+      .build()
+  )
+  ```
+- **From a Hugging Face Dataset**: Load curated datasets directly from the Hugging Face Hub.
+  ```python
+  loader = (
+      um.loader
+      .from_huggingface("oscur/pluto")  # Replace with your desired dataset
+      .with_columns(longitude_column="longitude", latitude_column="latitude")
       .build()
   )
   ```
@@ -108,7 +119,7 @@ loader = (
 )
 ```
 
-- **Why bother?** A mismatched CRS is like using a map from the wrong city—setting it right keeps your data aligned with the urban layers and the continuing `UrbanMapper`'s owrkflow.
+- **Why bother?** A mismatched CRS is like using a map from the wrong city—setting it right keeps your data aligned with the urban layers and the continuing `UrbanMapper`'s workflow.
 
 ## 📦 Loading the Data
 
