@@ -125,6 +125,14 @@ The `examples/` directory is organised into three main sections: `Basics/`, `End
     - **[2] Paris_Remarquable_Trees_Advanced_Pipeline.ipynb**: Explore the remarkable trees of Paris within its neighborhoods.
         - *What it does*: This notebook demonstrates how to load the remarkable trees dataset, create a neighborhoods layer, and enrich the neighborhoods with remarkable trees information. E.g., the count of them per neighborhood. Another one may be the circumference of the trees on average per neighborhood. Etc. As an extra, it LLM-compute a summary of why the trees are remarkable and what is the impact of them on the neighborhoods.
 
+    🗺️ **Overture Map & Urban Mapper?**
+
+    - **[1] overture_pipeline.ipynb**: Explore the Overture Map roads & buildings datasets using `UrbanMapper`.
+        - *What it does*: This notebook demonstrates how to load the Overture Map dataset, create a roads-based layer, and enrich the roads with Overture Map building counts. 
+
+    - **[2] overture_pipeline_advanced.ipynb**: Explore the Overture Map roads & buildings datasets using `UrbanMapper`.
+        - *What it does*: This notebook demonstrates how to load the Overture Map dataset, create a roads-based layer, and enrich the roads with Overture Map building counts, and plenty of other enrichers to explore the Overture buildings dataset.
+
 === "🔗 External Libraries Usage"
 
     `UrbanMapper` doesn’t work in isolation—it plays nicely with other powerful tools to make your user journey experience
