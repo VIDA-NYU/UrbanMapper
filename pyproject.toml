@@ -13,7 +13,7 @@ license = {text = "MIT"}
 readme = "README.md"
 requires-python = ">=3.10"
 keywords = []
-version = "0.1.0"
+version = "0.1.1"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
