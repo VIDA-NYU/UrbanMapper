@@ -6,7 +6,7 @@ build-backend = "pdm.backend"
 name = "urban-mapper"
 description = "🗺️ Spatial Join & Enrich any urban layer given any external urban dataset of interest, streamline your urban analysis with Scikit-Learn-Like pipelines, and share your insights with the urban research community!"
 authors = [
-     {name = "Provost Simon", email = "sgp9504@nyu.edu"}, # First author & maintainer
+     {name = "Provost Simon", email = "sgp29@kent.ac.uk"}, # First author & maintainer
      {name = "New York University", email = "fairuse@nyu.edu"}, # Copyright holder
 ]
 license = {text = "MIT"}
@@ -86,9 +86,6 @@ source-includes = [
     "*.md",
     "LICENSE",
 ]
-
-[tool.uv.sources]
-auctus-search = { git = "https://github.com/VIDA-NYU/auctus_search.git", branch = "main" }
 
 [dependency-groups]
 dev = [
