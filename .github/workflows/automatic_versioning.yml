@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checkout the code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Bump version
         id: bump
@@ -26,7 +28,8 @@ jobs:
         env:
           BUMPVERSION_TAG: "true"
         with:
-          args: ${{ inputs.bump-type }}
+          args: ${{ inputs.bump-type }} --config-file .bumpversion.toml
+          github-token: ${{ secrets.GH_TOKEN }}
 
       - name: Check
         if: steps.bump.outputs.bumped == 'true'
