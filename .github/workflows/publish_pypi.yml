@@ -8,6 +8,8 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout the code
         uses: actions/checkout@v4
@@ -18,7 +20,7 @@ jobs:
         uses: astral-sh/setup-uv@v4
         with:
           version: "0.5.11"
-          enable-cache: true
+          enable-cache: false
           python-version: "3.10"
 
       - name: Lock and Sync Dependencies
@@ -32,4 +34,4 @@ jobs:
 
       - name: Publish to PyPI
         run: |
-          uv publish
+          uv publish --token ${{ secrets.PYPI_TOKEN }}
