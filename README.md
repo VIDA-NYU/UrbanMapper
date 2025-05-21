@@ -3,6 +3,7 @@
    <h3>Enrich Urban Layers Given Urban Datasets</h3>
    <p><i>with ease-of-use API and Sklearn-alike Shareable & Reproducible Urban Pipeline</i></p>
    <p>
+      <img src="https://img.shields.io/pypi/v/urban-mapper?label=Version&style=for-the-badge" alt="PyPI Version">
       <img src="https://img.shields.io/static/v1?label=Beartype&message=compliant&color=4CAF50&style=for-the-badge&logo=https://avatars.githubusercontent.com/u/63089855?s=48&v=4&logoColor=white" alt="Beartype compliant">
       <img src="https://img.shields.io/static/v1?label=UV&message=compliant&color=2196F3&style=for-the-badge&logo=UV&logoColor=white" alt="UV compliant">
       <img src="https://img.shields.io/static/v1?label=RUFF&message=compliant&color=9C27B0&style=for-the-badge&logo=RUFF&logoColor=white" alt="RUFF compliant">
@@ -14,14 +15,15 @@
 
 
 
-![UrbanMapper Cover](./docs/public/resources/urban_mapper_cover.png)
+![UrbanMapper Cover](https://i.imgur.com/hZ2XkrN.png)
 
 
 ___
 
 > [!IMPORTANT]
-> 1) Documentation is out ! Check it out [here](https://urbanmapper.readthedocs.io/en/latest/) 🚀
-> 3) We support [JupyterGIS](https://github.com/geojupyter/jupytergis) as a bridge to export your `Urban Pipeline` for collaborative exploration 🏂 Shout-out to [@mfisher87](https://github.com/mfisher87) for his tremendous help.
+> - 📣 `UrbanMapper` is on [PyPi](https://pypi.org/project/urban-mapper/)!
+> - 🚀 Documentation is out ! Check it out [here](https://urbanmapper.readthedocs.io/en/latest/) 
+> - 🤝 We support [JupyterGIS](https://github.com/geojupyter/jupytergis) following one of your `Urban Pipeline`'s analysis for collaborative in real-time exploration on Jupyter 🏂 Shout-out to [@mfisher87](https://github.com/mfisher87) and `JGIS` team for their tremendous help.
 
 ## 🌆 UrbanMapper –– In a Nutshell
 
@@ -48,110 +50,21 @@ urban proceed with enriching your urban layer of interests from **insights**  yo
 
 ## 🥐 Installation
 
-We *highly* recommend using `uv` for installation from source to avoid the hassle of `Conda` or other package managers.
-It is also the fastest known to date on the OSS market and manages dependencies seamlessly without manual environment
-activation (Biggest flex!). If you do not want to use `uv`, there are no issues, but we will cover it in the upcoming
-documentation – not as follows.
-
-> [!TIP]
-> **UV's readings recommendations:**
-> - [Python Packaging in Rust](https://astral.sh/blog/uv)
-> - [A Year of UV](https://www.bitecode.dev/p/a-year-of-uv-pros-cons-and-should)
-> - [UV Is All You Need](https://dev.to/astrojuanlu/python-packaging-is-great-now-uv-is-all-you-need-4i2d)
-> - [State of the Art Python 2024](https://4zm.org/2024/10/28/state-of-the-art-python-in-2024.html)
-> - [Data Scientist, From School to Work](https://towardsdatascience.com/data-scientist-from-school-to-work-part-i/)
-
-### Prerequisites
-
-- First, ensure `uv` is installed on your machine by
-following [these instructions](https://docs.astral.sh/uv/getting-started/installation/).
-
-- Second, make sure you install at least `python` 3.10+. If you are not sure:
-
+Install `UrbanMapper` via ``pip`` (works in any environment):
+ ```bash
+ pip install urban-mapper
+ ```
+Then launch Jupyter Lab to explore `UrbanMapper`:
 ```bash
-uv python install 3.10
-uv python pin 3.10
+jupyter lab
 ```
 
-And you are ready to go! 🎉
+> [!TIP]
+> We recommend installing `UrbanMapper` in a virtual environment to keep things tidy and avoid dependency conflicts. You can find detailed instructions—including how to install within a virtual environment using [uv](https://docs.astral.sh/uv/getting-started/installation/), [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) or from source—
+in the [UrbanMapper Installation Guide](https://urbanmapper.readthedocs.io/en/latest/getting-started/installation/).
+> 
 
-### Steps
-
-1. Clone the `UrbanMapper` repository:
-   ```bash
-   git clone git@github.com:VIDA-NYU/UrbanMapper.git
-   # git clone https://github.com/VIDA-NYU/UrbanMapper.git
-   cd UrbanMapper
-   ```
-2. Lock and sync dependencies with `uv`:
-   ```bash
-   uv lock
-   uv sync
-   ```
-3. (Recommended) Install Jupyter extensions for interactive visualisations requiring Jupyter widgets:
-   ```bash
-   uv run jupyter labextension install @jupyter-widgets/jupyterlab-manager
-   ```
-4. Launch Jupyter Lab to explore `UrbanMapper` (Way faster than running Jupyter without `uv`):
-   ```bash
-   uv run --with jupyter jupyter lab
-   ```
-
-Voila 🥐 ! We'd recommend you explore next the # `Getting Started with UrbanMapper` section to see how to use the tool.
-
-<details>
-
-<summary>
-🫣 Different ways to install UrbanMapper (e.g w/ pip)
-</summary>
-
-<br>
-
-> **Note on Alternative Dependency Management Methods**
->
-> While we strongly recommend using `uv` for managing dependencies due to its superior speed and ease of use, 
-> alternative methods are available for those who prefer not to use `uv`. These alternatives are not as efficient, 
-> as they are slower and require more manual intervention.
->
-> Please be aware that the following assumptions are made for these alternative methods:
-> - You have `pip` installed.
-> - You are working within a virtual environment or a conda environment.
->
-> If you are not currently using a virtual or conda environment, we highly recommend setting one up to prevent 
-> potential conflicts and maintain a clean development workspace. For assistance, refer to the following resources:
-> - [Creating a Python virtual environment](https://docs.python.org/3/library/venv.html)
-> - [Managing conda environments](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)
-
-1. Clone the `UrbanMapper` repository:
-   ```bash
-    git clone git@github.com:VIDA-NYU/UrbanMapper.git
-    # git clone https://github.com/VIDA-NYU/UrbanMapper.git
-    cd UrbanMapper
-   ```
-2. Install `UrbanMapper` dependencies using `pip`:
-   ```bash
-    pip install -r requirements.txt
-   ```
-   
-3. Install `UrbanMapper`:
-   ```bash
-    pip install -e ./UrbanMapper
-    # or if you ensure you are in your virtual environment, cd UrbanMapper && pip install -e .
-    # Note that -e means "editable" mode, which allows you to make changes to the code and see them reflected.
-    # If you don't want to use editable mode, you can just run pip install ./UrbanMapper
-    ```
-
-4. (Recommended) Install Jupyter extensions for interactive visualisations requiring Jupyter widgets:
-   ```bash
-    jupyter labextension install @jupyter-widgets/jupyterlab-manager
-   ```
-
-5. Launch Jupyter Lab to explore `UrbanMapper`:
-   ```bash
-    jupyter lab
-   ```
-
-</details>
+---
 
 # 🗺️ Urban Layers Currently Supported
 

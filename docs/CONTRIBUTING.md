@@ -14,42 +14,114 @@ your work is important!
 
 ---
 
-## 🛠️ Environment Setup
-
-Get started by setting up your development environment. We recommend `uv` for its speed, but `pip` or `conda` work too.
+## 🛠️ Project Setup Guide 
 
 ### Prerequisites
 
-- **Install `uv`**: Grab it from the [official guide](https://docs.astral.sh/uv/getting-started/installation/).
+- `UrbanMapper` requires Python `3.10` or higher.
+- Use ``uv`` (recommended), ``conda``, or ``venv`` to manage your project setup. Follow the steps below to install one of them.
 
-### Steps
+    === "uv (Recommended)"
 
-1. **Clone the Repo**:
+        - To install `uv`, follow the instructions on the [uv documentation](https://docs.astral.sh/uv/getting-started/installation/).
+        - If you don’t have Python `3.10` or higher / you prefer to be sure, you can install and pin it using uv:
+        ```bash
+        uv python install 3.10
+        uv python pin 3.10
+        ```
+
+    === "conda"
+
+        - To install `conda`, follow the instructions on the [conda documentation](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html).
+        - If you don’t have Python `3.10` or higher, you can create a new conda environment with the required version:
+        ```bash
+        conda create -n urbanmapper python=3.10
+        conda activate urbanmapper
+        ```
+
+    === "venv"
+
+        - Ensure you have Python `3.10` or higher installed. You can check your Python version with:
+        ```bash
+        python3 --version
+        ```
+        - To create a virtual environment, use Python's built-in `venv` module:
+        ```bash
+        python3 -m venv urbanmapper-env
+        source urbanmapper-env/bin/activate  # On macOS/Linux
+        urbanmapper-env\Scripts\activate     # On Windows
+        ```
+
+### Clone the Repo
    ```bash
    git clone git@github.com:VIDA-NYU/UrbanMapper.git
    cd UrbanMapper
    ```
 
-2. **Sync Dependencies**:
-   ```bash
-   uv lock
-   uv sync
-   ```
-   **Note**: If you encounter errors related to 'cairo' during dependency installation, see
-   the [Troubleshooting](#troubleshooting) section.
+### Environment Setup
 
-3. **(Optional) Add Jupyter Extensions** for visualizations:
-   ```bash
-   uv run jupyter labextension install @jupyter-widgets/jupyterlab-manager
-   ```
+Get started by setting up your development environment. We recommend `uv` for its speed, but `pip` or `conda` work too. Choose one of the following options:
 
-4. **Launch Jupyter Lab**:
-   ```bash
-   uv run --with jupyter jupyter lab
-   ```
+=== "Using uv (Recommended)"
 
-- **Config Note**: Check out `config.yaml` in `urban_mapper/` for pipeline schemas and mixin mappings. It’s optional for
-  basic setup but key for advanced tweaks.
+    1. **Lock and sync dependencies**:
+    ```bash
+    uv lock
+    uv sync
+    ```
+    **Note**: If you encounter errors related to 'cairo' during dependency installation, see the [Troubleshooting](#troubleshooting) section.
+    
+    2. **(Recommended) Install Jupyter extensions** for interactive visualisations requiring Jupyter widgets:
+    ```bash
+    uv run jupyter labextension install @jupyter-widgets/jupyterlab-manager
+    ```
+
+    3. **Launch Jupyter Lab** to explore `UrbanMapper` (faster than running Jupyter without uv):
+    ```bash
+    uv run --with jupyter jupyter lab
+    ```
+
+    !!! tip "UV's readings recommendations:"
+        - [Python Packaging in Rust](https://astral.sh/blog/uv)
+        - [A Year of UV](https://www.bitecode.dev/p/a-year-of-uv-pros-cons-and-should)
+        - [UV Is All You Need](https://dev.to/astrojuanlu/python-packaging-is-great-now-uv-is-all-you-need-4i2d)
+        - [State of the Art Python 2024](https://4zm.org/2024/10/28/state-of-the-art-python-in-2024.html)
+        - [Data Scientist, From School to Work](https://towardsdatascience.com/data-scientist-from-school-to-work-part-i/)
+
+=== "Using pip"
+
+    If you prefer not to use `uv`, you can install `UrbanMapper` using `pip`. This method is slower and requires more manual intervention.
+
+    **Assumptions**:
+
+    - You have `pip` installed.
+    - You are working within a virtual environment or a conda environment.
+    !!! note
+        If you are not using a virtual or conda environment, it is highly recommended to set one up to avoid conflicts. Refer to [Python's venv documentation](https://docs.python.org/3/library/venv.html) or [conda's environment management guide](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) for assistance.
+
+    1. **Install dependencies**:
+    ```bash
+    pip install -r requirements.txt
+    ```
+    2. **Install `UrbanMapper`**:
+    ```bash
+    pip install -e ./UrbanMapper
+    # or if you ensure you are in your virtual environment, cd UrbanMapper && pip install -e .
+    ```
+    The `-e` flag installs `UrbanMapper` in editable mode, allowing changes to the code to be reflected immediately. If you don’t need this, use `pip install ./UrbanMapper` instead.
+        
+    3. **(Recommended) Install Jupyter extensions** for interactive visualisations:
+    ```bash
+    jupyter labextension install @jupyter-widgets/jupyterlab-manager
+    ```
+
+    4. **Launch Jupyter Lab**:
+    ```bash
+    jupyter lab
+    ```
+
+### Config Note:
+Check out `config.yaml` in `urban_mapper/` for pipeline schemas and mixin mappings. It’s optional for basic setup but key for advanced tweaks.
 
 !!! tip "Alternative Tools"
     Prefer `pip` or `conda`? That’s fine—just note `uv` is our go-to for performance.
@@ -171,12 +243,11 @@ Pre-commit hooks enforce standards by running checks (like `ruff`) before commit
     class SimpleGeoImputer(GeoImputerBase):
         def _transform(self, input_geodataframe: gpd.GeoDataFrame, urban_layer) -> gpd.GeoDataFrame:
             # Impute logic here
-            return input_geodataframe
-        def preview(self, format: str = "ascii") -> str:
-            return f"Imputer: SimpleGeoImputer\n  Lat: {self.latitude_column}"
+            return input_geodataframe        def preview(rmat: s        r = "-> str::
+    s        r     return f"Imputer: Simpl:s        r     eGeoImputer\n  Lat: {self.la:titude_column}"
     ```
 
-    - Place in `urban_mapper/modules/imputer/imputers/`.
+    - Place: in `urban_mapper/modules/imputer/imputers/`.
     - Auto-detected.
 
 === "Filter"
