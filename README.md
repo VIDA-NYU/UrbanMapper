@@ -15,14 +15,15 @@
 
 
 
-![UrbanMapper Cover](./docs/public/resources/urban_mapper_cover.png)
+![UrbanMapper Cover](https://i.imgur.com/hZ2XkrN.png)
 
 
 ___
 
 > [!IMPORTANT]
-> 1) Documentation is out ! Check it out [here](https://urbanmapper.readthedocs.io/en/latest/) 🚀
-> 3) We support [JupyterGIS](https://github.com/geojupyter/jupytergis) as a bridge to export your `Urban Pipeline` for collaborative exploration 🏂 Shout-out to [@mfisher87](https://github.com/mfisher87) for his tremendous help.
+> - 📣 `UrbanMapper` is on [PyPi](https://pypi.org/project/urban-mapper/)!
+> - 🚀 Documentation is out ! Check it out [here](https://urbanmapper.readthedocs.io/en/latest/) 
+> - 🤝 We support [JupyterGIS](https://github.com/geojupyter/jupytergis) following one of your `Urban Pipeline`'s analysis for collaborative in real-time exploration on Jupyter 🏂 Shout-out to [@mfisher87](https://github.com/mfisher87) and `JGIS` team for their tremendous help.
 
 ## 🌆 UrbanMapper –– In a Nutshell
 
@@ -48,65 +49,20 @@ urban proceed with enriching your urban layer of interests from **insights**  yo
 ---
 
 ## 🥐 Installation
-`UrbanMapper` is a Python package designed for urban spatial data analysis. Before you start, you’ll need to setup your environment and install the appropriate packages. `UrbanMapper` requires Python `3.10` or higher. 
 
-For more detailed installation instructions, refer to the [UrbanMapper Documentation](https://urbanmapper.readthedocs.io/en/latest/getting-started/installation/).
-
-### Virtual environment
-
-You should install `UrbanMapper` in a virtual environment to keep things tidy and avoid dependency conflicts. You can set up your environment using [uv](https://docs.astral.sh/uv/getting-started/installation/) (recommended), [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html), or a [virtual environment](https://docs.python.org/3/library/venv.html).
-Using ``uv`` is the recommended method due to its speed and seamless modern dependency management.
-
-<strong>Using uv (Recommended)</strong>
-```bash
-# Optional: install and pin a specific Python version
-uv python install 3.10
-uv python pin 3.10
-
-# Create and activate a virtual env using the pinned Python version
-uv venv
-source .venv/bin/activate
-
-# Install the package from PyPI
-uv pip install urban-mapper
-
-# Launch Jupyter Lab to explore `UrbanMapper`
-uv run --with jupyter jupyter lab
-
-# To exit the environment
-deactivate
-```
-<details>
-<summary><strong>Using conda</strong></summary>
-
-```bash
-# Create and activate a conda environment
-conda create -n umenv python=3.10
-conda activate umenv
-
-# Install the package from PyPI
-pip install urban-mapper
-
-# Launch Jupyter Lab to explore `UrbanMapper`
-jupyter lab
-
-# To exit the environment
-conda deactivate
-```
-</details>
-
-### Pip
-
-The most straightforward way to install `UrbanMapper` is with pip (works in any environment):
+Install `UrbanMapper` via ``pip`` (works in any environment):
  ```bash
  pip install urban-mapper
  ```
-Launch Jupyter Lab to explore `UrbanMapper`:
+Then launch Jupyter Lab to explore `UrbanMapper`:
 ```bash
 jupyter lab
 ```
-### Source
-Building `UrbanMapper` from source lets you make changes to the code base. To install from the source, refer to the [Project Setup Guide](../CONTRIBUTING.md/#project-setup-guide).
+
+> [!TIP]
+> We recommend installing `UrbanMapper` in a virtual environment to keep things tidy and avoid dependency conflicts. You can find detailed instructions—including how to install within a virtual environment using [uv](https://docs.astral.sh/uv/getting-started/installation/), [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) or from source—
+in the [UrbanMapper Installation Guide](https://urbanmapper.readthedocs.io/en/latest/getting-started/installation/).
+> 
 
 ---
 

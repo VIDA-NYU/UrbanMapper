@@ -4,26 +4,26 @@
 
 --- 
 
-## Virtual environment
+## ➡️ Via Virtual environment
 
-You should install `UrbanMapper` in a virtual environment to keep things tidy and avoid dependency conflicts. You can set up your environment using [uv](https://docs.astral.sh/uv/getting-started/installation/) (recommended), [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html), or a [virtual environment](https://docs.python.org/3/library/venv.html).
+We recommend you to install `UrbanMapper` in a virtual environment to keep things tidy and avoid dependency conflicts. You can set up your environment using [uv](https://docs.astral.sh/uv/getting-started/installation/) (recommended), [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html), or a [virtual environment](https://docs.python.org/3/library/venv.html).
 
 === "Using uv (Recommended)"
 
     ```bash
-    # Optional: install and pin a specific Python version
-    uv python install 3.10
-    uv python pin 3.10
-
-    # Create and activate a virtual environment using the pinned Python version
-    uv venv
-    source .venv/bin/activate
-
     # Install the package from PyPI
-    uv pip install urban-mapper
+    uv add urban-mapper
    
     # Launch Jupyter Lab to explore `UrbanMapper` (faster than running Jupyter without uv)
     uv run --with jupyter jupyter lab
+    ```
+    *Optional: Get into your UV's venv despite not being necessary / recommended by UV*
+
+    ```bash
+    #Create and activate a virtual environment using the pinned Python version
+    uv venv
+    source .venv/bin/activate
+    jupyter lab
 
     # To exit the environment
     deactivate
@@ -47,7 +47,7 @@ You should install `UrbanMapper` in a virtual environment to keep things tidy an
     ```
 ---
 
-## Pip
+## ➡️ Via `Pip`
 
 The most straightforward way to install `UrbanMapper` is with pip (works in any environment):
  ```bash
@@ -59,12 +59,12 @@ jupyter lab
 ```
 ---
 
-## Source
+## ➡️ From Source (Developer)
 Building `UrbanMapper` from source lets you make changes to the code base. To install from the source, refer to the [Project Setup Guide](../CONTRIBUTING.md/#project-setup-guide).
 
 ---
 
-## Conclusion
+## 🚀 Conclusion
 
 Well done! You’ve just installed `UrbanMapper`. Ready to take it further? 
 
