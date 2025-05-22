@@ -72,7 +72,7 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/VIDA-NYU/UrbanMapper"
-Documentation = "https://github.com/VIDA-NYU/UrbanMapper#%EF%B8%8F-urban-layers-currently-supported"
+Documentation = "https://urbanmapper.readthedocs.io/en/latest/"
 Changelog = "https://github.com/VIDA-NYU/UrbanMapper/blob/main/CHANGELOG.md"
 Repository = "https://github.com/VIDA-NYU/UrbanMapper"
 Issues = "https://github.com/VIDA-NYU/UrbanMapper/issues"
@@ -120,4 +120,5 @@ dev = [
     "mkdocs-jupyter>=0.25.1",
     "pymdown-extensions>=10.14.3",
     "mkdocs-material[emoji,imaging]>=9.6.11",
+    "mkdocs-mermaid2-plugin>=1.2.1",
 ]
