@@ -359,14 +359,45 @@ Pre-commit hooks enforce standards by running checks (like `ruff`) before commit
 
 `UrbanMapper`’s pipeline flows like this:
 
-```mermaid
-graph TD
-    A[Loader] --> B[Urban Layer]
-    B --> C[Imputers]
-    C --> D[Filters]
-    D --> E[Enrichers]
-    E --> F[Visualiser]
-```
+<div class="mermaid">
+    %%{init: {
+    'theme': 'base',
+    'themeVariables': {
+    'primaryColor': '#57068c',
+    'primaryTextColor': '#fff',
+    'primaryBorderColor': '#F49BAB',
+    'lineColor': '#F49BAB',
+    'secondaryColor': '#9B7EBD',
+    'tertiaryColor': '#E5D9F2'
+      }
+    }}%%
+    graph LR
+        subgraph "Data Ingestion"
+            A["Loader (1)"]
+            B["Urban Layer (1)"]
+            A -->|Raw data| B
+        end
+        subgraph "Data Preprocessing"
+            direction TB
+            C["Imputers (0..*)"]
+            D["Filters (0..*)"]
+            C -->|Imputed data| D
+        end
+        subgraph "Data Processing"
+            E["Enrichers (1..*)"]
+        end
+        subgraph "Data Output"
+            F["Visualiser (0, 1)"]
+        end
+
+        B -->|Spatial data| C
+        D -->|Filtered data| E
+        E -->|Enriched data| F
+</div>
+
+<p style="text-align: center; font-style: italic;">
+Notation: (1) = exactly one instance, (0..*) = zero or more instances, (1..*) = one or more instances, (0, 1) = zero or one instance
+</p>
 
 Each step processes the data sequentially, transforming it from raw input to enriched urban insights. New components
 should slot into this sequence (see `urban_mapper/pipeline/`).
