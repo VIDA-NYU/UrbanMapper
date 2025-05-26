@@ -24,6 +24,9 @@ uv.lock
 .ruff_cache/
 __pycache__/
 
+# macOS
+.DS_Store
+
 
 # Jetbrains
 *.iml
