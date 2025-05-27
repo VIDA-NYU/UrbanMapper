@@ -28,19 +28,51 @@ class UrbanPipeline:
     """`Scikit-Learn` Inspired `Pipeline` for `Urban Mapper`.
 
     Constructs and manages pipelines integrating various urban mapper components into a cohesive workflow,
-    handling execution order and data flow. As a bonus, you can `save`, `share`, `export`, and `load pipelines`,
-    is not that great for reprodcuibility?
+    handling execution order and data flow. Yet, not only, you also can `save`, `share`, `export`, and `load pipelines`,
+    is not that great for reproducibility?
 
-    Representation of a pipeline using Mermaid:
+    Have a look at how a pipeline could look like:
 
-    ```mermaid
-    graph TD
-        A[Loader] --> B[Urban Layer]
-        B --> C[Imputers]
-        C --> D[Filters]
-        D --> E[Enrichers]
-        E --> F[Visualiser]
-    ```
+    <div class="mermaid">
+    %%{init: {
+    'theme': 'base',
+    'themeVariables': {
+    'primaryColor': '#57068c',
+    'primaryTextColor': '#fff',
+    'primaryBorderColor': '#F49BAB',
+    'lineColor': '#F49BAB',
+    'secondaryColor': '#9B7EBD',
+    'tertiaryColor': '#E5D9F2'
+      }
+    }}%%
+    graph LR
+        subgraph "Data Ingestion"
+            A["Loader (1)"]
+            B["Urban Layer (1)"]
+            A -->|Raw data| B
+        end
+        subgraph "Data Preprocessing"
+            direction TB
+            C["Imputers (0..*)"]
+            D["Filters (0..*)"]
+            C -->|Imputed data| D
+        end
+        subgraph "Data Processing"
+            E["Enrichers (1..*)"]
+        end
+        subgraph "Data Output"
+            F["Visualiser (0, 1)"]
+        end
+
+        B -->|Spatial data| C
+        D -->|Filtered data| E
+        E -->|Enriched data| F
+    </div>
+
+    <p style="text-align: center; font-style: italic;">
+      Notation: (1) = exactly one instance, (0..*) = zero or more instances, (1..*) = one or more instances, (0, 1) = zero or one instance
+    </p>
+
 
     !!! note
         `Pipelines` must be `composed` before `transforming` or `visualising` data.
