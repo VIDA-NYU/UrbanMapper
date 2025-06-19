@@ -21,7 +21,7 @@
 ___
 
 > [!IMPORTANT]
-> - 📹 `UrbanMapper` Introductory Video (very much requested!) 👉 https://www.youtube.com/watch?v=QUmfvda_z2U 👈
+> - 📹 `UrbanMapper` Introductory Video 👉 https://www.youtube.com/watch?v=QUmfvda_z2U 👈
 > - 🤝 We support [JupyterGIS](https://github.com/geojupyter/jupytergis) following one of your `Urban Pipeline`'s analysis for collaborative in real-time exploration on Jupyter 🏂 Shout-out to [@mfisher87](https://github.com/mfisher87) and `JGIS` team for their tremendous help.
 
 ## UrbanMapper –– In a Nutshell
