@@ -21,11 +21,10 @@
 ___
 
 > [!IMPORTANT]
-> - 📣 `UrbanMapper` is on [PyPi](https://pypi.org/project/urban-mapper/)!
-> - 🚀 Documentation is out ! Check it out [here](https://urbanmapper.readthedocs.io/en/latest/) 
+> - 📹 `UrbanMapper` Introductory Video (very much requested!) 👉 https://www.youtube.com/watch?v=QUmfvda_z2U 👈
 > - 🤝 We support [JupyterGIS](https://github.com/geojupyter/jupytergis) following one of your `Urban Pipeline`'s analysis for collaborative in real-time exploration on Jupyter 🏂 Shout-out to [@mfisher87](https://github.com/mfisher87) and `JGIS` team for their tremendous help.
 
-## 🌆 UrbanMapper –– In a Nutshell
+## UrbanMapper –– In a Nutshell
 
 `UrbanMapper` –– `f(.)` –– brings urban layers (e.g. `Street Roads` / `Intersections` or `Sidewalks` / `Cross Walks`) ––
 `X` ––
@@ -48,7 +47,7 @@ urban proceed with enriching your urban layer of interests from **insights**  yo
 
 ---
 
-## 🥐 Installation
+## Installation
 
 Install `UrbanMapper` via ``pip`` (works in any environment):
  ```bash
@@ -66,40 +65,23 @@ in the [UrbanMapper Installation Guide](https://urbanmapper.readthedocs.io/en/la
 
 ---
 
-# 🗺️ Urban Layers Currently Supported
+# Urban Layers Currently Supported
 
-`UrbanMapper` currently supports the following urban layers:
+`UrbanMapper` currently supports loading the following urban layers:
 
-1) **Streets Roads** –– `UrbanMapper` can load street road networks from `OpenStreetMap` (OSM) using `OSMNx`.
-2) **Streets Intersections** –– `UrbanMapper` can load street intersections from `OpenStreetMap` (OSM) using `OSMNx`.
-3) **Sidewalks** –– `UrbanMapper` can load sidewalk via `Tile2Net` using Deep Learning for automated mapping of
-   pedestrian infrastructure from aerial imagery.
-4) **Cross Walks** –– `UrbanMapper` can load crosswalk via `Tile2Net` using Deep Learning for automated mapping of
-   pedestrian infrastructure from aerial imagery.
-5) **Cities' Features** -- `Urban Mapper` can load OSM cities features such as buildings, parks, Bike Lanes etc. via
-   `OSMNx` API.
-6) **Region Neighborhoods** –– `UrbanMapper` can load neighborhoods boundaries from `OpenStreetMap` (OSM) using `OSMNx` Features
-   module.
-7) **Region Cities** –– `UrbanMapper` can load cities boundaries from `OpenStreetMap` (OSM) using `OSMNx` Features module.
-8) **Region States** –– `UrbanMapper` can load states boundaries from `OpenStreetMap` (OSM) using `OSMNx` Features module.
-9) **Region Countries** –– `UrbanMapper` can load countries boundaries from `OpenStreetMap` (OSM) using `OSMNx`
-   Features module.
+- **Street networks** (`roads` and `intersections`) from `OpenStreetMap` via [OSMNx](https://osmnx.readthedocs.io/en/stable/)
+- **Pedestrian infrastructure** (`sidewalks` and `crosswalks`) via [`Tile2Net`](https://github.com/VIDA-NYU/tile2net) (automated mapping from aerial imagery)
+- **City features** (`buildings`, `parks`, `bike lanes`, etc.) from `OpenStreetMap` via [OSMNx](https://osmnx.readthedocs.io/en/stable/)
+- **Administrative boundaries** (`neighborhoods`, `cities`, `states`, `countries`) from `OpenStreetMap` via [OSMNx](https://osmnx.readthedocs.io/en/stable/)
 
-More will be added in the future, e.g `Subway`/`Tube` networks, etc. If you have any suggestions, please feel free to
-open an issue or a pull request on our GitHub repository.
-
-**References**
-
-- [OSMNx](https://osmnx.readthedocs.io/en/stable/) –– [Tile2Net](https://github.com/VIDA-NYU/tile2net) –– [OSM Cities Features](https://wiki.openstreetmap.org/wiki/Map_features)
+More layers, like `subway`/`tube` networks, will be added in the future. If you have any suggestions, please feel free to
+open an issue or a pull request!
 
 # 🚀 Getting Started with UrbanMapper
 
-Are you ready to dive into urban data analysis? The simplest approach to get started with `UrbanMapper` is to look
+Are you ready to dive into urban data analysis in a couple of lines of code? The simplest approach to get started with `UrbanMapper` is to look
 through the two getting-started examples available in the documentation then walk through the hands-on examples in the 
-`examples/` directory. These **Jupyter notebooks** walk you through the library's features, from `loading` and 
-`prepping data` to `enriching` urban layers and `visualising` the results. 
-
-Documentation is available at [UrbanMapper Documentation](https://urbanmapper.readthedocs.io/en/latest/).
+`examples/` directory. Documentation is available at [UrbanMapper Documentation](https://urbanmapper.readthedocs.io/en/latest/).
 
 ---
 
