@@ -114,7 +114,9 @@ class StaticVisualiser(VisualiserBase):
                     vmax=vmax_val,
                     **render_kwargs,
                 )
-                legend.append(Line2D([], [], color="gray", marker=marker, ls="", label=id))
+                legend.append(
+                    Line2D([], [], color="gray", marker=marker, ls="", label=id)
+                )
 
             ax.legend(handles=legend)
         else:

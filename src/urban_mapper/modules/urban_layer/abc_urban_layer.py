@@ -196,24 +196,21 @@ class UrbanLayerBase(ABC):
     def map_nearest_layer(
         self,
         data: Union[
-            Dict[
-                str,
-                gpd.GeoDataFrame
-            ],
-            gpd.GeoDataFrame,    
+            Dict[str, gpd.GeoDataFrame],
+            gpd.GeoDataFrame,
         ],
         longitude_column: str | None = None,
         latitude_column: str | None = None,
         output_column: str | None = None,
         threshold_distance: float | None = None,
         **kwargs,
-    ) -> Tuple[gpd.GeoDataFrame, Union[
-            Dict[
-                str,
-                gpd.GeoDataFrame
-            ],
-            gpd.GeoDataFrame,    
-        ]]:
+    ) -> Tuple[
+        gpd.GeoDataFrame,
+        Union[
+            Dict[str, gpd.GeoDataFrame],
+            gpd.GeoDataFrame,
+        ],
+    ]:
         """Map points to their nearest elements in this urban layer.
 
         This method is the public method calling internally the `_map_nearest_layer` method.

@@ -72,21 +72,13 @@ class GeoImputerBase(ABC):
     @require_arguments_not_none("urban_layer", error_msg="Urban layer cannot be None.")
     @require_attributes(["latitude_column", "longitude_column"])
     def transform(
-        self, input_geodataframe: Union[
-            Dict[
-                str,
-                gpd.GeoDataFrame
-            ],
-            gpd.GeoDataFrame    
-        ], 
+        self,
+        input_geodataframe: Union[Dict[str, gpd.GeoDataFrame], gpd.GeoDataFrame],
         urban_layer: UrbanLayerBase,
     ) -> Union[
-            Dict[
-                str,
-                gpd.GeoDataFrame
-            ],
-            gpd.GeoDataFrame,    
-        ]:
+        Dict[str, gpd.GeoDataFrame],
+        gpd.GeoDataFrame,
+    ]:
         """Public method to impute geographic data.
 
         Validates inputs and delegates to `_transform()` for imputation.

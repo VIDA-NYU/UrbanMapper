@@ -203,14 +203,15 @@ class UrbanPipeline:
         return self
 
     @require_attributes_not_none("steps")
-    def transform(self) -> Tuple[
+    def transform(
+        self,
+    ) -> Tuple[
         Union[
-            Dict[
-                str,
-                gpd.GeoDataFrame
-            ],
-            gpd.GeoDataFrame,    
-        ], UrbanLayerBase,]:
+            Dict[str, gpd.GeoDataFrame],
+            gpd.GeoDataFrame,
+        ],
+        UrbanLayerBase,
+    ]:
         """Execute pipeline transformation.
 
         Returns processed data and enriched urban layer after composition.
@@ -227,14 +228,15 @@ class UrbanPipeline:
         return self.executor.transform()
 
     @require_attributes_not_none("steps")
-    def compose_transform(self) -> Tuple[
+    def compose_transform(
+        self,
+    ) -> Tuple[
         Union[
-            Dict[
-                str,
-                gpd.GeoDataFrame
-            ],
+            Dict[str, gpd.GeoDataFrame],
             gpd.GeoDataFrame,
-        ], UrbanLayerBase,]:
+        ],
+        UrbanLayerBase,
+    ]:
         """Compose and transform in one step.
 
         Combines composition and transformation into a single operation.

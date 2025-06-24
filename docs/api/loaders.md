@@ -5,6 +5,9 @@
     It provides a unified interface for loading various data formats, including `shapefiles`, `parquet`, and `CSV` files 
     with geospatial information.
 
+    `UrbanMapper` steps support using multiple datasets. The user can create multiple loader instances, one for each dataset, 
+    combine them in a single dictionary with suitable keys, and use it in your pipeline.
+
     Meanwhile, we recommend to look through the [`Example`'s Loader](../copy_of_examples/1-Per-Module/1-loader/) for a more hands-on introduction about
     the Loader module and its usage.
 

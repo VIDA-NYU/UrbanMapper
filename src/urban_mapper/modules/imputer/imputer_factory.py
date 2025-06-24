@@ -152,21 +152,13 @@ class ImputerFactory:
         "_longitude_column",
     )
     def transform(
-        self, input_geodataframe: Union[
-            Dict[
-                str,
-                gpd.GeoDataFrame
-            ],
-            gpd.GeoDataFrame    
-        ], 
+        self,
+        input_geodataframe: Union[Dict[str, gpd.GeoDataFrame], gpd.GeoDataFrame],
         urban_layer: UrbanLayerBase,
     ) -> Union[
-            Dict[
-                str,
-                gpd.GeoDataFrame
-            ],
-            gpd.GeoDataFrame,    
-        ]:
+        Dict[str, gpd.GeoDataFrame],
+        gpd.GeoDataFrame,
+    ]:
         """Apply the configured imputer to data.
 
         Args:

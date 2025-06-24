@@ -65,21 +65,13 @@ class GeoFilterBase(ABC):
     )
     @require_arguments_not_none("urban_layer", error_msg="Urban layer cannot be None.")
     def transform(
-        self, input_geodataframe: Union[
-            Dict[
-                str,
-                gpd.GeoDataFrame
-            ],
-            gpd.GeoDataFrame    
-        ], 
+        self,
+        input_geodataframe: Union[Dict[str, gpd.GeoDataFrame], gpd.GeoDataFrame],
         urban_layer: UrbanLayerBase,
     ) -> Union[
-            Dict[
-                str,
-                gpd.GeoDataFrame
-            ],
-            gpd.GeoDataFrame,    
-        ]:
+        Dict[str, gpd.GeoDataFrame],
+        gpd.GeoDataFrame,
+    ]:
         """Filter a `GeoDataFrame` based on spatial criteria from an `urban layer`
 
         The primary public method for applying filters. It validates inputs and delegates

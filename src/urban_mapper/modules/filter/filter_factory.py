@@ -132,21 +132,13 @@ class FilterFactory:
 
     @require_attributes_not_none("_filter_type")
     def transform(
-        self, input_geodataframe: Union[
-            Dict[
-                str,
-                gpd.GeoDataFrame
-            ],
-            gpd.GeoDataFrame    
-        ], 
+        self,
+        input_geodataframe: Union[Dict[str, gpd.GeoDataFrame], gpd.GeoDataFrame],
         urban_layer: UrbanLayerBase,
-    ) ->Union[
-            Dict[
-                str,
-                gpd.GeoDataFrame
-            ],
-            gpd.GeoDataFrame,
-        ]:
+    ) -> Union[
+        Dict[str, gpd.GeoDataFrame],
+        gpd.GeoDataFrame,
+    ]:
         """Apply the filter to input data and return filtered results
 
         Creates and applies a filter instance to the input `GeoDataFrame`.
@@ -168,10 +160,7 @@ class FilterFactory:
             ...     .transform(data, layer)
         """
         filter_class = FILTER_REGISTRY[self._filter_type]
-        self._instance = filter_class(
-            data_id=self._data_id,
-            **self._extra_params
-        )
+        self._instance = filter_class(data_id=self._data_id, **self._extra_params)
 
         if (
             isinstance(input_geodataframe, Dict)

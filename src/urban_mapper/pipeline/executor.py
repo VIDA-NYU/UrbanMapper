@@ -56,12 +56,7 @@ class PipelineExecutor:
         ],
     ) -> None:
         self.steps = steps
-        self.data: Optional[ 
-            Dict[
-                str,
-                gpd.GeoDataFrame
-            ]
-        ] = None
+        self.data: Optional[Dict[str, gpd.GeoDataFrame]] = None
         self.urban_layer: Optional[UrbanLayerBase] = None
         self._composed: bool = False
 
@@ -156,14 +151,15 @@ class PipelineExecutor:
             bar()
             bar.title = f"🗺️ Successfully composed pipeline with {total_steps} steps!"
 
-    def transform(self) -> Tuple[
+    def transform(
+        self,
+    ) -> Tuple[
         Union[
-            Dict[
-                str,
-                gpd.GeoDataFrame
-            ],
-            gpd.GeoDataFrame,    
-        ], UrbanLayerBase,]:
+            Dict[str, gpd.GeoDataFrame],
+            gpd.GeoDataFrame,
+        ],
+        UrbanLayerBase,
+    ]:
         """Retrieve Results of `Pipeline Execution`.
 
         Returns processed data and enriched urban layer post-composition.
@@ -185,12 +181,11 @@ class PipelineExecutor:
         self,
     ) -> Tuple[
         Union[
-            Dict[
-                str,
-                gpd.GeoDataFrame
-            ],
-            gpd.GeoDataFrame,    
-        ], UrbanLayerBase,]:
+            Dict[str, gpd.GeoDataFrame],
+            gpd.GeoDataFrame,
+        ],
+        UrbanLayerBase,
+    ]:
         """Compose and Transform in One Step.
 
         Combines compose and transform operations.
