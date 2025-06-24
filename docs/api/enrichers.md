@@ -3,11 +3,8 @@
 !!! tip "What is the enricher module?"
     The `enricher` module is the heart of `UrbanMapper`’s analysis—they take your `urban layer` and `transform it` into meaningful
     `statistics`, like `counting taxi pickups` at each `intersection` or `averaging building heights` per `neighborhood` given your loaded `urban data`.
-
-    We highly recommend to look through the `User Guide`'s Enricher section for a more in-depth introduction about
-    the enricher module and its usage prior to explore its API.
-
-    [See The User Guide :fontawesome-solid-signs-post:](../user-guide/modules/5-enrichers.md){ .md-button } 
+    Meanwhile, we recommend to look through the [`Example`'s Enricher](../copy_of_examples/1-Per-Module/5-enricher/) for a more hands-on introduction about
+    the enricher module and its usage.
 
 !!! warning "Documentation Under Alpha Construction"
     **This documentation is in its early stages and still being developed.** The API may therefore change, 

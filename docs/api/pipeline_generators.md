@@ -6,10 +6,8 @@
     `Large Language Models (LLMs)`, this module transforms your natural language descriptions into executable 
     Python code for `UrbanMapper` pipelines.
 
-    We highly recommend to look through the `User Guide`'s Pipeline generator section for a more in-depth introduction about
-    the pipeline generator module and its usage prior to explore its API.
-
-    [See The User Guide :fontawesome-solid-signs-post:](../user-guide/modules/8-pipeline-generators.md){ .md-button }
+    Meanwhile, we recommend to look through the [`Example`'s Pipeline Generator](../copy_of_examples/1-Per-Module/8-pipeline_generator/) for a more hands-on introduction about
+    the Pipeline Generator module and its usage.
 
 !!! warning "Documentation Under Alpha Construction"
     **This documentation is in its early stages and still being developed.** The API may therefore change, 

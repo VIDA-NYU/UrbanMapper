@@ -3,10 +3,8 @@
 !!! tip "What is the Imputer module?"
     The `imputer` module is responsible for handling missing data in geospatial datasets.
 
-    We highly recommend to look through the `User Guide`'s Imputer section for a more in-depth introduction about
-    the imputer module and its usage prior to explore its API.
-
-    [See The User Guide :fontawesome-solid-signs-post:](../user-guide/modules/3-imputers.md){ .md-button } 
+    Meanwhile, we recommend to look through the [`Example`'s Imputer](../copy_of_examples/1-Per-Module/3-imputer/) for a more hands-on introduction about
+    the Imputer module and its usage.
 
 !!! warning "Documentation Under Alpha Construction"
     **This documentation is in its early stages and still being developed.** The API may therefore change, 
