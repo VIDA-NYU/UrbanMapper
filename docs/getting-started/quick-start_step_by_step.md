@@ -1,4 +1,4 @@
-# 🌇 `Getting Started Step-By-Step` guide!
+# `Getting Started Step-By-Step` guide!
 
 !!! warning "This is the first entry point out of how to get started with `UrbanMapper`"
     This guide is designed to help you quickly get up and running with `UrbanMapper`.
@@ -20,20 +20,31 @@ _Dataset's source:_
 - PLUTO data from [NYC Open Data](https://www.nyc.gov/content/planning/pages/resources/datasets/mappluto-pluto-change).
 
 !!! tip "Download all data without complicating yourself?"
-    You also can download the public datasets used throughout all examples including this current's one via two channels.
+    You also can download the public datasets used throughout all examples including this current's one via three channels.
     
-    - **Channel 1: Our Google Drive public folder**
-        - **Option A:** Download all datasets at once using the command:
-                ```bash
-                # If you do not have gdown installed, install it first
-                # brew install gdown or pip install gdown
-                gdown https://drive.google.com/drive/folders/1n-5zkNqT97W-I9Dc7X_mG4kezskfVtlb -O ./data --folder
-                ```
-        - **Option B:** Manually download specific datasets from the same Google Drive folder on demand.
-     - **Channel 2: Official data sources**
-         - Follow the data source links provided in the various notebooks.
-         - Download the datasets directly from their official channels.
-         - Place the downloaded files in the `data/` folder or any other folder of your choice.
+    - **Channel 1: Our Google Drive stash**
+        - **Option A**: Snag everything in one go with this command (no fuss, no muss!):
+            ```bash
+            # Need gdown? Install it first: brew install gdown or pip install gdown
+            gdown https://drive.google.com/drive/folders/1n-5zkNqT97W-I9Dc7X_mG4kezskfVtlb -O ./data --folder
+            ```
+        - **Option B**: Cherry-pick what you need manually from the [Google Drive folder](https://drive.google.com/drive/folders/1n-5zkNqT97W-I9Dc7X_mG4kezskfVtlb).
+    - **Channel 2: Straight from the source**
+        - Check the links in each notebook, download from the official sites, and drop them into your `data/` folder.
+    - **Channel 3: HuggingFace OSCUR datasets hub**
+        - If you prefer HuggingFace, you can find the datasets in the [OSCUR datasets hub](https://huggingface.co/datasets/oscur).
+            Use the `datasets` library to load them directly into your code:
+            ```python
+            from datasets import load_dataset
+            dataset = load_dataset("oscur/dataset_name")
+            ```
+            Or within the `Loader` module of `UrbanMapper`:
+            ```python
+            import urbanmapper as um
+            loader = um.UrbanMapper().loader.from_huggingface("oscur/pluto")
+            gdf = loader.load()
+            print(gdf.head()) 
+            ```
     
        Voila! You are ready to go! 🎉
 

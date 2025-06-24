@@ -1,4 +1,4 @@
-# 🌇 `Getting Started with Pipeline` guide!
+# `Getting Started with Pipeline` guide!
 
 !!! warning "This is the second entry point out of how to get started with `UrbanMapper`"
     Make sure to have walked through the first entry point out of how to get started with `UrbanMapper` before diving into
@@ -41,24 +41,6 @@ _Dataset's source:_
 > derived from data maintained by city agencies.
 
 - PLUTO data from [NYC Open Data](https://www.nyc.gov/content/planning/pages/resources/datasets/mappluto-pluto-change).
-
-!!! tip "Download all data without complicating yourself?"
-    You also can download the public datasets used throughout all examples including this current's one via two channels.
-    
-    - **Channel 1: Our Google Drive public folder**
-        - **Option A:** Download all datasets at once using the command:
-                ```bash
-                # If you do not have gdown installed, install it first
-                # brew install gdown or pip install gdown
-                gdown https://drive.google.com/drive/folders/1n-5zkNqT97W-I9Dc7X_mG4kezskfVtlb -O ./data --folder
-                ```
-        - **Option B:** Manually download specific datasets from the same Google Drive folder on demand.
-     - **Channel 2: Official data sources**
-         - Follow the data source links provided in the various notebooks.
-         - Download the datasets directly from their official channels.
-         - Place the downloaded files in the `data/` folder or any other folder of your choice.
-    
-       Voila! You are ready to go! 🎉
 
 **What you’ll learn**:
 
@@ -238,8 +220,6 @@ easy to `save`, `share`, and `rerun` your workflow.
 Ready for more? Explore the `examples/` folder for advanced case studies—like analysing taxi trips or urban
 collisions—and see how the pipeline can integrate with other tools.
 
-Ready to take it further? Head over to the [# Urban Mapper's Examples](examples.md) section for a
-detailed guide on how
-to walk through all the realease `UrbanMapper`'s Jupyter notebook examples for urban spatial data analysis.
+Ready to take it further? Head over to the [# Examples tab](../EXAMPLES.md) for more examples.
 
 Cheers!

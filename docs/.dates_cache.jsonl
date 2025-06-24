@@ -1,5 +1,6 @@
 {"BRANDING.md": {"created": "2025-04-25T14:12:26"}}
 {"CONTRIBUTING.md": {"created": "2025-04-25T14:12:26"}}
+{"USER_EXPERIENCE_DESIGN.md": {"created": "2025-06-27T09:33:45.543045"}}
 {"api/auctus.md": {"created": "2025-04-28T01:34:07"}}
 {"api/enrichers.md": {"created": "2025-04-28T00:39:34"}}
 {"api/filters.md": {"created": "2025-04-28T00:39:34"}}
@@ -11,7 +12,17 @@
 {"api/pipelines.md": {"created": "2025-04-28T00:39:34"}}
 {"api/urban_layers.md": {"created": "2025-04-28T00:39:34"}}
 {"api/visualisers.md": {"created": "2025-04-28T00:39:34"}}
+{"getting-started/examples.md": {"created": "2025-06-27T09:33:45.544780"}}
 {"getting-started/installation.md": {"created": "2025-04-25T14:12:47"}}
 {"getting-started/quick-start_pipeline.md": {"created": "2025-04-25T14:12:47"}}
 {"getting-started/quick-start_step_by_step.md": {"created": "2025-04-25T14:12:47"}}
 {"index.md": {"created": "2025-02-24T21:40:35"}}
+{"user-guide/modules/1-loaders.md": {"created": "2025-06-27T09:33:45.546521"}}
+{"user-guide/modules/2-urban-layers.md": {"created": "2025-06-27T09:33:45.546870"}}
+{"user-guide/modules/3-imputers.md": {"created": "2025-06-27T09:33:45.547032"}}
+{"user-guide/modules/4-filters.md": {"created": "2025-06-27T09:33:45.547219"}}
+{"user-guide/modules/5-enrichers.md": {"created": "2025-06-27T09:33:45.547324"}}
+{"user-guide/modules/6-visualisers.md": {"created": "2025-06-27T09:33:45.547508"}}
+{"user-guide/modules/7-pipelines.md": {"created": "2025-06-27T09:33:45.547683"}}
+{"user-guide/modules/8-pipeline-generators.md": {"created": "2025-06-27T09:33:45.548028"}}
+{"user-guide/overview.md": {"created": "2025-06-27T09:33:45.548221"}}
