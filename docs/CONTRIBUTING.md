@@ -1,4 +1,4 @@
-# 🤝 Contributing to `UrbanMapper`
+# Contributing to `UrbanMapper`
 
 Welcome to the `contributing guide` for **UrbanMapper**! We are excited to collaborate on developing a tool for urban
 data analysis that is both accessible and powerful. This guide will help you set up your environment, add new
@@ -14,7 +14,7 @@ your work is important!
 
 ---
 
-## 🛠️ Project Setup Guide 
+## Project Setup Guide 
 
 ### Prerequisites
 
@@ -128,7 +128,7 @@ Check out `config.yaml` in `urban_mapper/` for pipeline schemas and mixin mappin
 
 ---
 
-## 🧹 Linting and Formatting with Ruff
+## Linting and Formatting with Ruff
 
 We use `ruff` to keep the codebase clean and consistent. Run it before submitting changes.
 
@@ -148,7 +148,7 @@ We use `ruff` to keep the codebase clean and consistent. Run it before submittin
 
 ---
 
-## 🔒 Pre-Commit Hooks
+## Pre-Commit Hooks
 
 Pre-commit hooks enforce standards by running checks (like `ruff`) before commits.
 
@@ -168,7 +168,7 @@ Pre-commit hooks enforce standards by running checks (like `ruff`) before commit
 
 ---
 
-## 🧩 How to Create New Components
+## How to Create New Components
 
 `UrbanMapper`’s modular design makes extending it a breeze. Select the component type you want to add:
 
@@ -355,7 +355,7 @@ Pre-commit hooks enforce standards by running checks (like `ruff`) before commit
 
 ---
 
-## 🏗️ Pipeline Architecture
+## Pipeline Architecture
 
 `UrbanMapper`’s pipeline flows like this:
 
@@ -404,7 +404,7 @@ should slot into this sequence (see `urban_mapper/pipeline/`).
 
 ---
 
-## 📝 Generate Documentation
+## Generate Documentation
 
 First and foremost, thank you for your contribution! To generate documentation, follow these steps:
 
@@ -432,7 +432,7 @@ update the requirements files as described in [Managing Dependencies](#managing-
 
 ---
 
-## 📬 Pull Requests and Rebasing
+## Pull Requests and Rebasing
 
 - **Branch**:
    ```bash
@@ -475,12 +475,12 @@ update the requirements files as described in [Managing Dependencies](#managing-
 
 ---
 
-## 🎉 Thank You!
+## Thank You!
 
 Thanks for contributing to `UrbanMapper`! Your efforts shape urban data analysis. Questions? Open an issue—we’ve got
 your back.
 
-Happy mapping! 🌍
+Enjoy mapping! 🌍
 
 ---
 
