@@ -19,66 +19,55 @@
 
 ___
 
-## 🌆 `UrbanMapper` – In a Nutshell
+## `UrbanMapper`, In a Nutshell
 
-`UrbanMapper` –– $f(\cdot)$ –– brings urban layers (e.g., `Street Roads` / `Intersections` or `Sidewalks` /
-`Cross Walks`) –– $X$ –– and your urban datasets –– $Y$ –– together through the function $f(X, Y) = X \bowtie Y$,
-allowing you to spatial-join these components and enrich $X$ with attributes, features, and information from $Y$.
+`UrbanMapper` lets you link your data to spatial features—matching, for example, traffic events to streets—to enrich
+each location with meaningful, location-based information. Formally, it defines a spatial enrichment
+function $f(X, Y) = X \bowtie Y$, where $X$ represents urban layers (e.g., `Streets`, `Sidewalks`, `Intersections` and
+more)
+and $Y$ is a user-provided dataset (e.g., `traffic events`, `sensor data`). The operator $\bowtie$ performs a spatial
+join, enriching each feature in $X$ with relevant attributes from $Y$.
 
-While `UrbanMapper` is built with a **Scikit-Learn-like philosophy** – i.e., (I) from `loading` to `viz.` passing by
-`mapping` and `enriching`, we want to cover as much as users’ wishes in a welcoming way without having to code 20+/50+
-lines of code for one, ~~non-reproducible, non-shareable, non-updatable piece of code;~~ and (II) the library’s
-flexibility allows for easy contributions to sub-modules without having to start from scratch _“all the time”_.
+In short, `UrbanMapper` is a Python toolkit that enriches typically plain urban layers with datasets in a reproducible,
+shareable, and easily updatable way using minimal code. For example, given `traffic accident` data and a `streets` layer
+from [OpenStreetMap](https://www.openstreetmap.org), you can compute accidents per street with
+a [Scikit-Learn](https://scikit-learn.org/stable/)–style pipeline called the `Urban Pipeline`—in under 15 lines of code.
+As your data evolves or team members want new analyses, you can share and update the `Urban Pipeline` like a trained
+model, enabling others to run or extend the same workflow without rewriting code.
 
-This means that `UrbanMapper` is allowing you to build a reproducible, shareable, and updatable urban pipeline in a few
-lines of code 🎉 This could therefore be seen as a stepping-stone / accelerator to further analysis such as machine
-learning-based ones.
+There are more to `UrbanMapper`, explore!
 
-The only thing we request from you is to be sure that your datasets $Y$ are spatial datasets (i.e., with latitude and
-longitude coordinates) and let's urban proceed with enriching your urban layer of interests from **insights** your
-_datasets_ come with.
+See a trailer-style video below to get a quick overview of `UrbanMapper` and its features:
 
-## 🗺️ `Urban Layers` Currently Supported
+<div align="center">
+<iframe width="660" height="415" src="https://www.youtube-nocookie.com/embed/QUmfvda_z2U?si=nXKwC4_LA1C99ZR_&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+
+## `Urban Layers` Currently Supported
 
 `UrbanMapper` currently supports the following `urban layers`:
 
-1. [x] **Streets Roads** –– `UrbanMapper` can load street road networks from `OpenStreetMap` (OSM) using `OSMNx`.
-2. [x] **Streets Intersections** –– `UrbanMapper` can load street intersections from `OpenStreetMap` (OSM) using
-   `OSMNx`.
-3. [x] **Sidewalks** –– `UrbanMapper` can load sidewalk via `Tile2Net` using Deep Learning for automated mapping of
-   pedestrian infrastructure from aerial imagery.
-4. [x] **Cross Walks** –– `UrbanMapper` can load crosswalk via `Tile2Net` using Deep Learning for automated mapping of
-   pedestrian infrastructure from aerial imagery.
-5. [x] **Cities' Features** -- `Urban Mapper` can load OSM cities features such as buildings, parks, Bike Lanes etc. via
-   `OSMNx` API.
-6. [x] **Region Neighborhoods** –– `UrbanMapper` can load neighborhoods boundaries from `OpenStreetMap` (OSM) using
-   `OSMNx` Features
-   module.
-7. [x] **Region Cities** –– `UrbanMapper` can load cities boundaries from `OpenStreetMap` (OSM) using `OSMNx` Features
-   module.
-8. [x] **Region States** –– `UrbanMapper` can load states boundaries from `OpenStreetMap` (OSM) using `OSMNx` Features
-   module.
-9. [x] **Region Countries** –– `UrbanMapper` can load countries boundaries from `OpenStreetMap` (OSM) using `OSMNx`
-   Features module.
-10. [ ] **Subway/Tube** –– `UrbanMapper` could in the future for instance being able to load subway/tube networks.
+- [x] **Streets Roads** – Loads street road networks from [OpenStreetMap](https://www.openstreetmap.org) (OSM) using [OSMNx](https://osmnx.readthedocs.io/en/stable/).
+- [x] **Streets Intersections** – Loads street intersections from OSM using [OSMNx](https://osmnx.readthedocs.io/en/stable/).
+- [x] **Sidewalks** – Loads sidewalks via [Tile2Net](https://github.com/VIDA-NYU/tile2net) using Deep Learning for automated mapping of pedestrian infrastructure from aerial imagery.
+- [x] **Cross Walks** – Loads crosswalks via [Tile2Net](https://github.com/VIDA-NYU/tile2net) using Deep Learning for automated mapping of pedestrian infrastructure from aerial imagery.
+- [x] **Cities' Features** – Loads OSM city features such as buildings, parks, bike lanes, etc., via [OSMNx](https://osmnx.readthedocs.io/en/stable/) API.
+- [x] **Region Neighborhoods** – Loads neighborhood boundaries from OSM using [OSMNx](https://osmnx.readthedocs.io/en/stable/) Features module.
+- [x] **Region Cities** – Loads city boundaries from OSM using [OSMNx](https://osmnx.readthedocs.io/en/stable/) Features module.
+- [x] **Region States** – Loads state boundaries from OSM using [OSMNx](https://osmnx.readthedocs.io/en/stable/) Features module.
+- [x] **Region Countries** – Loads country boundaries from OSM using [OSMNx](https://osmnx.readthedocs.io/en/stable/) Features module.
+- [ ] **Subway/Tube** – Planned support for loading subway/tube networks.
 
-More will be added in the future, e.g `Subway`/`Tube` networks, etc. If you have any suggestions, please feel free to
-open an issue or a pull request on our GitHub repository.
-
-**References**
-
-- [OSMNx](https://osmnx.readthedocs.io/en/stable/) –– [Tile2Net](https://github.com/VIDA-NYU/tile2net) –– [OSM Cities Features](https://wiki.openstreetmap.org/wiki/Map_features)
+More `urban layers` will be added in the future.
+Suggestions? Open an issue or pull request on our [GitHub repository](https://github.com/VIDA-NYU/UrbanMapper/issues).
 
 ___
 
-## 🌆 `UrbanMapper` – Use Cases by `Urban Layer`
+## `UrbanMapper` – Use Cases by `Urban Layer`
 
 `UrbanMapper` is a flexible tool for addressing a wide range of urban analysis challenges. This non-exhaustive list of
 practical use cases showcases its capabilities in `transportation`, `safety`, `environment`, `demographics`, and
 `urban planning` scenarios among others based on each `urban layer` supported.
-
-!!! warning "Non-Exhaustive Use Cases List"
-    Note that these examples are not exhaustive and can be adapted to fit your specific needs. Be imaginative!
 
 === "🛣️ Streets Roads"
 
@@ -136,7 +125,7 @@ practical use cases showcases its capabilities in `transportation`, `safety`, `e
       Overlay noise data onto `building footprints` to identify residential areas needing soundproofing or noise barriers.
 
 === "🌎Regions Layers"
-    
+
     **🏘️ Neighborhoods**:
 
     - **Evaluate public transportation coverage**  
@@ -175,14 +164,13 @@ practical use cases showcases its capabilities in `transportation`, `safety`, `e
 
 ---
 
-# 📚 Where To Get Started ?
+# Where To Get Started ?
 
 - [Installation](getting-started/installation.md): How to install `UrbanMapper`
-- [Getting Started Step By Step](getting-started/quick-start_step_by_step.md): Create your first `UrbanMapper`'s analysis
+- [Getting Started Step By Step](getting-started/quick-start_step_by_step.md): Create your first `UrbanMapper`'s
+  analysis
   step-by-step.
 - [Getting Started W/ Pipeline](getting-started/quick-start_pipeline.md): Create your first `UrbanMapper`'s analysis w/
   pipeline.
-- [Urban Mapper's Examples](getting-started/examples.md): Understand how the `examples/` folder is structured and how to
-  use it.
-- [User Guide](user-guide/overview.md): In-depth guides for each component
+- [Urban Mapper's Examples](./EXAMPLES.md): Explore the `examples/` interactively via Jupyter notebooks.
 - [API Reference](api/loaders.md): Complete API documentation
