@@ -38,8 +38,6 @@ theme:
   features:
     - navigation.instant
     - navigation.tracking
-    - navigation.sections
-    - navigation.expand
     - navigation.indexes
     - toc.follow
     - content.code.copy
@@ -50,7 +48,6 @@ theme:
     - content.code.copy
     - content.code.select
     - content.code.annotate
-    - navigation.tabs
     - navigation.top
     - search.suggest
     - toc.follow
@@ -96,8 +93,36 @@ markdown_extensions:
 
 plugins:
   - search
+  - document-dates:
+      position: bottom
+      type: date
+      locale: en
+      date_format: '%Y-%m-%d'
+      time_format: '%H:%M:%S'
+      exclude:
+        - index.md
+        - copy_of_examples/*
+      show_author: true
   - mkdocs-jupyter:
       include_source: True
+      execute: true
+      execute_ignore:
+          - "copy_of_examples/1-Per-Module/1-loader.ipynb"
+          - "copy_of_examples/1-Per-Module/8-pipeline_generator.ipynb"
+          - "copy_of_examples/3-Case-Studies/3-Europe-Restaurants/1-EU_Restaurants_Pipeline.ipynb"
+          - "copy_of_examples/3-Case-Studies/4-Paris-Remarkable Trees/1-Paris_Remarquable_Trees_Pipeline.ipynb"
+          - "copy_of_examples/3-Case-Studies/4-Paris-Remarkable Trees/2-Paris_Remarquable_Trees_Advanced_Pipeline.ipynb"
+          - "copy_of_examples/3-Case-Studies/5-Overture-instead-of-OSM/1-overture_pipeline.ipynb"
+          - "copy_of_examples/3-Case-Studies/5-Overture-instead-of-OSM/2-overture_pipeline_advanced.ipynb"
+          - "copy_of_examples/4-External-Libraries-Usages/1-auctus_search.ipynb"
+          - "copy_of_examples/4-External-Libraries-Usages/3-jupyter_gis_multi_pipeline/1-one_pipeline.ipynb"
+          - "copy_of_examples/4-External-Libraries-Usages/3-jupyter_gis_multi_pipeline/2-two_pipeline.ipynb"
+          - "copy_of_examples/4-External-Libraries-Usages/3-jupyter_gis_multi_pipeline/3-three_pipeline.ipynb"
+          - "copy_of_examples/3-Case-Studies/1-Downtown-BK-Collisions/3-Downtown_BK_Collisions_Advanced_Pipeline.ipynb"
+          - "copy_of_examples/3-Case-Studies/1-Downtown-BK-Collisions/4-Downtown_BK_Collisions_Advanced_Pipeline_Extras.ipynb"
+          - "copy_of_examples/3-Case-Studies/2-Downtown-BK-Taxi-Trips/3-Downtown_BK_Taxi_Trips_Advanced_Pipeline.ipynb"
+          - "copy_of_examples/3-Case-Studies/2-Downtown-BK-Taxi-Trips/4-Downtown_BK_Taxi_Trips_Advanced_Pipeline_Extras.ipynb"
+
   - mkdocstrings:
       handlers:
         python:
@@ -146,17 +171,46 @@ nav:
     - Installation: getting-started/installation.md
     - Getting Started Step-By-Step: getting-started/quick-start_step_by_step.md
     - Getting Started W/ Pipeline: getting-started/quick-start_pipeline.md
-    - Urban Mapper's Examples: getting-started/examples.md
-  - User Guide:
-    - Overview: user-guide/overview.md
-    - 1 -> Loaders: user-guide/modules/1-loaders.md
-    - 2 -> Urban Layers: user-guide/modules/2-urban-layers.md
-    - 3 -> Imputers: user-guide/modules/3-imputers.md
-    - 4 -> Filters: user-guide/modules/4-filters.md
-    - 5 -> Enrichers: user-guide/modules/5-enrichers.md
-    - 6 -> Visualisers: user-guide/modules/6-visualisers.md
-    - 7 -> Pipelines: user-guide/modules/7-pipelines.md
-    - 8 -> Pipeline Generators: user-guide/modules/8-pipeline-generators.md
+  - Examples:
+      - Overview: EXAMPLES.md
+      - Per-Module Examples:
+          - "Loader": copy_of_examples/1-Per-Module/1-loader.ipynb
+          - "Urban Layer": copy_of_examples/1-Per-Module/2-urban_layer.ipynb
+          - "Imputer": copy_of_examples/1-Per-Module/3-imputer.ipynb
+          - "Filter": copy_of_examples/1-Per-Module/4-filter.ipynb
+          - "Enricher": copy_of_examples/1-Per-Module/5-enricher.ipynb
+          - "Visualiser": copy_of_examples/1-Per-Module/6-visualiser.ipynb
+          - "Urban Pipeline": copy_of_examples/1-Per-Module/7-urban_pipeline.ipynb
+          - "Pipeline Generator": copy_of_examples/1-Per-Module/8-pipeline_generator.ipynb
+      - End-to-End Examples:
+          - "Step by Step": copy_of_examples/2-End-to-End/1-step_by_step.ipynb
+          - "Pipeline Way": copy_of_examples/2-End-to-End/2-pipeline_way.ipynb
+      - Case Studies:
+          - Downtown BK Collisions:
+              - "Step by Step": copy_of_examples/3-Case-Studies/1-Downtown-BK-Collisions/1-Downtown_BK_Collisions_StepByStep.ipynb
+              - "Pipeline": copy_of_examples/3-Case-Studies/1-Downtown-BK-Collisions/2-Downtown_BK_Collisions_Pipeline.ipynb
+              - "Advanced Pipeline": copy_of_examples/3-Case-Studies/1-Downtown-BK-Collisions/3-Downtown_BK_Collisions_Advanced_Pipeline.ipynb
+              - "Advanced Pipeline Extras": copy_of_examples/3-Case-Studies/1-Downtown-BK-Collisions/4-Downtown_BK_Collisions_Advanced_Pipeline_Extras.ipynb
+          - Downtown BK Taxi Trips:
+              - "Step by Step": copy_of_examples/3-Case-Studies/2-Downtown-BK-Taxi-Trips/1-Downtown_BK_Taxi_Trips_StepByStep.ipynb
+              - "Pipeline": copy_of_examples/3-Case-Studies/2-Downtown-BK-Taxi-Trips/2-Downtown_BK_Taxi_Trips_Pipeline.ipynb
+              - "Advanced Pipeline": copy_of_examples/3-Case-Studies/2-Downtown-BK-Taxi-Trips/3-Downtown_BK_Taxi_Trips_Advanced_Pipeline.ipynb
+              - "Advanced Pipeline Extras": copy_of_examples/3-Case-Studies/2-Downtown-BK-Taxi-Trips/4-Downtown_BK_Taxi_Trips_Advanced_Pipeline_Extras.ipynb
+          - Europe Restaurants:
+              - "EU Restaurants Pipeline": copy_of_examples/3-Case-Studies/3-Europe-Restaurants/1-EU_Restaurants_Pipeline.ipynb
+          - Paris Remarkable Trees:
+              - "Pipeline": copy_of_examples/3-Case-Studies/4-Paris-Remarkable-Trees/1-Paris_Remarquable_Trees_Pipeline.ipynb
+              - "Advanced Pipeline": copy_of_examples/3-Case-Studies/4-Paris-Remarkable-Trees/2-Paris_Remarquable_Trees_Advanced_Pipeline.ipynb
+          - Overture instead of OSM:
+              - "Overture Pipeline": copy_of_examples/3-Case-Studies/5-Overture-instead-of-OSM/1-overture_pipeline.ipynb
+              - "Advanced Overture Pipeline": copy_of_examples/3-Case-Studies/5-Overture-instead-of-OSM/2-overture_pipeline_advanced.ipynb
+      - External Libraries Usages:
+          - "Auctus Search": copy_of_examples/4-External-Libraries-Usages/1-auctus_search.ipynb
+          - "Interactive Table VIS": copy_of_examples/4-External-Libraries-Usages/2-interactive_table_vis.ipynb
+          - "Jupyter GIS Multi Pipeline":
+              - One Pipeline: copy_of_examples/4-External-Libraries-Usages/3-jupyter_gis_multi_pipeline/1-one_pipeline.ipynb
+              - Two Pipeline: copy_of_examples/4-External-Libraries-Usages/3-jupyter_gis_multi_pipeline/2-two_pipeline.ipynb
+              - Three Pipeline: copy_of_examples/4-External-Libraries-Usages/3-jupyter_gis_multi_pipeline/3-three_pipeline.ipynb
   - API Reference:
     - Loaders: api/loaders.md
     - Urban Layers: api/urban_layers.md
@@ -171,5 +225,4 @@ nav:
     - JupyterGIS Mixins: api/jupyter_gis.md
   - Contributing: ./CONTRIBUTING.md
   - Releases: https://github.com/VIDA-NYU/UrbanMapper/releases
-  - Branding: ./BRANDING.md
-  - User Experience Design: ./USER_EXPERIENCE_DESIGN.md
+  - "Branding & UX": ./BRANDING.md
