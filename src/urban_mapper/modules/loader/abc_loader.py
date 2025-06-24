@@ -79,7 +79,14 @@ class LoaderBase(ABC):
             >>> loader = CSVLoader("taxi_data.csv", latitude_column="pickup_lat", longitude_column="pickup_lng")
             >>> gdf = loader.load_data_from_file()
         """
-        return self._load_data_from_file()
+        loaded_file = self._load_data_from_file()
+
+        if self.additional_loader_parameters.get("map_columns") is not None:
+            loaded_file = loaded_file.rename(
+                columns=self.additional_loader_parameters["map_columns"]
+            )
+
+        return loaded_file
 
     @abstractmethod
     def preview(self, format: str = "ascii") -> Any:

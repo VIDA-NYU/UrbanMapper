@@ -55,12 +55,14 @@ class ParquetLoader(LoaderBase):
         coordinate_reference_system: str = DEFAULT_CRS,
         engine: str = "pyarrow",
         columns: Optional[list[str]] = None,
+        **additional_loader_parameters: Any,
     ) -> None:
         super().__init__(
             file_path=file_path,
             latitude_column=latitude_column,
             longitude_column=longitude_column,
             coordinate_reference_system=coordinate_reference_system,
+            **additional_loader_parameters,
         )
         self.engine = engine
         self.columns = columns
@@ -141,7 +143,8 @@ class ParquetLoader(LoaderBase):
                 f"  Longitude Column: {self.longitude_column}\n"
                 f"  Engine: {self.engine}\n"
                 f"  Columns: {cols}\n"
-                f"  CRS: {self.coordinate_reference_system}"
+                f"  CRS: {self.coordinate_reference_system}\n"
+                f"  Additional params: {self.additional_loader_parameters}\n"
             )
         elif format == "json":
             return {
@@ -152,6 +155,7 @@ class ParquetLoader(LoaderBase):
                 "engine": self.engine,
                 "columns": cols,
                 "coordinate_reference_system": self.coordinate_reference_system,
+                "additional_params": self.additional_loader_parameters,
             }
         else:
             raise ValueError(f"Unsupported format '{format}'")

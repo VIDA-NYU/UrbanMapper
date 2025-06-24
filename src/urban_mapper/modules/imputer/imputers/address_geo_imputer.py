@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 import geopandas as gpd
 import osmnx
@@ -52,13 +52,14 @@ class AddressGeoImputer(GeoImputerBase):
 
     def __init__(
         self,
-        latitude_column: str,
-        longitude_column: str,
-        address_column_name: str,
+        latitude_column: Optional[str] = None,
+        longitude_column: Optional[str] = None,
+        data_id: Optional[str] = None,
+        address_column_name: Optional[str] = None,
     ):
-        super().__init__(latitude_column, longitude_column)
+        super().__init__(latitude_column, longitude_column, data_id)
         self.latitude_column = latitude_column
-        self.longitude_column = longitude_column
+        self.longitude_column = longitude_column        
         self.address_column_name = address_column_name
 
     def _transform(
@@ -125,16 +126,21 @@ class AddressGeoImputer(GeoImputerBase):
             ValueError: If format is unsupported.
         """
         if format == "ascii":
-            return (
-                f"Imputer: AddressGeoImputer\n"
+            lines = [
+                f"Imputer: AddressGeoImputer",
                 f"  Action: Impute '{self.latitude_column}' and '{self.longitude_column}' "
-                f"using addresses from '{self.address_column_name}'"
-            )
+                f"using addresses from '{self.address_column_name}'",
+            ]
+            if self.data_id:
+                lines.append(f"  Data ID: '{self.data_id}'")
+
+            return "\n".join(lines)
         elif format == "json":
             return {
                 "imputer": "AddressGeoImputer",
                 "action": f"Impute '{self.latitude_column}' and '{self.longitude_column}' "
                 f"using addresses from '{self.address_column_name}'",
+                f"data_id": self.data_id,
             }
         else:
             raise ValueError(f"Unsupported format '{format}'")

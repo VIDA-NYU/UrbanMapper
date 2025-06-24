@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Any
+from typing import Optional, Union, Dict, Any
 import geopandas as gpd
 from beartype import beartype
 
@@ -18,6 +18,7 @@ class GeoImputerBase(ABC):
     Attributes:
         latitude_column (Optional[str]): Column name for latitude values post-imputation.
         longitude_column (Optional[str]): Column name for longitude values post-imputation.
+        data_id (Optional[str]): Column name for processing specific values post-imputation.
 
     !!! note
         This class is abstract and cannot be instantiated directly. Use concrete
@@ -28,7 +29,11 @@ class GeoImputerBase(ABC):
         self,
         latitude_column: Optional[str] = None,
         longitude_column: Optional[str] = None,
+        data_id: Optional[str] = None,
+        *args,
+        **kwargs,
     ) -> None:
+        self.data_id = data_id
         self.latitude_column = latitude_column
         self.longitude_column = longitude_column
 
@@ -67,8 +72,21 @@ class GeoImputerBase(ABC):
     @require_arguments_not_none("urban_layer", error_msg="Urban layer cannot be None.")
     @require_attributes(["latitude_column", "longitude_column"])
     def transform(
-        self, input_geodataframe: gpd.GeoDataFrame, urban_layer: UrbanLayerBase
-    ) -> gpd.GeoDataFrame:
+        self, input_geodataframe: Union[
+            Dict[
+                str,
+                gpd.GeoDataFrame
+            ],
+            gpd.GeoDataFrame    
+        ], 
+        urban_layer: UrbanLayerBase,
+    ) -> Union[
+            Dict[
+                str,
+                gpd.GeoDataFrame
+            ],
+            gpd.GeoDataFrame,    
+        ]:
         """Public method to impute geographic data.
 
         Validates inputs and delegates to `_transform()` for imputation.
@@ -82,7 +100,7 @@ class GeoImputerBase(ABC):
             `GeoDataFrame`.
 
         Args:
-            input_geodataframe: `GeoDataFrame` with data to process.
+            input_geodataframe: one or more `GeoDataFrame` with data to process.
             urban_layer: Urban layer for spatial context.
 
         Returns:
@@ -105,7 +123,15 @@ class GeoImputerBase(ABC):
         !!! note
             Ensure latitude_column and longitude_column are set before calling.
         """
-        return self._transform(input_geodataframe, urban_layer)
+        if isinstance(input_geodataframe, gpd.GeoDataFrame):
+            return self._transform(input_geodataframe, urban_layer)
+        else:
+            return {
+                key: self._transform(gdf, urban_layer)
+                if self.data_id is None or self.data_id == key
+                else gdf
+                for key, gdf in input_geodataframe.items()
+            }
 
     @abstractmethod
     def preview(self, format: str = "ascii") -> Any:

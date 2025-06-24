@@ -2,7 +2,7 @@ import json
 from collections import defaultdict
 from itertools import islice
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Union, Dict
 
 import datasets
 import geopandas as gpd
@@ -71,6 +71,7 @@ class LoaderFactory:
         self.source_data: Optional[Union[str, pd.DataFrame, gpd.GeoDataFrame]] = None
         self.latitude_column: Optional[str] = None
         self.longitude_column: Optional[str] = None
+        self.map_columns: Optional[Dict[str, str]] = None
         self.crs: str = DEFAULT_CRS
         self._instance: Optional[LoaderBase] = None
         self._preview: Optional[dict] = None
@@ -98,6 +99,7 @@ class LoaderFactory:
         self.source_type = "file"
         self.latitude_column = None
         self.longitude_column = None
+        self.map_columns = None
         self.source_data = file_path
         logger.log(
             "DEBUG_LOW",
@@ -131,6 +133,7 @@ class LoaderFactory:
         self.source_data = dataframe
         self.latitude_column = "None"
         self.longitude_column = "None"
+        self.map_columns = "None"
         logger.log(
             "DEBUG_LOW",
             f"FROM_DATAFRAME: Initialised LoaderFactory with dataframe={dataframe}",
@@ -371,6 +374,7 @@ class LoaderFactory:
 
         self.latitude_column = "None"
         self.longitude_column = "None"
+        self.map_columns = "None"
         logger.log(
             "DEBUG_LOW",
             f"FROM_HUGGINGFACE: Loaded dataset {repo_id} with "
@@ -435,6 +439,31 @@ class LoaderFactory:
         )
         return self
 
+    def with_map(
+        self,
+        map_columns: Dict[str, str],
+    ) -> "LoaderFactory":
+        """Specify a set of source-target to map column names.
+        
+        This method configures which columns in the data source should have column names changed.
+        
+        Args:
+            map_columns: dictionary with source-target (key-value) columns to map from source to target names.
+            
+        Returns:
+            The LoaderFactory instance for method chaining.
+            
+        Examples:
+            >>> loader = mapper.loader.from_file("data/points.csv")\
+            ...     .with_map(map_columns={"long": "longitude", "lat": "latitude"})
+        """
+        self.map_columns = map_columns
+        logger.log(
+            "DEBUG_LOW",
+            f"WITH_MAP: Initialised LoaderFactory with map_columns={map_columns}",
+        )
+        return self
+
     def _load_from_file(self, coordinate_reference_system: str) -> gpd.GeoDataFrame:
         file_path: str = self.source_data
         file_ext = Path(file_path).suffix.lower()
@@ -444,6 +473,7 @@ class LoaderFactory:
             latitude_column=self.latitude_column,
             longitude_column=self.longitude_column,
             coordinate_reference_system=coordinate_reference_system,
+            map_columns=self.map_columns,
         )
         return self._instance.load_data_from_file()
 
@@ -466,6 +496,9 @@ class LoaderFactory:
             geo_dataframe.set_crs(coordinate_reference_system, inplace=True)
         elif geo_dataframe.crs.to_string() != coordinate_reference_system:
             geo_dataframe = geo_dataframe.to_crs(coordinate_reference_system)
+        if self.map_columns is not None and self.map_columns != "None":
+            geo_dataframe = geo_dataframe.rename(columns=self.map_columns)
+
         return geo_dataframe
 
     @require_attributes(["source_type", "source_data"])
@@ -588,6 +621,7 @@ class LoaderFactory:
             latitude_column=self.latitude_column,
             longitude_column=self.longitude_column,
             coordinate_reference_system=self.crs,
+            map_columns=self.map_columns,
         )
         if self._preview is not None:
             self.preview(format=self._preview["format"])

@@ -76,14 +76,19 @@ class BoundingBoxFilter(GeoFilterBase):
               Action: Filter data to the bounding box of the urban layer
         """
         if format == "ascii":
-            return (
-                "Filter: BoundingBoxFilter\n"
-                "  Action: Filter data to the bounding box of the urban layer"
-            )
+            lines = [
+                "Filter: BoundingBoxFilter",
+                "  Action: Filter data to the bounding box of the urban layer",
+            ]
+            if self.data_id:
+                lines.append(f"  Data ID: '{self.data_id}'")
+
+            return "\n".join(lines)
         elif format == "json":
             return {
                 "filter": "BoundingBoxFilter",
                 "action": "Filter data to the bounding box of the urban layer",
+                "data_id": self.data_id,
             }
         else:
             raise ValueError(f"Unsupported format '{format}'")

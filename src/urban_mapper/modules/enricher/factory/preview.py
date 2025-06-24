@@ -66,6 +66,8 @@ class PreviewBuilder:
         steps.append(
             f"│   └── Values From: {', '.join(self.config.values_from) if self.config.values_from else '<Not Set>'}"
         )
+        if self.config.data_id:
+            steps.append(f"│   └── Data ID: {self.config.data_id}")
         steps.append("├── Step 2: Action")
         if self.config.action == "aggregate":
             method = self.config.aggregator_config.get("method")
@@ -112,6 +114,7 @@ class PreviewBuilder:
                 "data_input": {
                     "group_by": self.config.group_by,
                     "values_from": self.config.values_from,
+                    "data_id": self.config.data_id,
                 },
                 "action": {
                     "type": self.config.action,

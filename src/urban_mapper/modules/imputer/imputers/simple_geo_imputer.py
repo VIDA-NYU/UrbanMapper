@@ -59,16 +59,21 @@ class SimpleGeoImputer(GeoImputerBase):
             ValueError: If format is unsupported.
         """
         if format == "ascii":
-            return (
-                f"Imputer: SimpleGeoImputer\n"
-                f"  Action: Drop rows with missing '{self.latitude_column}' or '{self.longitude_column}'"
-            )
+            lines = [
+                f"Imputer: SimpleGeoImputer",
+                f"  Action: Drop rows with missing '{self.latitude_column}' or '{self.longitude_column}'",
+            ]
+            if self.data_id:
+                lines.append(f"  Data ID: '{self.data_id}'")
+
+            return "\n".join(lines)
         elif format == "json":
             return {
                 "imputer": "SimpleGeoImputer",
                 "action": f"Drop rows with missing '{self.latitude_column}' or '{self.longitude_column}'",
                 "latitude_column": self.latitude_column,
                 "longitude_column": self.longitude_column,
+                "data_id": self.data_id,
             }
         else:
             raise ValueError(f"Unsupported format '{format}'")

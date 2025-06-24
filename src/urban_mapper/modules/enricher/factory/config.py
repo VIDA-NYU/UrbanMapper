@@ -18,6 +18,7 @@ class EnricherConfig:
         enricher_type: Type of enricher to use.
         enricher_config: Params for the enricher.
         debug: Whether to include debug info.
+        data_id: ID of the dataset to be transformed
 
     Examples:
         >>> import urban_mapper as um
@@ -35,11 +36,13 @@ class EnricherConfig:
         self.enricher_type: str = "SingleAggregatorEnricher"
         self.enricher_config: Dict[str, Any] = {}
         self.debug: bool = False
+        self.data_id: Optional[str] = None
 
     def with_data(
         self,
         group_by: Union[str, List[str]],
         values_from: Optional[Union[str, List[str]]] = None,
+        data_id: Optional[str] = None,
     ) -> "EnricherConfig":
         """Set columns for grouping and value extraction.
 
@@ -54,6 +57,7 @@ class EnricherConfig:
         Args:
             group_by: Column(s) to group by—string or list.
             values_from: Column(s) to aggregate—string or list, optional.
+            data_id: ID of the dataset to be transformed
 
         Returns:
             Self, for chaining.
@@ -67,6 +71,7 @@ class EnricherConfig:
         self.values_from = (
             [values_from] if isinstance(values_from, str) else values_from
         )
+        self.data_id = data_id
         logger.log(
             "DEBUG_LOW",
             f"WITH_DATA: Initialised EnricherConfig with "
