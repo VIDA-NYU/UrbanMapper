@@ -4,10 +4,9 @@
     The `filter` module is responsible for filtering geospatial datasets based on specific criteria or conditions out 
     of your `urban layer`.
 
-    We highly recommend to look through the `User Guide`'s Filter section for a more in-depth introduction about
-    the filter module and its usage prior to explore its API.
+    Meanwhile, we recommend to look through the [`Example`'s Filter](../copy_of_examples/1-Per-Module/4-filter/) for a more hands-on introduction about
+    the Filter module and its usage.
 
-    [See The User Guide :fontawesome-solid-signs-post:](../user-guide/modules/4-filters.md){ .md-button } 
 
 !!! warning "Documentation Under Alpha Construction"
     **This documentation is in its early stages and still being developed.** The API may therefore change, 

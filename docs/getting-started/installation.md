@@ -1,4 +1,4 @@
-# 🥐 Welcome to the Installation guide!
+# How to Install UrbanMapper?
 
 `UrbanMapper` is a Python package designed for urban spatial data analysis. Before you start, you’ll need to setup your environment and install the appropriate packages. `UrbanMapper` requires Python `3.10` or higher.
 
@@ -61,14 +61,3 @@ jupyter lab
 
 ## ➡️ From Source (Developer)
 Building `UrbanMapper` from source lets you make changes to the code base. To install from the source, refer to the [Project Setup Guide](../CONTRIBUTING.md/#project-setup-guide).
-
----
-
-## 🚀 Conclusion
-
-Well done! You’ve just installed `UrbanMapper`. Ready to take it further? 
-
-Head over to the [# Getting Started Step by Step](quick-start_step_by_step.md) section for a step-by-step guide on how 
-to use `UrbanMapper` for urban spatial data analysis.
-
-Cheers!

@@ -5,10 +5,8 @@
     It provides a unified interface for loading various data formats, including `shapefiles`, `parquet`, and `CSV` files 
     with geospatial information.
 
-    We highly recommend to look through the `User Guide`'s Loader section for a more in-depth introduction about
-    the loader module and its usage prior to explore its API.
-
-    [See The User Guide :fontawesome-solid-signs-post:](../user-guide/modules/1-loaders.md){ .md-button } 
+    Meanwhile, we recommend to look through the [`Example`'s Loader](../copy_of_examples/1-Per-Module/1-loader/) for a more hands-on introduction about
+    the Loader module and its usage.
 
 !!! warning "Documentation Under Alpha Construction"
     **This documentation is in its early stages and still being developed.** The API may therefore change, 

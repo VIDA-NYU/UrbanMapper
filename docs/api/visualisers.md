@@ -4,10 +4,9 @@
     The `visualiser` module is responsible to deliver visualiser's primitives such as matplotlib or folium,
     following a `UrbanMapper`'s analysis.
 
-    We highly recommend to look through the `User Guide`'s Visualiser section for a more in-depth introduction about
-    the visualiser module and its usage prior to explore its API.
-
-    [See The User Guide :fontawesome-solid-signs-post:](../user-guide/modules/6-visualisers.md){ .md-button } 
+    Meanwhile, we recommend to look through the [`Example`'s Visualiser](../copy_of_examples/1-Per-Module/6-visualiser/) for a more hands-on introduction about
+    the Visualiser module and its usage.
+ 
 
 !!! warning "Documentation Under Alpha Construction"
     **This documentation is in its early stages and still being developed.** The API may therefore change, 

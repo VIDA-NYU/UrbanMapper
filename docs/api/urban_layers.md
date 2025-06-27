@@ -5,10 +5,8 @@
     provide structure for urban insights, such as mapping taxi trips to busy `intersections` or analysing `neighbourhood`
     demographics.
 
-    We highly recommend to look through the `User Guide`'s Urban Layer section for a more in-depth introduction about
-    the Urban Layer module and its usage prior to explore its API.
-
-    [See The User Guide :fontawesome-solid-signs-post:](../user-guide/modules/2-urban-layers.md){ .md-button } 
+    Meanwhile, we recommend to look through the [`Example`'s Urban layer](../copy_of_examples/1-Per-Module/2-urban_layer/) for a more hands-on introduction about
+    the Urban layer module and its usage.
 
 !!! warning "Documentation Under Alpha Construction"
     **This documentation is in its early stages and still being developed.** The API may therefore change, 

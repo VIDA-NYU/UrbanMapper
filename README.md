@@ -22,46 +22,52 @@ ___
 
 > [!IMPORTANT]
 > - 📹 `UrbanMapper` Introductory Video 👉 https://www.youtube.com/watch?v=QUmfvda_z2U 👈
-> - 🤝 We support [JupyterGIS](https://github.com/geojupyter/jupytergis) following one of your `Urban Pipeline`'s analysis for collaborative in real-time exploration on Jupyter 🏂 Shout-out to [@mfisher87](https://github.com/mfisher87) and `JGIS` team for their tremendous help.
+> - 🤝 We support [JupyterGIS](https://github.com/geojupyter/jupytergis) following one of your `Urban Pipeline`'s
+    analysis for collaborative in real-time exploration on Jupyter 🏂 Shout-out
+    to [@mfisher87](https://github.com/mfisher87) and `JGIS` team for their tremendous help.
 
-## UrbanMapper –– In a Nutshell
+## UrbanMapper, In a Nutshell
 
-`UrbanMapper` –– `f(.)` –– brings urban layers (e.g. `Street Roads` / `Intersections` or `Sidewalks` / `Cross Walks`) ––
-`X` ––
-and your urban datasets –– `Y` –– together through the function *f(X, Y) = X ⋈ Y*, allowing you to spatial-join
-these components, and enrich `X` given `Y` attributes, features and information.
+`UrbanMapper` lets you link your data to spatial features—matching, for example, traffic events to streets—to enrich
+each location with meaningful, location-based information. Formally, it defines a spatial enrichment
+function $f(X, Y) = X \bowtie Y$, where $X$ represents urban layers (e.g., `Streets`, `Sidewalks`, `Intersections` and
+more)
+and $Y$ is a user-provided dataset (e.g., `traffic events`, `sensor data`). The operator $\bowtie$ performs a spatial
+join, enriching each feature in $X$ with relevant attributes from $Y$.
 
-While `UrbanMapper` is built with a **Scikit-Learn-like philosophy** – i.e., (I) from `loading` to `viz.` passing by
-`mapping` and `enriching`, we want to cover as much as users’ wishes in a welcoming way without having to code 20+/50+
-lines of code for one, ~~non-reproducible, non-shareable, non-updatable piece of code;~~ and (II) the library’s
-flexibility allows for easy
-contributions to sub-modules without having to start from scratch _“all the time”_.
+In short, `UrbanMapper` is a Python toolkit that enriches typically plain urban layers with datasets in a reproducible,
+shareable, and easily updatable way using minimal code. For example, given `traffic accident` data and a `streets` layer
+from [OpenStreetMap](https://www.openstreetmap.org), you can compute accidents per street with
+a [Scikit-Learn](https://scikit-learn.org/stable/)–style pipeline called the `Urban Pipeline`—in under 15 lines of code.
+As your data evolves or team members want new analyses, you can share and update the `Urban Pipeline` like a trained
+model, enabling others to run or extend the same workflow without rewriting code.
 
-This means that `UrbanMapper` is allowing you to build a reproducible, shareable, and updatable urban pipeline in a
-few lines of code 🎉 This could therefore be seen as a stepping-stone / accelerator to further analysis such as machine
-learning-based ones.
-
-The only thing we request from you is to be sure that your datasets `Y` are spatial datasets (i.e. with latitude and
-longitude coordinates) and let's
-urban proceed with enriching your urban layer of interests from **insights**  your _datasets_ comes with.
+There are more to `UrbanMapper`, explore!
 
 ---
 
 ## Installation
 
 Install `UrbanMapper` via ``pip`` (works in any environment):
+
  ```bash
  pip install urban-mapper
  ```
+
 Then launch Jupyter Lab to explore `UrbanMapper`:
+
 ```bash
 jupyter lab
 ```
 
 > [!TIP]
-> We recommend installing `UrbanMapper` in a virtual environment to keep things tidy and avoid dependency conflicts. You can find detailed instructions—including how to install within a virtual environment using [uv](https://docs.astral.sh/uv/getting-started/installation/), [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) or from source—
-in the [UrbanMapper Installation Guide](https://urbanmapper.readthedocs.io/en/latest/getting-started/installation/).
-> 
+> We recommend installing `UrbanMapper` in a virtual environment to keep things tidy and avoid dependency conflicts. You
+> can find detailed instructions—including how to install within a virtual environment
+>
+using [uv](https://docs.astral.sh/uv/getting-started/installation/), [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
+> or from source—
+> in the [UrbanMapper Installation Guide](https://urbanmapper.readthedocs.io/en/latest/getting-started/installation/).
+>
 
 ---
 
@@ -69,19 +75,26 @@ in the [UrbanMapper Installation Guide](https://urbanmapper.readthedocs.io/en/la
 
 `UrbanMapper` currently supports loading the following urban layers:
 
-- **Street networks** (`roads` and `intersections`) from `OpenStreetMap` via [OSMNx](https://osmnx.readthedocs.io/en/stable/)
-- **Pedestrian infrastructure** (`sidewalks` and `crosswalks`) via [`Tile2Net`](https://github.com/VIDA-NYU/tile2net) (automated mapping from aerial imagery)
-- **City features** (`buildings`, `parks`, `bike lanes`, etc.) from `OpenStreetMap` via [OSMNx](https://osmnx.readthedocs.io/en/stable/)
-- **Administrative boundaries** (`neighborhoods`, `cities`, `states`, `countries`) from `OpenStreetMap` via [OSMNx](https://osmnx.readthedocs.io/en/stable/)
+- **Street networks** (`roads` and `intersections`) from `OpenStreetMap`
+  via [OSMNx](https://osmnx.readthedocs.io/en/stable/)
+- **Pedestrian infrastructure** (`sidewalks` and `crosswalks`) via [`Tile2Net`](https://github.com/VIDA-NYU/tile2net) (
+  automated mapping from aerial imagery)
+- **City features** (`buildings`, `parks`, `bike lanes`, etc.) from `OpenStreetMap`
+  via [OSMNx](https://osmnx.readthedocs.io/en/stable/)
+- **Administrative boundaries** (`neighborhoods`, `cities`, `states`, `countries`) from `OpenStreetMap`
+  via [OSMNx](https://osmnx.readthedocs.io/en/stable/)
 
-More layers, like `subway`/`tube` networks, will be added in the future. If you have any suggestions, please feel free to
+More layers, like `subway`/`tube` networks, will be added in the future. If you have any suggestions, please feel free
+to
 open an issue or a pull request!
 
 # 🚀 Getting Started with UrbanMapper
 
-Are you ready to dive into urban data analysis in a couple of lines of code? The simplest approach to get started with `UrbanMapper` is to look
-through the two getting-started examples available in the documentation then walk through the hands-on examples in the 
-`examples/` directory. Documentation is available at [UrbanMapper Documentation](https://urbanmapper.readthedocs.io/en/latest/).
+Are you ready to dive into urban data analysis in a couple of lines of code? The simplest approach to get started with
+`UrbanMapper` is to look
+through the two getting-started examples available in the documentation then walk through the hands-on examples in the
+`examples/` directory. Documentation is available
+at [UrbanMapper Documentation](https://urbanmapper.readthedocs.io/en/latest/).
 
 ---
 
