@@ -23,7 +23,6 @@ class GeoFilterBase(ABC):
     def __init__(
         self,
         data_id: Optional[str] = None,
-        *args, 
         **kwargs,
     ) -> None:
         self.data_id = data_id

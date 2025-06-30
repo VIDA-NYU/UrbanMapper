@@ -32,7 +32,7 @@ class FilterFactory:
 
     Attributes:
         _filter_type (Optional[str]): The type of filter to create.
-        _config (Dict[str, Any]): Configuration parameters for the filter.
+        _extra_params (Dict[str, Any]): Configuration parameters for the filter.
         _instance (Optional[GeoFilterBase]): The filter instance (internal use).
         _preview (Optional[dict]): Preview configuration (internal use).
 
@@ -48,7 +48,7 @@ class FilterFactory:
 
     def __init__(self):
         self._filter_type: Optional[str] = None
-        self._config: Dict[str, Any] = {}
+        self._extra_params: Dict[str, Any] = {}
         self._instance: Optional[GeoFilterBase] = None
         self._preview: Optional[dict] = None
         self._data_id: Optional[str] = None
@@ -170,7 +170,7 @@ class FilterFactory:
         filter_class = FILTER_REGISTRY[self._filter_type]
         self._instance = filter_class(
             data_id=self._data_id,
-            **self._config
+            **self._extra_params
         )
 
         if (
@@ -214,7 +214,7 @@ class FilterFactory:
         filter_class = FILTER_REGISTRY[self._filter_type]
         self._instance = filter_class(
             data_id=self._data_id,
-            **self._config,
+            **self._extra_params,
         )
         if self._preview is not None:
             self.preview(format=self._preview["format"])

@@ -19,6 +19,7 @@ class GeoImputerBase(ABC):
         latitude_column (Optional[str]): Column name for latitude values post-imputation.
         longitude_column (Optional[str]): Column name for longitude values post-imputation.
         data_id (Optional[str]): Column name for processing specific values post-imputation.
+        **extra_params: Any other argument used by a child class.
 
     !!! note
         This class is abstract and cannot be instantiated directly. Use concrete
@@ -30,8 +31,7 @@ class GeoImputerBase(ABC):
         latitude_column: Optional[str] = None,
         longitude_column: Optional[str] = None,
         data_id: Optional[str] = None,
-        *args,
-        **kwargs,
+        **extra_params,
     ) -> None:
         self.data_id = data_id
         self.latitude_column = latitude_column

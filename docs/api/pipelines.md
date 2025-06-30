@@ -2,7 +2,7 @@
 
 !!! tip "What is the pipeline tool?"
     The `pipeline` tool is a module that allows you to create a sequence of data processing steps, or "pipeline", 
-    to transform your `urban layer` given your `urban dataset` and some user-defined `enrichments`.
+    to transform your `urban layer` given one or more `urban datasets` and some user-defined `enrichments`.
 
     Meanwhile, we highly recommend to look through the [`Examples`'s Pipeline](../copy_of_examples/1-Per-Module/7-urban_pipeline/) for a more hands-on introduction about
     the pipeline tool and its usage.

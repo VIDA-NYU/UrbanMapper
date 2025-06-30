@@ -46,7 +46,7 @@ class ImputerFactory:
         self._imputer_type: Optional[str] = None
         self._latitude_column: Optional[str] = None
         self._longitude_column: Optional[str] = None
-        self._config: Dict[str, Any] = {}
+        self._extra_params: Dict[str, Any] = {}
         self._instance: Optional[GeoImputerBase] = None
         self._preview: Optional[dict] = None
 
@@ -123,22 +123,26 @@ class ImputerFactory:
         self,
         longitude_column: str,
         latitude_column: str,
+        **extra_params,
     ) -> "ImputerFactory":
         """Configure latitude and longitude columns.
 
         Args:
             longitude_column: Column name for longitude.
             latitude_column: Column name for latitude.
+            **extra_params: Any other argument to be passed to a child class, such as address to `AddressGeoImputer`.
 
         Returns:
             ImputerFactory: Self for chaining.
         """
         self._longitude_column = longitude_column
         self._latitude_column = latitude_column
+        self._extra_params = extra_params
         logger.log(
             "DEBUG_LOW",
             f"ON_COLUMNS: Initialised ImputerFactory with "
             f"longitude_column={longitude_column}, latitude_column={latitude_column}",
+            f"extra_params={self._extra_params}",
         )
         return self
 
@@ -183,7 +187,7 @@ class ImputerFactory:
             latitude_column=self._latitude_column,
             longitude_column=self._longitude_column,
             data_id=self._data_id,
-            **self._config,
+            **self._extra_params,
         )
 
         if (
@@ -239,7 +243,7 @@ class ImputerFactory:
             latitude_column=self._latitude_column,
             longitude_column=self._longitude_column,
             data_id=self._data_id,
-            **self._config,
+            **self._extra_params,
         )
         if self._preview is not None:
             self.preview(format=self._preview["format"])
