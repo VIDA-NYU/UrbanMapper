@@ -63,11 +63,8 @@ jupyter lab
 > [!TIP]
 > We recommend installing `UrbanMapper` in a virtual environment to keep things tidy and avoid dependency conflicts. You
 > can find detailed instructions—including how to install within a virtual environment
->
-using [uv](https://docs.astral.sh/uv/getting-started/installation/), [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
-> or from source—
-> in the [UrbanMapper Installation Guide](https://urbanmapper.readthedocs.io/en/latest/getting-started/installation/).
->
+> using [uv](https://docs.astral.sh/uv/getting-started/installation/), [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
+> or from source in the [UrbanMapper Installation Guide](https://urbanmapper.readthedocs.io/en/latest/getting-started/installation/).
 
 ---
 
