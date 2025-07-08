@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Any, Type
+from typing import Optional, Dict, Any, Type, Union
 import importlib
 import inspect
 import pkgutil
@@ -42,10 +42,11 @@ class ImputerFactory:
     """
 
     def __init__(self):
+        self._data_id: Optional[str] = None
         self._imputer_type: Optional[str] = None
         self._latitude_column: Optional[str] = None
         self._longitude_column: Optional[str] = None
-        self._config: Dict[str, Any] = {}
+        self._extra_params: Dict[str, Any] = {}
         self._instance: Optional[GeoImputerBase] = None
         self._preview: Optional[dict] = None
 
@@ -89,24 +90,59 @@ class ImputerFactory:
         )
         return self
 
+    def with_data(self, data_id: str) -> "ImputerFactory":
+        """Set the data ID to perform impute.
+
+        Args:
+            data_id: ID of the dataset to be transformed.
+
+        Returns:
+            ImputerFactory: Self for chaining.
+
+        Raises:
+            ValueError: If primitive_type is not in IMPUTER_REGISTRY.
+
+        !!! tip
+            Check IMPUTER_REGISTRY keys for valid imputer types.
+        """
+        if self._data_id is not None:
+            logger.log(
+                "DEBUG_MID",
+                f"WARNING: Data ID already set to '{self._data_id}'. Overwriting.",
+            )
+            self._data_id = None
+
+        self._data_id = data_id
+        logger.log(
+            "DEBUG_LOW",
+            f"WITH_DATA: Initialised ImputerFactory with data_id={data_id}",
+        )
+        return self
+
     def on_columns(
-        self, longitude_column: str, latitude_column: str
+        self,
+        longitude_column: str,
+        latitude_column: str,
+        **extra_params,
     ) -> "ImputerFactory":
         """Configure latitude and longitude columns.
 
         Args:
             longitude_column: Column name for longitude.
             latitude_column: Column name for latitude.
+            **extra_params: Any other argument to be passed to a child class, such as address to `AddressGeoImputer`.
 
         Returns:
             ImputerFactory: Self for chaining.
         """
         self._longitude_column = longitude_column
         self._latitude_column = latitude_column
+        self._extra_params = extra_params
         logger.log(
             "DEBUG_LOW",
             f"ON_COLUMNS: Initialised ImputerFactory with "
             f"longitude_column={longitude_column}, latitude_column={latitude_column}",
+            f"extra_params={self._extra_params}",
         )
         return self
 
@@ -116,16 +152,21 @@ class ImputerFactory:
         "_longitude_column",
     )
     def transform(
-        self, input_geodataframe: gpd.GeoDataFrame, urban_layer: UrbanLayerBase
-    ) -> gpd.GeoDataFrame:
+        self,
+        input_geodataframe: Union[Dict[str, gpd.GeoDataFrame], gpd.GeoDataFrame],
+        urban_layer: UrbanLayerBase,
+    ) -> Union[
+        Dict[str, gpd.GeoDataFrame],
+        gpd.GeoDataFrame,
+    ]:
         """Apply the configured imputer to data.
 
         Args:
-            input_geodataframe: `GeoDataFrame` to process.
+            input_geodataframe: one or more `GeoDataFrame` to process.
             urban_layer: Urban layer for context.
 
         Returns:
-            GeoDataFrame: Imputed data.
+            Union[Dict[str, GeoDataFrame], GeoDataFrame]: Imputed data.
 
         Raises:
             ValueError: If configuration is incomplete.
@@ -137,8 +178,21 @@ class ImputerFactory:
         self._instance = imputer_class(
             latitude_column=self._latitude_column,
             longitude_column=self._longitude_column,
-            **self._config,
+            data_id=self._data_id,
+            **self._extra_params,
         )
+
+        if (
+            isinstance(input_geodataframe, Dict)
+            and self._data_id is not None
+            and self._data_id not in input_geodataframe
+        ):
+            print(
+                "WARNING: ",
+                f"Data ID {self._data_id} was not found in the list of dataframes ",
+                "No input transformation will be executed ",
+            )
+
         return self._instance.transform(input_geodataframe, urban_layer)
 
     def build(self) -> GeoImputerBase:
@@ -180,7 +234,8 @@ class ImputerFactory:
         self._instance = imputer_class(
             latitude_column=self._latitude_column,
             longitude_column=self._longitude_column,
-            **self._config,
+            data_id=self._data_id,
+            **self._extra_params,
         )
         if self._preview is not None:
             self.preview(format=self._preview["format"])

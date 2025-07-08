@@ -3,7 +3,7 @@ import json
 import os
 import uuid
 from pathlib import Path
-from typing import Tuple, Any, List, Union, Optional
+from typing import Tuple, Any, List, Union, Optional, Dict
 
 import dill
 import geopandas as gpd
@@ -47,7 +47,7 @@ class UrbanPipeline:
     }}%%
     graph LR
         subgraph "Data Ingestion"
-            A["Loader (1)"]
+            A["Loaders (1..*)"]
             B["Urban Layer (1)"]
             A -->|Raw data| B
         end
@@ -203,13 +203,21 @@ class UrbanPipeline:
         return self
 
     @require_attributes_not_none("steps")
-    def transform(self) -> Tuple[gpd.GeoDataFrame, UrbanLayerBase]:
+    def transform(
+        self,
+    ) -> Tuple[
+        Union[
+            Dict[str, gpd.GeoDataFrame],
+            gpd.GeoDataFrame,
+        ],
+        UrbanLayerBase,
+    ]:
         """Execute pipeline transformation.
 
         Returns processed data and enriched urban layer after composition.
 
         Returns:
-            Tuple[gpd.GeoDataFrame, UrbanLayerBase]: Processed data and urban layer.
+            Tuple[Union[Dict[str, gpd.GeoDataFrame], gpd.GeoDataFrame], UrbanLayerBase]: Processed data and urban layer.
 
         Raises:
             ValueError: If no steps or not composed.
@@ -220,13 +228,21 @@ class UrbanPipeline:
         return self.executor.transform()
 
     @require_attributes_not_none("steps")
-    def compose_transform(self) -> Tuple[gpd.GeoDataFrame, UrbanLayerBase]:
+    def compose_transform(
+        self,
+    ) -> Tuple[
+        Union[
+            Dict[str, gpd.GeoDataFrame],
+            gpd.GeoDataFrame,
+        ],
+        UrbanLayerBase,
+    ]:
         """Compose and transform in one step.
 
         Combines composition and transformation into a single operation.
 
         Returns:
-            Tuple[gpd.GeoDataFrame, UrbanLayerBase]: Processed data and urban layer.
+            Tuple[Union[Dict[str, gpd.GeoDataFrame], gpd.GeoDataFrame], UrbanLayerBase]: Processed data and urban layer.
 
         Raises:
             ValueError: If no steps or steps are invalid.

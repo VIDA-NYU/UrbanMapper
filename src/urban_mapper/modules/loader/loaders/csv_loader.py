@@ -55,13 +55,15 @@ class CSVLoader(LoaderBase):
         coordinate_reference_system: str = DEFAULT_CRS,
         separator: str = ",",
         encoding: str = "utf-8",
+        **additional_loader_parameters: Any,
     ) -> None:
         super().__init__(
             file_path=file_path,
+            latitude_column=latitude_column,
+            longitude_column=longitude_column,
             coordinate_reference_system=coordinate_reference_system,
+            **additional_loader_parameters,
         )
-        self.latitude_column = latitude_column
-        self.longitude_column = longitude_column
         self.separator = separator
         self.encoding = encoding
 
@@ -138,7 +140,8 @@ class CSVLoader(LoaderBase):
                 f"  Longitude Column: {self.longitude_column}\n"
                 f"  Separator: {self.separator}\n"
                 f"  Encoding: {self.encoding}\n"
-                f"  CRS: {self.coordinate_reference_system}"
+                f"  CRS: {self.coordinate_reference_system}\n"
+                f"  Additional params: {self.additional_loader_parameters}\n"
             )
         elif format == "json":
             return {
@@ -149,6 +152,7 @@ class CSVLoader(LoaderBase):
                 "separator": self.separator,
                 "encoding": self.encoding,
                 "crs": self.coordinate_reference_system,
+                "additional_params": self.additional_loader_parameters,
             }
         else:
             raise ValueError(f"Unsupported format: {format}")

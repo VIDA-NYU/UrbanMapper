@@ -112,7 +112,8 @@ class ShapefileLoader(LoaderBase):
                 f"  File: {self.file_path}\n"
                 f"  Latitude Column: {lat_col}\n"
                 f"  Longitude Column: {lon_col}\n"
-                f"  CRS: {self.coordinate_reference_system}"
+                f"  CRS: {self.coordinate_reference_system}\n"
+                f"  Additional params: {self.additional_loader_parameters}\n"
             )
         elif format == "json":
             return {
@@ -121,6 +122,7 @@ class ShapefileLoader(LoaderBase):
                 "latitude_column": lat_col,
                 "longitude_column": lon_col,
                 "crs": self.coordinate_reference_system,
+                "additional_params": self.additional_loader_parameters,
             }
         else:
             raise ValueError(f"Unsupported format: {format}")

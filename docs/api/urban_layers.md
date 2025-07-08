@@ -1,7 +1,7 @@
 # Urban Layer
 
 !!! tip "What is the Urban Layer's module?"
-    The `urban_layer` module is responsible for te spatial canvases on which your data is displayed. These layers
+    The `urban_layer` module is responsible for the spatial canvases on which your datasets are displayed. These layers
     provide structure for urban insights, such as mapping taxi trips to busy `intersections` or analysing `neighbourhood`
     demographics.
 

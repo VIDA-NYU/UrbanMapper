@@ -1,4 +1,4 @@
-from typing import Tuple, Optional, Any, List, Union
+from typing import Tuple, Optional, Any, List, Union, Dict
 import geopandas as gpd
 from beartype import beartype
 from urban_mapper.modules.loader import LoaderBase
@@ -56,7 +56,7 @@ class PipelineExecutor:
         ],
     ) -> None:
         self.steps = steps
-        self.data: Optional[gpd.GeoDataFrame] = None
+        self.data: Optional[Dict[str, gpd.GeoDataFrame]] = None
         self.urban_layer: Optional[UrbanLayerBase] = None
         self._composed: bool = False
 
@@ -66,7 +66,7 @@ class PipelineExecutor:
         """Compose and Execute Pipeline Steps.
 
         !!! tip "Steps Execution Order"
-            - [x] Load data
+            - [x] Load datasets
             - [x] Apply imputers
             - [x] Apply filters
             - [x] Map to urban layer
@@ -94,18 +94,14 @@ class PipelineExecutor:
             raise ValueError("Pipeline must include exactly one UrbanLayerBase step.")
         urban_layer_name, urban_layer_instance = urban_layer_step
 
-        loader_step = next(
-            ((name, step) for name, step in self.steps if isinstance(step, LoaderBase)),
-            None,
-        )
-        if loader_step is None:
-            raise ValueError("Pipeline must include exactly one LoaderBase step.")
-        loader_name, loader_instance = loader_step
-
+        num_loaders = sum(isinstance(step, LoaderBase) for _, step in self.steps)
         num_imputers = sum(isinstance(step, GeoImputerBase) for _, step in self.steps)
         num_filters = sum(isinstance(step, GeoFilterBase) for _, step in self.steps)
         num_enrichers = sum(isinstance(step, EnricherBase) for _, step in self.steps)
-        total_steps = 2 + num_imputers + num_filters + num_enrichers
+        total_steps = 1 + num_loaders + num_imputers + num_filters + num_enrichers
+
+        if num_loaders == 0:
+            raise ValueError("Pipeline must include exactly one LoaderBase step.")
 
         with alive_bar(
             total_steps,
@@ -113,9 +109,17 @@ class PipelineExecutor:
             force_tty=True,
             dual_line=False,
         ) as bar:
-            bar()
-            bar.title = f"~> Loading {loader_name}..."
-            self.data = loader_instance.load_data_from_file()
+            self.data = None if num_loaders == 1 else {}
+
+            for name, step in self.steps:
+                if isinstance(step, LoaderBase):
+                    bar()
+                    bar.title = f"~> Loading: {name}..."
+
+                    if num_loaders == 1:
+                        self.data = step.load_data_from_file()
+                    else:
+                        self.data[name] = step.load_data_from_file()
 
             for name, step in self.steps:
                 if isinstance(step, GeoImputerBase):
@@ -147,13 +151,21 @@ class PipelineExecutor:
             bar()
             bar.title = f"🗺️ Successfully composed pipeline with {total_steps} steps!"
 
-    def transform(self) -> Tuple[gpd.GeoDataFrame, UrbanLayerBase]:
+    def transform(
+        self,
+    ) -> Tuple[
+        Union[
+            Dict[str, gpd.GeoDataFrame],
+            gpd.GeoDataFrame,
+        ],
+        UrbanLayerBase,
+    ]:
         """Retrieve Results of `Pipeline Execution`.
 
         Returns processed data and enriched urban layer post-composition.
 
         Returns:
-            Tuple[gpd.GeoDataFrame, UrbanLayerBase]: Processed data and urban layer.
+            Tuple[Union[Dict[str, gpd.GeoDataFrame], gpd.GeoDataFrame], UrbanLayerBase]: Processed data and urban layer.
 
         Raises:
             ValueError: If pipeline hasn’t been composed.
@@ -167,13 +179,19 @@ class PipelineExecutor:
 
     def compose_transform(
         self,
-    ) -> Tuple[gpd.GeoDataFrame, UrbanLayerBase]:
+    ) -> Tuple[
+        Union[
+            Dict[str, gpd.GeoDataFrame],
+            gpd.GeoDataFrame,
+        ],
+        UrbanLayerBase,
+    ]:
         """Compose and Transform in One Step.
 
         Combines compose and transform operations.
 
         Returns:
-            Tuple[gpd.GeoDataFrame, UrbanLayerBase]: Processed data and urban layer.
+            Tuple[Union[Dict[str, gpd.GeoDataFrame], gpd.GeoDataFrame], UrbanLayerBase]: Processed data and urban layer.
 
         Raises:
             ValueError: If pipeline is already composed or lacks required steps.

@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Any, Type
+from typing import Optional, Dict, Any, Type, Union
 import importlib
 import inspect
 import pkgutil
@@ -32,7 +32,7 @@ class FilterFactory:
 
     Attributes:
         _filter_type (Optional[str]): The type of filter to create.
-        _config (Dict[str, Any]): Configuration parameters for the filter.
+        _extra_params (Dict[str, Any]): Configuration parameters for the filter.
         _instance (Optional[GeoFilterBase]): The filter instance (internal use).
         _preview (Optional[dict]): Preview configuration (internal use).
 
@@ -48,9 +48,10 @@ class FilterFactory:
 
     def __init__(self):
         self._filter_type: Optional[str] = None
-        self._config: Dict[str, Any] = {}
+        self._extra_params: Dict[str, Any] = {}
         self._instance: Optional[GeoFilterBase] = None
         self._preview: Optional[dict] = None
+        self._data_id: Optional[str] = None
 
     @reset_attributes_before(["_filter_type"])
     def with_type(self, primitive_type: str) -> "FilterFactory":
@@ -100,20 +101,54 @@ class FilterFactory:
         )
         return self
 
+    def with_data(self, data_id: str) -> "FilterFactory":
+        """Set the data ID to perform filtering.
+
+        Args:
+            data_id: ID of the dataset to be transformed
+
+        Returns:
+            FilterFactory: Self for chaining.
+
+        Raises:
+            ValueError: If primitive_type is not in FILTER_REGISTRY.
+
+        !!! tip
+            Check FILTER_REGISTRY keys for valid filtering types.
+        """
+        if self._data_id is not None:
+            logger.log(
+                "DEBUG_MID",
+                f"WARNING: Data ID already set to '{self._data_id}'. Overwriting.",
+            )
+            self._data_id = None
+
+        self._data_id = data_id
+        logger.log(
+            "DEBUG_LOW",
+            f"WITH_DATA: Initialised FilterFactory with data_id={data_id}",
+        )
+        return self
+
     @require_attributes_not_none("_filter_type")
     def transform(
-        self, input_geodataframe: gpd.GeoDataFrame, urban_layer: UrbanLayerBase
-    ) -> gpd.GeoDataFrame:
+        self,
+        input_geodataframe: Union[Dict[str, gpd.GeoDataFrame], gpd.GeoDataFrame],
+        urban_layer: UrbanLayerBase,
+    ) -> Union[
+        Dict[str, gpd.GeoDataFrame],
+        gpd.GeoDataFrame,
+    ]:
         """Apply the filter to input data and return filtered results
 
         Creates and applies a filter instance to the input `GeoDataFrame`.
 
         Args:
-            input_geodataframe (gpd.GeoDataFrame): The `GeoDataFrame` to filter.
+            input_geodataframe (Union[Dict[str, gpd.GeoDataFrame], gpd.GeoDataFrame]): one or more `GeoDataFrame` to filter.
             urban_layer (UrbanLayerBase): The urban layer for filtering criteria.
 
         Returns:
-            gpd.GeoDataFrame: The filtered `GeoDataFrame`.
+            Union[Dict[str, gpd.GeoDataFrame], gpd.GeoDataFrame]: The filtered data.
 
         Raises:
             ValueError: If _filter_type is not set.
@@ -125,7 +160,19 @@ class FilterFactory:
             ...     .transform(data, layer)
         """
         filter_class = FILTER_REGISTRY[self._filter_type]
-        self._instance = filter_class(**self._config)
+        self._instance = filter_class(data_id=self._data_id, **self._extra_params)
+
+        if (
+            isinstance(input_geodataframe, Dict)
+            and self._data_id is not None
+            and self._data_id not in input_geodataframe
+        ):
+            print(
+                "WARNING: ",
+                f"Data ID {self._data_id} was not found in the list of dataframes ",
+                "No filter transformation will be executed ",
+            )
+
         return self._instance.transform(input_geodataframe, urban_layer)
 
     def build(self) -> GeoFilterBase:
@@ -154,7 +201,10 @@ class FilterFactory:
         if self._filter_type is None:
             raise ValueError("Filter type must be specified. Call with_type() first.")
         filter_class = FILTER_REGISTRY[self._filter_type]
-        self._instance = filter_class(**self._config)
+        self._instance = filter_class(
+            data_id=self._data_id,
+            **self._extra_params,
+        )
         if self._preview is not None:
             self.preview(format=self._preview["format"])
         return self._instance

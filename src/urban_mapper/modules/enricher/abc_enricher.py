@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Any
-import geopandas as gpd
+from typing import Optional, Any, Union, Dict
+import geopandas as gpd, pandas as pd, numpy as np
 from beartype import beartype
 from urban_mapper.modules.urban_layer.abc_urban_layer import UrbanLayerBase
+from pandas.core.indexes.base import Index
 
 
 @beartype
@@ -78,9 +79,29 @@ class EnricherBase(ABC):
         """
         NotImplementedError("Preview method not implemented.")
 
+    def set_layer_data_source(
+        self, urban_layer: UrbanLayerBase, index: Index
+    ) -> UrbanLayerBase:
+        """Initialized UrbanLayer data_id column with source name based on index list argument.
+
+        Args:
+            urban_layer: Urban layer to change.
+            index: Index list of the Urban layer to change.
+
+        Returns:
+            Urban layer with new column data_id.
+        """
+        if self.config.data_id:
+            if "data_id" not in urban_layer.layer:
+                urban_layer.layer["data_id"] = pd.Series(np.nan, dtype="object")
+
+            urban_layer.layer.loc[index, "data_id"] = self.config.data_id
+
+        return urban_layer
+
     def enrich(
         self,
-        input_geodataframe: gpd.GeoDataFrame,
+        input_geodataframe: Union[Dict[str, gpd.GeoDataFrame], gpd.GeoDataFrame],
         urban_layer: UrbanLayerBase,
         **kwargs,
     ) -> UrbanLayerBase:
@@ -90,7 +111,7 @@ class EnricherBase(ABC):
         implementation-specific `_enrich` method after any needed validation.
 
         Args:
-            input_geodataframe: `GeoDataFrame` with data to enrich with.
+            input_geodataframe: one or more `GeoDataFrame` with data to enrich with.
             urban_layer: Urban layer to beef up with data from input_geodataframe.
             **kwargs: Additional bespoke parameters to customise enrichment.
 
@@ -114,4 +135,13 @@ class EnricherBase(ABC):
             ...     .build()
             >>> enriched_streets = enricher.enrich(taxi_trips, streets)
         """
-        return self._enrich(input_geodataframe, urban_layer, **kwargs)
+        if isinstance(input_geodataframe, gpd.GeoDataFrame):
+            return self._enrich(input_geodataframe, urban_layer, **kwargs)
+        else:
+            enriched_layer = urban_layer
+
+            for key, gdf in input_geodataframe.items():
+                if self.config.data_id is None or self.config.data_id == key:
+                    enriched_layer = self._enrich(gdf, enriched_layer, **kwargs)
+
+            return enriched_layer

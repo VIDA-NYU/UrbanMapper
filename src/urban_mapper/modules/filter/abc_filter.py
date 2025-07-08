@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Optional, Union, Dict
 
 import geopandas as gpd
 from beartype import beartype
@@ -19,6 +19,13 @@ class GeoFilterBase(ABC):
         This is an abstract class and cannot be instantiated directly. Use concrete
         implementations like `BoundingBoxFilter` instead.
     """
+
+    def __init__(
+        self,
+        data_id: Optional[str] = None,
+        **kwargs,
+    ) -> None:
+        self.data_id = data_id
 
     @abstractmethod
     def _transform(
@@ -58,19 +65,24 @@ class GeoFilterBase(ABC):
     )
     @require_arguments_not_none("urban_layer", error_msg="Urban layer cannot be None.")
     def transform(
-        self, input_geodataframe: gpd.GeoDataFrame, urban_layer: UrbanLayerBase
-    ) -> gpd.GeoDataFrame:
+        self,
+        input_geodataframe: Union[Dict[str, gpd.GeoDataFrame], gpd.GeoDataFrame],
+        urban_layer: UrbanLayerBase,
+    ) -> Union[
+        Dict[str, gpd.GeoDataFrame],
+        gpd.GeoDataFrame,
+    ]:
         """Filter a `GeoDataFrame` based on spatial criteria from an `urban layer`
 
         The primary public method for applying filters. It validates inputs and delegates
         to the subclass-specific `_transform()` method.
 
         Args:
-            input_geodataframe (gpd.GeoDataFrame): The `GeoDataFrame` to filter.
+            input_geodataframe (Union[Dict[str, GeoDataFrame], GeoDataFrame]): one or more `GeoDataFrame` to filter.
             urban_layer (UrbanLayerBase): The `urban layer` providing spatial filtering criteria.
 
         Returns:
-            gpd.GeoDataFrame: A filtered `GeoDataFrame` containing only rows meeting the criteria.
+            Union[Dict[str, GeoDataFrame], GeoDataFrame]: one or more filtered `GeoDataFrame` containing only rows meeting the criteria.
 
         Raises:
             ValueError: If input_geodataframe or urban_layer is None.
@@ -85,7 +97,16 @@ class GeoFilterBase(ABC):
             >>> filtered_data.head()
             >>> # 👆This would show onloy data within the bounding box of the streets layer. I.e. `Manhattan, New York`.
         """
-        return self._transform(input_geodataframe, urban_layer)
+
+        if isinstance(input_geodataframe, gpd.GeoDataFrame):
+            return self._transform(input_geodataframe, urban_layer)
+        else:
+            return {
+                key: self._transform(gdf, urban_layer)
+                if self.data_id is None or self.data_id == key
+                else gdf
+                for key, gdf in input_geodataframe.items()
+            }
 
     @abstractmethod
     def preview(self, format: str = "ascii") -> Any:

@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 import geopandas as gpd
 import osmnx
@@ -28,21 +28,21 @@ class AddressGeoImputer(GeoImputerBase):
         Examples:
         >>> import urban_mapper as um
         >>> factory = um.UrbanMapper().imputer.with_type("AddressGeoImputer")\
-        ...     .on_columns(longitude_column="lng", latitude_column="lat", address_column_name="address")
+        ...     .on_columns(longitude_column="lng", latitude_column="lat", address_column="address")
         ...     # or .on_columns("lng", "lat", "address")
         >>> gdf = factory.transform(data_gdf, urban_layer)
 
     Attributes:
         latitude_column (str): Column for latitude values.
         longitude_column (str): Column for longitude values.
-        address_column_name (str): Column with address strings.
+        address_column (str): Column with address strings.
 
     Examples:
         >>> from urban_mapper.modules.imputer import AddressGeoImputer
         >>> imputer = AddressGeoImputer(
         ...     latitude_column="lat",
         ...     longitude_column="lng",
-        ...     address_column_name="address"
+        ...     address_column="address"
         ... )
         >>> geocoded_gdf = imputer.transform(data_gdf, urban_layer)
 
@@ -52,14 +52,13 @@ class AddressGeoImputer(GeoImputerBase):
 
     def __init__(
         self,
-        latitude_column: str,
-        longitude_column: str,
-        address_column_name: str,
+        latitude_column: Optional[str] = None,
+        longitude_column: Optional[str] = None,
+        data_id: Optional[str] = None,
+        address_column: Optional[str] = None,
     ):
-        super().__init__(latitude_column, longitude_column)
-        self.latitude_column = latitude_column
-        self.longitude_column = longitude_column
-        self.address_column_name = address_column_name
+        super().__init__(latitude_column, longitude_column, data_id)
+        self.address_column = address_column
 
     def _transform(
         self, input_geodataframe: gpd.GeoDataFrame, urban_layer: UrbanLayerBase
@@ -85,7 +84,7 @@ class AddressGeoImputer(GeoImputerBase):
         missing_records = dataframe[mask_missing].copy()
 
         def geocode_address(row):
-            address = str(row.get(self.address_column_name, "")).strip()
+            address = str(row.get(self.address_column, "")).strip()
             if not address:
                 return None
             try:
@@ -125,16 +124,21 @@ class AddressGeoImputer(GeoImputerBase):
             ValueError: If format is unsupported.
         """
         if format == "ascii":
-            return (
-                f"Imputer: AddressGeoImputer\n"
+            lines = [
+                f"Imputer: AddressGeoImputer",
                 f"  Action: Impute '{self.latitude_column}' and '{self.longitude_column}' "
-                f"using addresses from '{self.address_column_name}'"
-            )
+                f"using addresses from '{self.address_column}'",
+            ]
+            if self.data_id:
+                lines.append(f"  Data ID: '{self.data_id}'")
+
+            return "\n".join(lines)
         elif format == "json":
             return {
                 "imputer": "AddressGeoImputer",
                 "action": f"Impute '{self.latitude_column}' and '{self.longitude_column}' "
-                f"using addresses from '{self.address_column_name}'",
+                f"using addresses from '{self.address_column}'",
+                f"data_id": self.data_id,
             }
         else:
             raise ValueError(f"Unsupported format '{format}'")

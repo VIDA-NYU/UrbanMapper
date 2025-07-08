@@ -78,6 +78,8 @@ class InteractiveVisualiser(VisualiserBase):
         "width",
         "height",
         "colorbar_text_color",
+        "marker_type",
+        "marker_kwds",
     }
 
     def _render(

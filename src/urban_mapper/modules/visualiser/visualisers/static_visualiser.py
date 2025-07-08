@@ -1,6 +1,7 @@
 import geopandas as gpd
 from beartype import beartype
 from typing import Any, List
+from matplotlib.lines import Line2D
 
 from urban_mapper.modules.visualiser.abc_visualiser import VisualiserBase
 
@@ -62,6 +63,7 @@ class StaticVisualiser(VisualiserBase):
         """Render a static plot of the GeoDataFrame.
 
         Creates a static Matplotlib plot for the specified column.
+        It renders each source (data_id column) with different markers, when the GeoDataFrame has data_id column
 
         !!! note "To Keep in Mind"
             Only supports visualisation of a single column at a time.
@@ -81,9 +83,46 @@ class StaticVisualiser(VisualiserBase):
         if len(columns) > 1:
             raise ValueError("StaticVisualiser only supports a single column.")
         render_kwargs = {**self.style, **kwargs}
-        ax = urban_layer_geodataframe.plot(
-            column=columns[0], legend=True, **render_kwargs
-        )
+
+        if "data_id" in urban_layer_geodataframe:
+            data_ids = urban_layer_geodataframe.data_id.dropna().unique()
+            data_ids.sort()
+
+            marker_list = list(Line2D.markers)
+            marker_list = marker_list[2:]  ## discard point (.) and pixel (,)
+            marker_list = marker_list[: len(data_ids)]
+
+            col = urban_layer_geodataframe[~urban_layer_geodataframe.data_id.isna()][
+                columns[0]
+            ]
+            vmin_val = col.min()
+            vmax_val = col.max()
+
+            ax = None
+            legend = []
+
+            for id, marker in zip(data_ids, marker_list):
+                urban_layer_gdf = urban_layer_geodataframe[
+                    urban_layer_geodataframe.data_id == id
+                ]
+                ax = urban_layer_gdf.plot(
+                    column=columns[0],
+                    legend=id == data_ids[-1],
+                    ax=ax,
+                    marker=marker,
+                    vmin=vmin_val,
+                    vmax=vmax_val,
+                    **render_kwargs,
+                )
+                legend.append(
+                    Line2D([], [], color="gray", marker=marker, ls="", label=id)
+                )
+
+            ax.legend(handles=legend)
+        else:
+            ax = urban_layer_geodataframe.plot(
+                column=columns[0], legend=True, **render_kwargs
+            )
         return ax.get_figure()
 
     def preview(self, format: str = "ascii") -> Any:

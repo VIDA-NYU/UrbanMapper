@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Tuple, List, Dict, Any
+from typing import Tuple, List, Dict, Any, Union
 import geopandas as gpd
 from beartype import beartype
 from pathlib import Path
@@ -34,6 +34,7 @@ class UrbanLayerBase(ABC):
         self.mappings: List[Dict[str, object]] = []
         self.coordinate_reference_system: str = DEFAULT_CRS
         self.has_mapped: bool = False
+        self.data_id: str | None = None
 
     @abstractmethod
     def from_place(self, place_name: str, **kwargs) -> None:
@@ -194,13 +195,22 @@ class UrbanLayerBase(ABC):
     )
     def map_nearest_layer(
         self,
-        data: gpd.GeoDataFrame,
+        data: Union[
+            Dict[str, gpd.GeoDataFrame],
+            gpd.GeoDataFrame,
+        ],
         longitude_column: str | None = None,
         latitude_column: str | None = None,
         output_column: str | None = None,
         threshold_distance: float | None = None,
         **kwargs,
-    ) -> Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
+    ) -> Tuple[
+        gpd.GeoDataFrame,
+        Union[
+            Dict[str, gpd.GeoDataFrame],
+            gpd.GeoDataFrame,
+        ],
+    ]:
         """Map points to their nearest elements in this urban layer.
 
         This method is the public method calling internally the `_map_nearest_layer` method.
@@ -210,7 +220,7 @@ class UrbanLayerBase(ABC):
         spatial join (`_map_narest_layer(.)`) as many times as the mappings has objects.
 
         Args:
-            data: `GeoDataFrame` containing the points to map.
+            data: one or more `GeoDataFrame` containing the points to map.
             longitude_column: Name of the column containing longitude values.
                 If provided, overrides any predefined mappings.
             latitude_column: Name of the column containing latitude values.
@@ -224,7 +234,7 @@ class UrbanLayerBase(ABC):
         Returns:
             A tuple containing:
             - The updated urban layer `GeoDataFrame` (may be unchanged in some implementations)
-            - The input data `GeoDataFrame` with the output column(s) added containing mapping results
+            - The input data `GeoDataFrame`(s) with the output column(s) added containing mapping results
 
         Raises:
             ValueError: If the layer has not been loaded, if required columns are missing,
@@ -265,13 +275,35 @@ class UrbanLayerBase(ABC):
                 {"threshold_distance": threshold_distance} if threshold_distance else {}
             )
             mapping_kwargs.update(kwargs)
-            result = self._map_nearest_layer(
-                data,
-                longitude_column,
-                latitude_column,
-                output_column,
-                **mapping_kwargs,
-            )
+
+            if isinstance(data, gpd.GeoDataFrame):
+                result = self._map_nearest_layer(
+                    data,
+                    longitude_column,
+                    latitude_column,
+                    output_column,
+                    **mapping_kwargs,
+                )
+            else:
+                result = {}
+                last_key = list(data.keys())[-1]
+
+                for key, gdf in data.items():
+                    result[key] = gdf
+
+                    if self.data_id is None or self.data_id == key:
+                        self.layer, mapped_data = self._map_nearest_layer(
+                            gdf,
+                            longitude_column,
+                            latitude_column,
+                            output_column,
+                            _reset_layer_index=key == last_key,
+                            **mapping_kwargs,
+                        )
+                        result[key] = mapped_data
+
+                result = (self.layer, result)
+
             self.has_mapped = True
             return result
 
@@ -304,15 +336,38 @@ class UrbanLayerBase(ABC):
                     "DEBUG_MID",
                     "INFO: Last mapping, resetting urban layer's index.",
                 )
-            self.layer, temp_mapped = self._map_nearest_layer(
-                mapped_data,
-                lon_col,
-                lat_col,
-                out_col,
-                _reset_layer_index=(True if mapping == self.mappings[-1] else False),
-                **mapping_kwargs,
-            )
-            mapped_data[out_col] = temp_mapped[out_col]
+            if isinstance(mapped_data, gpd.GeoDataFrame):
+                self.layer, temp_mapped = self._map_nearest_layer(
+                    mapped_data,
+                    lon_col,
+                    lat_col,
+                    out_col,
+                    _reset_layer_index=(mapping == self.mappings[-1]),
+                    **mapping_kwargs,
+                )
+                mapped_data[out_col] = temp_mapped[out_col]
+            else:
+                temp_mapped_data = {}
+                last_key = list(mapped_data.keys())[-1]
+
+                for key, gdf in mapped_data.items():
+                    temp_mapped_data[key] = gdf
+
+                    if self.data_id is None or self.data_id == key:
+                        self.layer, temp_mapped = self._map_nearest_layer(
+                            gdf,
+                            lon_col,
+                            lat_col,
+                            out_col,
+                            _reset_layer_index=(
+                                mapping == self.mappings[-1] and key == last_key
+                            ),
+                            **mapping_kwargs,
+                        )
+                        gdf[out_col] = temp_mapped[out_col]
+                        temp_mapped_data[key] = gdf
+
+                mapped_data = temp_mapped_data
 
         self.has_mapped = True
         return self.layer, mapped_data
