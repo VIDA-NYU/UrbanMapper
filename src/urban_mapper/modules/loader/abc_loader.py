@@ -21,6 +21,7 @@ class LoaderBase(ABC):
         file_path (Path): Path to the file to load.
         latitude_column (str): Name of the column containing latitude values.
         longitude_column (str): Name of the column containing longitude values.
+        geometry_column (str): Name of the column containing geometry data.
         coordinate_reference_system (str): The coordinate reference system to use. Default: `EPSG:4326`.
         additional_loader_parameters (Dict[str, Any]): Additional parameters specific to the loader implementation. Consider this as `kwargs`.
     """
@@ -30,12 +31,14 @@ class LoaderBase(ABC):
         file_path: Union[str, Path],
         latitude_column: Optional[str] = None,
         longitude_column: Optional[str] = None,
+        geometry_column: Optional[str] = None,
         coordinate_reference_system: str = DEFAULT_CRS,
         **additional_loader_parameters: Any,
     ) -> None:
         self.file_path: Path = Path(file_path)
         self.latitude_column: str = latitude_column or ""
         self.longitude_column: str = longitude_column or ""
+        self.geometry_column: str = geometry_column or ""
         self.coordinate_reference_system: str = coordinate_reference_system
         self.additional_loader_parameters: Dict[str, Any] = additional_loader_parameters
 

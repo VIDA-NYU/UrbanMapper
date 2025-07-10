@@ -6,8 +6,13 @@ from typing import Union, Optional, Any
 
 from urban_mapper.modules.loader.abc_loader import LoaderBase
 from urban_mapper.config import DEFAULT_CRS
-from urban_mapper.utils import require_attributes
+from urban_mapper.utils.helpers import require_either_or_attributes
+from urban_mapper.modules.loader.helpers.geometry_helpers import validate_wkt_column, convert_wkt_to_geometry
+from urban_mapper import logger  # Add logger import
 
+from shapely import wkt
+import shapely
+import logging
 
 @beartype
 class CSVLoader(LoaderBase):
@@ -21,6 +26,7 @@ class CSVLoader(LoaderBase):
         file_path (Path): Path to the `CSV` file to load.
         latitude_column (str): Name of the column containing latitude values.
         longitude_column (str): Name of the column containing longitude values.
+        geometry_column (str): Name of the column containing geometry data in WKT format.
         coordinate_reference_system (str): The coordinate reference system to use. Default: `EPSG:4326`
         separator (str): The delimiter character used in the CSV file. Default: `","`
         encoding (str): The character encoding of the CSV file. Default: `"utf-8"`
@@ -52,6 +58,7 @@ class CSVLoader(LoaderBase):
         file_path: Union[str, Path],
         latitude_column: Optional[str] = None,
         longitude_column: Optional[str] = None,
+        geometry_column: Optional[str] = None,
         coordinate_reference_system: str = DEFAULT_CRS,
         separator: str = ",",
         encoding: str = "utf-8",
@@ -64,24 +71,26 @@ class CSVLoader(LoaderBase):
             coordinate_reference_system=coordinate_reference_system,
             **additional_loader_parameters,
         )
+        self.geometry_column = geometry_column
         self.separator = separator
         self.encoding = encoding
 
-    @require_attributes(["latitude_column", "longitude_column"])
+    @require_either_or_attributes(
+        [["latitude_column", "longitude_column"], ["geometry_column"]],
+        error_msg="Either both 'latitude_column' and 'longitude_column' must be set, or 'geometry_column' must be set."
+    )
     def _load_data_from_file(self) -> gpd.GeoDataFrame:
         """Load data from a CSV file and convert it to a `GeoDataFrame`.
 
         This method reads a `CSV` file using pandas, validates the latitude and
-        longitude columns, and converts the data to a `GeoDataFrame` with point
-        geometries using the specified coordinate reference system.
+        longitude columns or geometry column, and converts the data to a `GeoDataFrame`
+        with point geometries using the specified coordinate reference system.
 
         Returns:
-            A `GeoDataFrame` containing the loaded data with point geometries
-            created from the latitude and longitude columns.
+            A `GeoDataFrame` containing the loaded data with point geometries.
 
         Raises:
-            ValueError: If latitude_column or longitude_column is None.
-            ValueError: If the specified columns are not found in the CSV file.
+            ValueError: If neither `latitude_column` and `longitude_column` nor `geometry` are valid.
             pd.errors.ParserError: If the CSV file cannot be parsed.
             UnicodeDecodeError: If the file encoding is incorrect.
         """
@@ -89,15 +98,38 @@ class CSVLoader(LoaderBase):
             self.file_path, sep=self.separator, encoding=self.encoding
         )
 
-        if self.latitude_column not in dataframe.columns:
-            raise ValueError(
-                f"Column '{self.latitude_column}' not found in the CSV file."
-            )
-        if self.longitude_column not in dataframe.columns:
-            raise ValueError(
-                f"Column '{self.longitude_column}' not found in the CSV file."
-            )
+        if self.geometry_column:
+            # If geometry_column is provided, validate and infer latitude and longitude
+            if self.geometry_column not in dataframe.columns:
+                raise ValueError(f"Column '{self.geometry_column}' not found in the CSV file.")
+            
+            dataframe = validate_wkt_column(dataframe, self.geometry_column)
 
+            try:
+                geo_dataframe = convert_wkt_to_geometry(dataframe, self.geometry_column, self.coordinate_reference_system)
+            except Exception as e:
+                raise ValueError(f"Invalid WKT data in column '{self.geometry_column}': {e}")
+
+            # Convert to GeoDataFrame and set CRS
+            dataframe = gpd.GeoDataFrame(dataframe, geometry="geometry", crs="EPSG:4326")
+
+            # Calculate centroid and extract lat/lon (works for all geometry types)
+            dataframe["centroid"] = dataframe["geometry"].centroid
+            dataframe[self.latitude_column] = dataframe["centroid"].y
+            dataframe[self.longitude_column] = dataframe["centroid"].x
+
+        else:
+            # If geometry is not provided, validate latitude and longitude columns
+            if self.latitude_column not in dataframe.columns:
+                raise ValueError(
+                    f"Column '{self.latitude_column}' not found in the CSV file."
+                )
+            if self.longitude_column not in dataframe.columns:
+                raise ValueError(
+                    f"Column '{self.longitude_column}' not found in the CSV file."
+                )
+
+        # Ensure latitude and longitude columns are numeric
         dataframe[self.latitude_column] = pd.to_numeric(
             dataframe[self.latitude_column], errors="coerce"
         )
@@ -105,6 +137,7 @@ class CSVLoader(LoaderBase):
             dataframe[self.longitude_column], errors="coerce"
         )
 
+        # Create GeoDataFrame
         geodataframe = gpd.GeoDataFrame(
             dataframe,
             geometry=gpd.points_from_xy(
@@ -138,6 +171,7 @@ class CSVLoader(LoaderBase):
                 f"  File: {self.file_path}\n"
                 f"  Latitude Column: {self.latitude_column}\n"
                 f"  Longitude Column: {self.longitude_column}\n"
+                f"  Geometry Column: {self.geometry_column}\n"
                 f"  Separator: {self.separator}\n"
                 f"  Encoding: {self.encoding}\n"
                 f"  CRS: {self.coordinate_reference_system}\n"
@@ -149,6 +183,7 @@ class CSVLoader(LoaderBase):
                 "file": self.file_path,
                 "latitude_column": self.latitude_column,
                 "longitude_column": self.longitude_column,
+                "geometry_column": self.geometry_column,
                 "separator": self.separator,
                 "encoding": self.encoding,
                 "crs": self.coordinate_reference_system,
