@@ -483,7 +483,7 @@ class LoaderFactory:
         )
         return self
 
-    def _load_from_file(self, coordinate_reference_system: str) -> gpd.GeoDataFrame:
+    def _load_from_file(self) -> gpd.GeoDataFrame:
         file_path: str = self.source_data
         file_ext = Path(file_path).suffix.lower()
         loader_class = FILE_LOADER_FACTORY[file_ext]["class"]
@@ -492,14 +492,12 @@ class LoaderFactory:
             latitude_column=self.latitude_column,
             longitude_column=self.longitude_column,
             geometry_column=self.geometry_column,
-            coordinate_reference_system=coordinate_reference_system,
+            coordinate_reference_system=self.crs,
             map_columns=self.map_columns,
         )
         return self._instance.load_data_from_file()
 
-    def _load_from_dataframe(
-        self, coordinate_reference_system: str
-    ) -> gpd.GeoDataFrame:
+    def _load_from_dataframe(self) -> gpd.GeoDataFrame:
         input_dataframe: Union[pd.DataFrame, gpd.GeoDataFrame] = self.source_data
         if isinstance(input_dataframe, gpd.GeoDataFrame):
             geo_dataframe: gpd.GeoDataFrame = input_dataframe.copy()
@@ -509,7 +507,7 @@ class LoaderFactory:
                     raise ValueError(f"Column '{self.geometry_column}' not found in the DataFrame.")
                 input_dataframe = validate_wkt_column(input_dataframe, self.geometry_column)
                 try:
-                    geo_dataframe = convert_wkt_to_geometry(input_dataframe, self.geometry_column, coordinate_reference_system)
+                    geo_dataframe = convert_wkt_to_geometry(input_dataframe, self.geometry_column, self.crs)
                 except Exception as e:
                     raise ValueError(f"Invalid WKT data in column '{self.geometry_column}': {e}")
             else:
@@ -519,19 +517,19 @@ class LoaderFactory:
                         input_dataframe[self.longitude_column],
                         input_dataframe[self.latitude_column],
                     ),
-                    crs=coordinate_reference_system,
+                    crs=self.crs,
                 )
         if geo_dataframe.crs is None:
-            geo_dataframe.set_crs(coordinate_reference_system, inplace=True)
-        elif geo_dataframe.crs.to_string() != coordinate_reference_system:
-            geo_dataframe = geo_dataframe.to_crs(coordinate_reference_system)
+            geo_dataframe.set_crs(self.crs, inplace=True)
+        elif geo_dataframe.crs.to_string() != self.crs:
+            geo_dataframe = geo_dataframe.to_crs(self.crs)
         if self.map_columns is not None and self.map_columns != "None":
             geo_dataframe = geo_dataframe.rename(columns=self.map_columns)
 
         return geo_dataframe
 
     @require_attributes(["source_type", "source_data"])
-    def load(self, coordinate_reference_system: str = DEFAULT_CRS) -> gpd.GeoDataFrame:
+    def load(self) -> gpd.GeoDataFrame:
         """Load the data and return it as a `GeoDataFrame`.
         
         This method loads the data from the configured source and returns it as a
@@ -569,7 +567,7 @@ class LoaderFactory:
             #     raise ValueError(
             #         f"Loader for {file_ext} requires latitude and longitude columns. Call with_columns() first."
             #     )
-            loaded_data = self._load_from_file(coordinate_reference_system)
+            loaded_data = self._load_from_file()
             if self._preview is not None:
                 self.preview(format=self._preview["format"])
             return loaded_data
@@ -578,7 +576,7 @@ class LoaderFactory:
                 raise ValueError(
                     "DataFrame loading requires latitude and longitude columns. Call with_columns() with valid column names."
                 )
-            loaded_data = self._load_from_dataframe(coordinate_reference_system)
+            loaded_data = self._load_from_dataframe()
             if self._preview is not None:
                 logger.log(
                     "DEBUG_LOW",
@@ -591,7 +589,7 @@ class LoaderFactory:
                     "Hugging Face dataset loading requires latitude and longitude columns. "
                     "Call with_columns() with valid column names."
                 )
-            loaded_data = self._load_from_dataframe(coordinate_reference_system)
+            loaded_data = self._load_from_dataframe()
             if self._preview is not None:
                 logger.log(
                     "DEBUG_LOW",
