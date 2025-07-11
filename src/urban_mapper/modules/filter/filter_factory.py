@@ -53,7 +53,13 @@ class FilterFactory:
         self._preview: Optional[dict] = None
         self._data_id: Optional[str] = None
 
-    @reset_attributes_before(["_filter_type"])
+    def reset(self):
+        self._filter_type = None
+        self._extra_params = {}
+        self._instance = None
+        self._preview = None
+        self._data_id = None        
+
     def with_type(self, primitive_type: str) -> "FilterFactory":
         """Specify the type of filter to use.
 
@@ -78,6 +84,8 @@ class FilterFactory:
             >>> filter_factory = mapper.filter.with_type("BoundingBoxFilter")
 
         """
+        self.reset()
+        
         if self._filter_type is not None:
             logger.log(
                 "DEBUG_MID",

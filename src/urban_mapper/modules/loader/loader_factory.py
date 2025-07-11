@@ -79,9 +79,17 @@ class LoaderFactory:
         self._preview: Optional[dict] = None
         self.geometry_column: Optional[str] = None
 
-    @reset_attributes_before(
-        ["source_type", "source_data", "latitude_column", "longitude_column", "geometry_column"]
-    )
+    def reset(self):
+        self.source_type = None
+        self.source_data = None
+        self.latitude_column  = None
+        self.longitude_column = None
+        self.map_columns = None
+        self.geometry_column = None
+        self.crs = DEFAULT_CRS
+        self._instance = None
+        self._preview = None        
+
     def from_file(self, file_path: str) -> "LoaderFactory":
         """Configure the factory to load data from a file.
 
@@ -99,11 +107,8 @@ class LoaderFactory:
             >>> loader = mapper.loader.from_file("data/points.csv")
             >>> # Next steps would typically be to call with_columns() and load()
         """
+        self.reset()
         self.source_type = "file"
-        self.latitude_column = None
-        self.longitude_column = None
-        self.geometry_column = None
-        self.map_columns = None
         self.source_data = file_path
         logger.log(
             "DEBUG_LOW",
@@ -133,6 +138,7 @@ class LoaderFactory:
             >>> # For regular DataFrames, you must specify coordinate columns:
             >>> loader.with_columns(longitude_column="lon", latitude_column="lat")
         """
+        self.reset()        
         self.source_type = "dataframe"
         self.source_data = dataframe
         self.latitude_column = "None"
@@ -272,6 +278,7 @@ class LoaderFactory:
             - XXX (similarity: 85%)
 
         """
+        self.reset()
         self.source_type = "huggingface"
         try:
             if number_of_rows:

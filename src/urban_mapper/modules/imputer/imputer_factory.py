@@ -50,7 +50,16 @@ class ImputerFactory:
         self._instance: Optional[GeoImputerBase] = None
         self._preview: Optional[dict] = None
 
-    @reset_attributes_before(["_imputer_type", "_latitude_column", "_longitude_column"])
+    def reset(self):
+        self._data_id = None
+        self._imputer_type = None
+        self._latitude_column = None
+        self._longitude_column = None
+        self._geometry_column = None
+        self._extra_params = {}
+        self._instance = None
+        self._preview = None           
+
     def with_type(self, primitive_type: str) -> "ImputerFactory":
         """Set the imputer type to instantiate.
 
@@ -66,6 +75,8 @@ class ImputerFactory:
         !!! tip
             Check IMPUTER_REGISTRY keys for valid imputer types.
         """
+        self.reset()
+
         if self._imputer_type is not None:
             logger.log(
                 "DEBUG_MID",
