@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Union, Tuple
 import geopandas as gpd
 from beartype import beartype
 
@@ -11,9 +11,11 @@ def ensure_coordinate_reference_system(
 ) -> Callable[..., gpd.GeoDataFrame]:
     def wrapper(self, *args, **kwargs) -> gpd.GeoDataFrame:
         loaded_geodataframe: gpd.GeoDataFrame = function_to_wrap(self, *args, **kwargs)
-        target_coordinate_reference_system: str = getattr(
+        target_coordinate_reference_system: Union[str, Tuple[str, str]] = getattr(
             self, "coordinate_reference_system", DEFAULT_CRS
         )
+
+        target_coordinate_reference_system = target_coordinate_reference_system[1] if isinstance(target_coordinate_reference_system, tuple) else target_coordinate_reference_system
 
         if loaded_geodataframe.crs is None:
             loaded_geodataframe.set_crs(

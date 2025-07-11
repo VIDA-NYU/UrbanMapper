@@ -2,7 +2,7 @@ import pandas as pd
 import geopandas as gpd
 from beartype import beartype
 from pathlib import Path
-from typing import Union, Optional, Any
+from typing import Union, Optional, Any, Tuple
 
 from urban_mapper.modules.loader.abc_loader import LoaderBase
 from urban_mapper.config import DEFAULT_CRS
@@ -21,7 +21,9 @@ class ParquetLoader(LoaderBase):
         file_path (Union[str, Path]): Path to the Parquet file to load.
         latitude_column (Optional[str]): Name of the column containing latitude values. Default: `None`
         longitude_column (Optional[str]): Name of the column containing longitude values. Default: `None`
-        coordinate_reference_system (str): The coordinate reference system to use. Default: `EPSG:4326`
+        coordinate_reference_system (Union[str, Tuple[str, str]]):
+            If a string, it specifies the coordinate reference system to use (default: 'EPSG:4326').
+            If a tuple (source_crs, target_crs), it defines a conversion from the source CRS to the target CRS (default target CRS: 'EPSG:4326').
         engine (str): The engine to use for reading Parquet files. Default: `"pyarrow"`
         columns (Optional[list[str]]): List of columns to read from the Parquet file. Default: `None`, which reads all columns.
 
@@ -45,6 +47,24 @@ class ParquetLoader(LoaderBase):
         ...     columns=["latitude", "longitude", "value"]
         ... )
         >>> gdf = loader.load_data_from_file()
+        >>>
+        >>> # With CRS
+        >>> loader = ParquetLoader(
+        ...     file_path="data.parquet",
+        ...     latitude_column="latitude",
+        ...     longitude_column="longitude",
+        ...     coordinate_reference_system="EPSG:4326"
+        ... )
+        >>> gdf = loader.load_data_from_file()
+        >>>
+        >>> # With source-target CRS
+        >>> loader = ParquetLoader(
+        ...     file_path="data.parquet",
+        ...     latitude_column="latitude",
+        ...     longitude_column="longitude",
+        ...     coordinate_reference_system=("EPSG:4326", "EPSG:3857")
+        ... )
+        >>> gdf = loader.load_data_from_file()
     """
 
     def __init__(
@@ -52,7 +72,7 @@ class ParquetLoader(LoaderBase):
         file_path: Union[str, Path],
         latitude_column: Optional[str] = None,
         longitude_column: Optional[str] = None,
-        coordinate_reference_system: str = DEFAULT_CRS,
+        coordinate_reference_system: Union[str, Tuple[str, str]] = DEFAULT_CRS,
         engine: str = "pyarrow",
         columns: Optional[list[str]] = None,
         **additional_loader_parameters: Any,
@@ -112,7 +132,7 @@ class ParquetLoader(LoaderBase):
                 dataframe[self.longitude_column],
                 dataframe[self.latitude_column],
             ),
-            crs=self.coordinate_reference_system,
+            crs=self.coordinate_reference_system[0] if isinstance(self.coordinate_reference_system, tuple) else self.coordinate_reference_system,
         )
         return geodataframe
 

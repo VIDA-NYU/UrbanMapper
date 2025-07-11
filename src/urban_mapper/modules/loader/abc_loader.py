@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Union, Optional, Any, Dict
+from typing import Union, Optional, Any, Dict, Tuple
 import geopandas as gpd
 from beartype import beartype
 from urban_mapper.modules.loader.helpers import ensure_coordinate_reference_system
@@ -21,8 +21,9 @@ class LoaderBase(ABC):
         file_path (Path): Path to the file to load.
         latitude_column (str): Name of the column containing latitude values.
         longitude_column (str): Name of the column containing longitude values.
-        geometry_column (str): Name of the column containing geometry data.
-        coordinate_reference_system (str): The coordinate reference system to use. Default: `EPSG:4326`.
+        coordinate_reference_system (Union[str, Tuple[str, str]]):
+            If a string, it specifies the coordinate reference system to use (default: 'EPSG:4326').
+            If a tuple (source_crs, target_crs), it defines a conversion from the source CRS to the target CRS (default target CRS: 'EPSG:4326').
         additional_loader_parameters (Dict[str, Any]): Additional parameters specific to the loader implementation. Consider this as `kwargs`.
     """
 
@@ -32,14 +33,14 @@ class LoaderBase(ABC):
         latitude_column: Optional[str] = None,
         longitude_column: Optional[str] = None,
         geometry_column: Optional[str] = None,
-        coordinate_reference_system: str = DEFAULT_CRS,
+        coordinate_reference_system: Union[str, Tuple[str, str]] = DEFAULT_CRS,
         **additional_loader_parameters: Any,
     ) -> None:
         self.file_path: Path = Path(file_path)
         self.latitude_column: str = latitude_column or ""
         self.longitude_column: str = longitude_column or ""
         self.geometry_column: str = geometry_column or ""
-        self.coordinate_reference_system: str = coordinate_reference_system
+        self.coordinate_reference_system: Union[str, Tuple[str, str]] = coordinate_reference_system
         self.additional_loader_parameters: Dict[str, Any] = additional_loader_parameters
 
     @abstractmethod

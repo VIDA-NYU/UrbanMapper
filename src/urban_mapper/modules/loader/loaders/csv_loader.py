@@ -2,7 +2,7 @@ import pandas as pd
 import geopandas as gpd
 from beartype import beartype
 from pathlib import Path
-from typing import Union, Optional, Any
+from typing import Union, Optional, Any, Tuple
 
 from urban_mapper.modules.loader.abc_loader import LoaderBase
 from urban_mapper.config import DEFAULT_CRS
@@ -27,7 +27,9 @@ class CSVLoader(LoaderBase):
         latitude_column (str): Name of the column containing latitude values.
         longitude_column (str): Name of the column containing longitude values.
         geometry_column (str): Name of the column containing geometry data in WKT format.
-        coordinate_reference_system (str): The coordinate reference system to use. Default: `EPSG:4326`
+        coordinate_reference_system (Union[str, Tuple[str, str]]):
+            If a string, it specifies the coordinate reference system to use (default: 'EPSG:4326').
+            If a tuple (source_crs, target_crs), it defines a conversion from the source CRS to the target CRS (default target CRS: 'EPSG:4326').
         separator (str): The delimiter character used in the CSV file. Default: `","`
         encoding (str): The character encoding of the CSV file. Default: `"utf-8"`
 
@@ -51,6 +53,24 @@ class CSVLoader(LoaderBase):
         ...     encoding="latin-1"
         ... )
         >>> gdf = loader.load_data_from_file()
+        >>>
+        >>> # With CRS
+        >>> loader = CSVLoader(
+        ...     file_path="custom_data.csv",
+        ...     latitude_column="lat",
+        ...     longitude_column="lng",
+        ...     coordinate_reference_system="EPSG:4326"
+        ... )
+        >>> gdf = loader.load_data_from_file()
+        >>>
+        >>> # With source-target CRS
+        >>> loader = CSVLoader(
+        ...     file_path="custom_data.csv",
+        ...     latitude_column="lat",
+        ...     longitude_column="lng",
+        ...     coordinate_reference_system=("EPSG:4326", "EPSG:3857")
+        ... )
+        >>> gdf = loader.load_data_from_file()
     """
 
     def __init__(
@@ -59,7 +79,7 @@ class CSVLoader(LoaderBase):
         latitude_column: Optional[str] = None,
         longitude_column: Optional[str] = None,
         geometry_column: Optional[str] = None,
-        coordinate_reference_system: str = DEFAULT_CRS,
+        coordinate_reference_system: Union[str, Tuple[str, str]] = DEFAULT_CRS,
         separator: str = ",",
         encoding: str = "utf-8",
         **additional_loader_parameters: Any,
@@ -144,7 +164,7 @@ class CSVLoader(LoaderBase):
                 dataframe[self.longitude_column],
                 dataframe[self.latitude_column],
             ),
-            crs=self.coordinate_reference_system,
+            crs=self.coordinate_reference_system[0] if isinstance(self.coordinate_reference_system, tuple) else self.coordinate_reference_system,
         )
         return geodataframe
 

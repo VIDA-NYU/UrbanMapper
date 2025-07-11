@@ -25,7 +25,9 @@ class ShapefileLoader(LoaderBase):
             a temporary latitude column is generated from representative points. Default: `None`
         longitude_column (Optional[str]): Name of the column containing longitude values. If not provided or empty,
             a temporary longitude column is generated from representative points. Default: `None`
-        coordinate_reference_system (str): The coordinate reference system to use. Default: `EPSG:4326`
+        coordinate_reference_system (Union[str, Tuple[str, str]]):
+            If a string, it specifies the coordinate reference system to use (default: 'EPSG:4326').
+            If a tuple (source_crs, target_crs), it defines a conversion from the source CRS to the target CRS (default target CRS: 'EPSG:4326').
 
     Examples:
         >>> from urban_mapper.modules.loader import ShapefileLoader
@@ -69,8 +71,10 @@ class ShapefileLoader(LoaderBase):
                 "Standard shapefile format requires a geometry column."
             )
 
-        if gdf.crs.to_string() != self.coordinate_reference_system:
-            gdf = gdf.to_crs(self.coordinate_reference_system)
+        coord_system = self.coordinate_reference_system[0] if isinstance(self.coordinate_reference_system, tuple) else self.coordinate_reference_system
+
+        if gdf.crs.to_string() != coord_system:
+            gdf = gdf.to_crs(coord_system)
 
         if (
             not self.latitude_column

@@ -2,7 +2,7 @@ import json
 from collections import defaultdict
 from itertools import islice
 from pathlib import Path
-from typing import Optional, Union, Dict
+from typing import Optional, Union, Dict, Tuple
 
 import datasets
 import geopandas as gpd
@@ -74,7 +74,7 @@ class LoaderFactory:
         self.latitude_column: Optional[str] = None
         self.longitude_column: Optional[str] = None
         self.map_columns: Optional[Dict[str, str]] = None
-        self.crs: str = DEFAULT_CRS
+        self.crs: Union[str, Tuple[str, str]] = DEFAULT_CRS
         self._instance: Optional[LoaderBase] = None
         self._preview: Optional[dict] = None
         self.geometry_column: Optional[str] = None
@@ -440,7 +440,7 @@ class LoaderFactory:
         )
         return self
 
-    def with_crs(self, crs: str = DEFAULT_CRS) -> "LoaderFactory":
+    def with_crs(self, crs: Union[str, Tuple[str, str]] = DEFAULT_CRS) -> "LoaderFactory":
         """Specify the coordinate reference system for the loaded data.
         
         This method configures the `coordinate reference system (CRS)` to use for the loaded
@@ -449,6 +449,9 @@ class LoaderFactory:
         Args:
             crs: The coordinate reference system to use, in any format accepted by geopandas
                 (default: `EPSG:4326`, which is standard `WGS84` coordinates).
+                If a string, it specifies the coordinate reference system to use (default: 'EPSG:4326').
+                If a tuple (source_crs, target_crs), it defines a conversion from the source CRS to the target CRS (default target CRS: 'EPSG:4326').
+
             
         Returns:
             The LoaderFactory instance for method chaining.
@@ -457,6 +460,9 @@ class LoaderFactory:
             >>> loader = mapper.loader.from_file("data/points.csv")\
             ...     .with_columns(longitude_column="lon", latitude_column="lat")\
             ...     .with_crs("EPSG:3857")  # Use Web Mercator projection
+            >>> loader = mapper.loader.from_file("data/points.csv")\
+            ...     .with_columns(longitude_column="lon", latitude_column="lat")\
+            ...     .with_crs( ("EPSG:2263", "EPSG:3857") )  # Use NY State Plane to load data and convert them to Web Mercator projection
         """
         self.crs = crs
         logger.log(
@@ -524,12 +530,16 @@ class LoaderFactory:
                         input_dataframe[self.longitude_column],
                         input_dataframe[self.latitude_column],
                     ),
-                    crs=self.crs,
+                    crs=self.crs[0] if isinstance(self.crs, tuple) else self.crs,
                 )
+
+        target_coordinate_reference_system = self.crs[1] if isinstance(self.crs, tuple) else self.crs   
+
         if geo_dataframe.crs is None:
-            geo_dataframe.set_crs(self.crs, inplace=True)
-        elif geo_dataframe.crs.to_string() != self.crs:
-            geo_dataframe = geo_dataframe.to_crs(self.crs)
+            geo_dataframe.set_crs(target_coordinate_reference_system, inplace=True)
+        elif geo_dataframe.crs.to_string() != target_coordinate_reference_system:
+            geo_dataframe = geo_dataframe.to_crs(target_coordinate_reference_system)
+
         if self.map_columns is not None and self.map_columns != "None":
             geo_dataframe = geo_dataframe.rename(columns=self.map_columns)
 
@@ -542,10 +552,6 @@ class LoaderFactory:
         This method loads the data from the configured source and returns it as a
         geopandas `GeoDataFrame`. It handles the details of loading from different
         source types and formats.
-        
-        Args:
-            coordinate_reference_system: The coordinate reference system to use for the
-                loaded data (default: "EPSG:4326", which is standard WGS84 coordinates).
                 
         Returns:
             A GeoDataFrame containing the loaded data.
