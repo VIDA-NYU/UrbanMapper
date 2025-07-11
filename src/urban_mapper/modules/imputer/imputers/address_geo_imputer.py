@@ -83,7 +83,7 @@ class AddressGeoImputer(GeoImputerBase):
         )
         missing_records = dataframe[mask_missing].copy()
 
-        def geocode_address(row):
+        def geocode_address(row, active_geometry_name):
             address = str(row.get(self.address_column, "")).strip()
             if not address:
                 return None
@@ -92,17 +92,19 @@ class AddressGeoImputer(GeoImputerBase):
                 if not latitude_longitude:
                     return None
                 latitude_value, longitude_value = latitude_longitude
-                return pd.Series(
-                    {
-                        self.latitude_column: latitude_value,
-                        self.longitude_column: longitude_value,
-                        "geometry": Point(longitude_value, latitude_value),
-                    }
-                )
+                row[self.latitude_column] = latitude_value
+                row[self.longitude_column] = longitude_value
+
+                if active_geometry_name is None:
+                  row["geometry"] = Point(longitude_value, latitude_value)
+                else:  
+                  row[active_geometry_name] = Point(longitude_value, latitude_value)  
+
+                return row  
             except Exception:
                 return None
 
-        geocoded_data = missing_records.apply(geocode_address, axis=1)
+        geocoded_data = missing_records.apply(geocode_address, axis=1, args=(missing_records.active_geometry_name,))
         valid_indices = geocoded_data.dropna().index
 
         if not valid_indices.empty:
