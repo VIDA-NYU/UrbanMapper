@@ -71,7 +71,11 @@ class ShapefileLoader(LoaderBase):
                 "Standard shapefile format requires a geometry column."
             )
 
-        coord_system = self.coordinate_reference_system[0] if isinstance(self.coordinate_reference_system, tuple) else self.coordinate_reference_system
+        coord_system = (
+            self.coordinate_reference_system[0]
+            if isinstance(self.coordinate_reference_system, tuple)
+            else self.coordinate_reference_system
+        )
 
         if gdf.crs.to_string() != coord_system:
             gdf = gdf.to_crs(coord_system)

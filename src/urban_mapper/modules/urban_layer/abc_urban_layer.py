@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Tuple, List, Dict, Any, Union
+from typing import Tuple, List, Dict, Any, Union, Optional
 import geopandas as gpd
 from beartype import beartype
 from pathlib import Path
@@ -87,10 +87,11 @@ class UrbanLayerBase(ABC):
     def _map_nearest_layer(
         self,
         data: gpd.GeoDataFrame,
-        longitude_column: str,
-        latitude_column: str,
-        output_column: str = "nearest_element",
-        _reset_layer_index: bool = True,
+        longitude_column: Optional[str] = None,
+        latitude_column: Optional[str] = None,
+        geometry_column: Optional[str] = None,
+        output_column: Optional[str] = "nearest_element",
+        _reset_layer_index: Optional[bool] = True,
         **kwargs,
     ) -> Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
         """Map points to their nearest elements in this urban layer.
@@ -134,6 +135,7 @@ class UrbanLayerBase(ABC):
         """
         pass
 
+    ##TODO: REFACTORING: MOVE ALL CHILDREN CODE TO THIS PARENT
     @abstractmethod
     def get_layer(self) -> gpd.GeoDataFrame:
         """Get the `GeoDataFrame` representing this urban layer.
@@ -150,6 +152,7 @@ class UrbanLayerBase(ABC):
         """
         pass
 
+    ##TODO: REFACTORING: MOVE ALL CHILDREN CODE TO THIS PARENT
     @abstractmethod
     def get_layer_bounding_box(self) -> Tuple[float, float, float, float]:
         """Get the bounding box coordinates of this urban layer.
@@ -201,6 +204,7 @@ class UrbanLayerBase(ABC):
         ],
         longitude_column: str | None = None,
         latitude_column: str | None = None,
+        geometry_column: str | None = None,
         output_column: str | None = None,
         threshold_distance: float | None = None,
         **kwargs,
@@ -265,10 +269,16 @@ class UrbanLayerBase(ABC):
             raise ValueError(
                 "This layer has already been mapped. If you want to map again, create a new instance."
             )
-        if longitude_column or latitude_column or output_column:
-            if not (longitude_column and latitude_column and output_column):
+        if longitude_column or latitude_column or geometry_column or output_column:
+            has_geometry = geometry_column is not None
+            has_lat_and_long = (
+                latitude_column is not None and longitude_column is not None
+            )
+            has_output = output_column is not None
+
+            if (not has_geometry and not has_lat_and_long) or not has_output:
                 raise ValueError(
-                    "When overriding mappings, longitude_column, latitude_column, and output_column "
+                    "When overriding mappings, longitude_column/latitude_column or geometry_column and output_column "
                     "must all be specified."
                 )
             mapping_kwargs = (
@@ -278,10 +288,11 @@ class UrbanLayerBase(ABC):
 
             if isinstance(data, gpd.GeoDataFrame):
                 result = self._map_nearest_layer(
-                    data,
-                    longitude_column,
-                    latitude_column,
-                    output_column,
+                    data=data,
+                    longitude_column=longitude_column,
+                    latitude_column=latitude_column,
+                    geometry_column=geometry_column,
+                    output_column=output_column,
                     **mapping_kwargs,
                 )
             else:
@@ -293,10 +304,11 @@ class UrbanLayerBase(ABC):
 
                     if self.data_id is None or self.data_id == key:
                         self.layer, mapped_data = self._map_nearest_layer(
-                            gdf,
-                            longitude_column,
-                            latitude_column,
-                            output_column,
+                            data=gdf,
+                            longitude_column=longitude_column,
+                            latitude_column=latitude_column,
+                            geometry_column=geometry_column,
+                            output_column=output_column,
                             _reset_layer_index=key == last_key,
                             **mapping_kwargs,
                         )
@@ -316,10 +328,16 @@ class UrbanLayerBase(ABC):
         for mapping in self.mappings:
             lon_col = mapping.get("longitude_column", None)
             lat_col = mapping.get("latitude_column", None)
+            geo_col = mapping.get("geometry_column", None)
             out_col = mapping.get("output_column", None)
-            if not (lon_col and lat_col and out_col):
+
+            has_geometry = geo_col is not None
+            has_lat_and_long = lat_col is not None and lon_col is not None
+            has_output = out_col is not None
+
+            if (not has_geometry and not has_lat_and_long) or not has_output:
                 raise ValueError(
-                    "Each mapping must specify longitude_column, latitude_column, and output_column."
+                    "Each mapping must specify longitude_column/latitude_column or geometry_column and output_column "
                 )
 
             mapping_kwargs = mapping.get("kwargs", {}).copy()
@@ -327,10 +345,6 @@ class UrbanLayerBase(ABC):
                 mapping_kwargs["threshold_distance"] = threshold_distance
             mapping_kwargs.update(kwargs)
 
-            if None in [lon_col, lat_col, out_col]:
-                raise ValueError(
-                    "All of longitude_column, latitude_column, and output_column must be specified."
-                )
             if self.mappings[-1]:
                 logger.log(
                     "DEBUG_MID",
@@ -338,10 +352,11 @@ class UrbanLayerBase(ABC):
                 )
             if isinstance(mapped_data, gpd.GeoDataFrame):
                 self.layer, temp_mapped = self._map_nearest_layer(
-                    mapped_data,
-                    lon_col,
-                    lat_col,
-                    out_col,
+                    data=mapped_data,
+                    longitude_column=lon_col,
+                    latitude_column=lat_col,
+                    geometry_column=geo_col,
+                    output_column=out_col,
                     _reset_layer_index=(mapping == self.mappings[-1]),
                     **mapping_kwargs,
                 )

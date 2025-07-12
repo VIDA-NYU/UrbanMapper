@@ -1,5 +1,6 @@
 import pandas as pd
 import geopandas as gpd
+from shapely import wkt
 from beartype import beartype
 from pathlib import Path
 from typing import Union, Optional, Any, Tuple
@@ -7,12 +8,6 @@ from typing import Union, Optional, Any, Tuple
 from urban_mapper.modules.loader.abc_loader import LoaderBase
 from urban_mapper.config import DEFAULT_CRS
 from urban_mapper.utils.helpers import require_either_or_attributes
-from urban_mapper.modules.loader.helpers.geometry_helpers import validate_wkt_column, convert_wkt_to_geometry
-from urban_mapper import logger  # Add logger import
-
-from shapely import wkt
-import shapely
-import logging
 
 @beartype
 class CSVLoader(LoaderBase):
@@ -36,7 +31,7 @@ class CSVLoader(LoaderBase):
     Examples:
         >>> from urban_mapper.modules.loader import CSVLoader
         >>>
-        >>> # Basic usage
+        >>> # Basic usage with lat/long
         >>> loader = CSVLoader(
         ...     file_path="taxi_trips.csv",
         ...     latitude_column="pickup_lat",
@@ -44,11 +39,17 @@ class CSVLoader(LoaderBase):
         ... )
         >>> gdf = loader.load_data_from_file()
         >>>
+        >>> # Basic usage with geometry
+        >>> loader = CSVLoader(
+        ...     file_path="taxi_trips.csv",
+        ...     geometry_column="the_geom"
+        ... )
+        >>> gdf = loader.load_data_from_file()
+        >>>
         >>> # With custom separator and encoding
         >>> loader = CSVLoader(
         ...     file_path="custom_data.csv",
-        ...     latitude_column="lat",
-        ...     longitude_column="lng",
+        ...     geometry_column="geom",
         ...     separator=";",
         ...     encoding="latin-1"
         ... )
@@ -88,29 +89,32 @@ class CSVLoader(LoaderBase):
             file_path=file_path,
             latitude_column=latitude_column,
             longitude_column=longitude_column,
+            geometry_column=geometry_column,
             coordinate_reference_system=coordinate_reference_system,
             **additional_loader_parameters,
         )
-        self.geometry_column = geometry_column
         self.separator = separator
         self.encoding = encoding
 
     @require_either_or_attributes(
         [["latitude_column", "longitude_column"], ["geometry_column"]],
-        error_msg="Either both 'latitude_column' and 'longitude_column' must be set, or 'geometry_column' must be set."
+        error_msg="Either both 'latitude_column' and 'longitude_column' must be set, or 'geometry_column' must be set.",
     )
     def _load_data_from_file(self) -> gpd.GeoDataFrame:
         """Load data from a CSV file and convert it to a `GeoDataFrame`.
 
         This method reads a `CSV` file using pandas, validates the latitude and
-        longitude columns or geometry column, and converts the data to a `GeoDataFrame`
-        with point geometries using the specified coordinate reference system.
+        longitude columns, and converts the data to a `GeoDataFrame` with point
+        geometries using the specified coordinate reference system.
 
         Returns:
-            A `GeoDataFrame` containing the loaded data with point geometries.
+            A `GeoDataFrame` containing the loaded data with point geometries
+            created from the latitude and longitude columns.
 
         Raises:
-            ValueError: If neither `latitude_column` and `longitude_column` nor `geometry` are valid.
+            ValueError: If latitude_column, longitude_column, or geometry_column is None.
+            ValueError: If latitude_column or longitude_column and geometry_column are defined together.
+            ValueError: If the specified columns are not found in the CSV file.
             pd.errors.ParserError: If the CSV file cannot be parsed.
             UnicodeDecodeError: If the file encoding is incorrect.
         """
@@ -118,28 +122,7 @@ class CSVLoader(LoaderBase):
             self.file_path, sep=self.separator, encoding=self.encoding
         )
 
-        if self.geometry_column:
-            # If geometry_column is provided, validate and infer latitude and longitude
-            if self.geometry_column not in dataframe.columns:
-                raise ValueError(f"Column '{self.geometry_column}' not found in the CSV file.")
-            
-            dataframe = validate_wkt_column(dataframe, self.geometry_column)
-
-            try:
-                geo_dataframe = convert_wkt_to_geometry(dataframe, self.geometry_column, self.coordinate_reference_system)
-            except Exception as e:
-                raise ValueError(f"Invalid WKT data in column '{self.geometry_column}': {e}")
-
-            # Convert to GeoDataFrame and set CRS
-            dataframe = gpd.GeoDataFrame(dataframe, geometry="geometry", crs="EPSG:4326")
-
-            # Calculate centroid and extract lat/lon (works for all geometry types)
-            dataframe["centroid"] = dataframe["geometry"].centroid
-            dataframe[self.latitude_column] = dataframe["centroid"].y
-            dataframe[self.longitude_column] = dataframe["centroid"].x
-
-        else:
-            # If geometry is not provided, validate latitude and longitude columns
+        if self.latitude_column != "" and self.longitude_column != "":
             if self.latitude_column not in dataframe.columns:
                 raise ValueError(
                     f"Column '{self.latitude_column}' not found in the CSV file."
@@ -149,22 +132,35 @@ class CSVLoader(LoaderBase):
                     f"Column '{self.longitude_column}' not found in the CSV file."
                 )
 
-        # Ensure latitude and longitude columns are numeric
-        dataframe[self.latitude_column] = pd.to_numeric(
-            dataframe[self.latitude_column], errors="coerce"
-        )
-        dataframe[self.longitude_column] = pd.to_numeric(
-            dataframe[self.longitude_column], errors="coerce"
-        )
-
-        # Create GeoDataFrame
-        geodataframe = gpd.GeoDataFrame(
-            dataframe,
-            geometry=gpd.points_from_xy(
+            # Ensure latitude and longitude columns are numeric
+            dataframe[self.latitude_column] = pd.to_numeric(
+                dataframe[self.latitude_column], errors="coerce"
+            )
+            dataframe[self.longitude_column] = pd.to_numeric(
+                dataframe[self.longitude_column], errors="coerce"
+            )
+            geometry = gpd.points_from_xy(
                 dataframe[self.longitude_column],
                 dataframe[self.latitude_column],
-            ),
-            crs=self.coordinate_reference_system[0] if isinstance(self.coordinate_reference_system, tuple) else self.coordinate_reference_system,
+            )
+        else:
+            if self.geometry_column not in dataframe.columns:
+                raise ValueError(
+                    f"Column '{self.geometry_column}' not found in the CSV file."
+                )
+
+            filter_not_na = dataframe[self.geometry_column].notna()
+            dataframe.loc[filter_not_na, self.geometry_column] = dataframe.loc[
+                filter_not_na, self.geometry_column
+            ].apply(wkt.loads)
+            geometry = self.geometry_column
+
+        geodataframe = gpd.GeoDataFrame(
+            dataframe,
+            geometry=geometry,
+            crs=self.coordinate_reference_system[0]
+            if isinstance(self.coordinate_reference_system, tuple)
+            else self.coordinate_reference_system,
         )
         return geodataframe
 

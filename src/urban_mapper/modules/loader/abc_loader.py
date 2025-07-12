@@ -40,7 +40,9 @@ class LoaderBase(ABC):
         self.latitude_column: str = latitude_column or ""
         self.longitude_column: str = longitude_column or ""
         self.geometry_column: str = geometry_column or ""
-        self.coordinate_reference_system: Union[str, Tuple[str, str]] = coordinate_reference_system
+        self.coordinate_reference_system: Union[str, Tuple[str, str]] = (
+            coordinate_reference_system
+        )
         self.additional_loader_parameters: Dict[str, Any] = additional_loader_parameters
 
     @abstractmethod
@@ -86,9 +88,17 @@ class LoaderBase(ABC):
         loaded_file = self._load_data_from_file()
 
         if self.additional_loader_parameters.get("map_columns") is not None:
-            loaded_file = loaded_file.rename(
-                columns=self.additional_loader_parameters["map_columns"]
-            )
+            map_columns = self.additional_loader_parameters.get("map_columns")
+
+            if (
+                loaded_file.active_geometry_name is not None
+                and loaded_file.active_geometry_name in map_columns.keys()
+            ):
+                source = loaded_file.active_geometry_name
+                loaded_file = loaded_file.rename_geometry(map_columns[source])
+                del map_columns[source]
+
+            loaded_file = loaded_file.rename(columns=map_columns)
 
         return loaded_file
 

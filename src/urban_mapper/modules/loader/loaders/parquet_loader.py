@@ -1,12 +1,13 @@
 import pandas as pd
 import geopandas as gpd
+from shapely import wkt
 from beartype import beartype
 from pathlib import Path
 from typing import Union, Optional, Any, Tuple
 
 from urban_mapper.modules.loader.abc_loader import LoaderBase
 from urban_mapper.config import DEFAULT_CRS
-from urban_mapper.utils import require_attributes
+from urban_mapper.utils import require_attributes, require_either_or_attributes
 
 
 @beartype
@@ -72,6 +73,7 @@ class ParquetLoader(LoaderBase):
         file_path: Union[str, Path],
         latitude_column: Optional[str] = None,
         longitude_column: Optional[str] = None,
+        geometry_column: Optional[str] = None,
         coordinate_reference_system: Union[str, Tuple[str, str]] = DEFAULT_CRS,
         engine: str = "pyarrow",
         columns: Optional[list[str]] = None,
@@ -81,13 +83,17 @@ class ParquetLoader(LoaderBase):
             file_path=file_path,
             latitude_column=latitude_column,
             longitude_column=longitude_column,
+            geometry_column=geometry_column,
             coordinate_reference_system=coordinate_reference_system,
             **additional_loader_parameters,
         )
         self.engine = engine
         self.columns = columns
 
-    @require_attributes(["latitude_column", "longitude_column"])
+    @require_either_or_attributes(
+        [["latitude_column", "longitude_column"], ["geometry_column"]],
+        error_msg="Either both 'latitude_column' and 'longitude_column' must be set, or 'geometry_column' must be set.",
+    )
     def _load_data_from_file(self) -> gpd.GeoDataFrame:
         """Load data from a `Parquet` file and convert it to a `GeoDataFrame`.
 
@@ -100,7 +106,8 @@ class ParquetLoader(LoaderBase):
             created from the latitude and longitude columns.
 
         Raises:
-            ValueError: If `latitude_column` or `longitude_column` is `None`.
+            ValueError: If `latitude_column`, `longitude_column` or `geometry_column` is `None`.
+            ValueError: If `latitude_column`/`longitude_column` and `geometry_column` are defined together.
             ValueError: If the specified latitude or longitude columns are not found in the Parquet file.
             IOError: If the Parquet file cannot be read.
         """
@@ -110,29 +117,44 @@ class ParquetLoader(LoaderBase):
             columns=self.columns,
         )
 
-        if self.latitude_column not in dataframe.columns:
-            raise ValueError(
-                f"Column '{self.latitude_column}' not found in the Parquet file."
-            )
-        if self.longitude_column not in dataframe.columns:
-            raise ValueError(
-                f"Column '{self.longitude_column}' not found in the Parquet file."
-            )
+        if self.latitude_column != "" and self.longitude_column != "":
+            if self.latitude_column not in dataframe.columns:
+                raise ValueError(
+                    f"Column '{self.latitude_column}' not found in the Parquet file."
+                )
+            if self.longitude_column not in dataframe.columns:
+                raise ValueError(
+                    f"Column '{self.longitude_column}' not found in the Parquet file."
+                )
 
-        dataframe[self.latitude_column] = pd.to_numeric(
-            dataframe[self.latitude_column], errors="coerce"
-        )
-        dataframe[self.longitude_column] = pd.to_numeric(
-            dataframe[self.longitude_column], errors="coerce"
-        )
+            dataframe[self.latitude_column] = pd.to_numeric(
+                dataframe[self.latitude_column], errors="coerce"
+            )
+            dataframe[self.longitude_column] = pd.to_numeric(
+                dataframe[self.longitude_column], errors="coerce"
+            )
+            geometry = gpd.points_from_xy(
+                dataframe[self.longitude_column],
+                dataframe[self.latitude_column],
+            )
+        else:
+            if self.geometry_column not in dataframe.columns:
+                raise ValueError(
+                    f"Column '{self.geometry_column}' not found in the Parquet file."
+                )
+
+            filter_not_na = dataframe[self.geometry_column].notna()
+            dataframe.loc[filter_not_na, self.geometry_column] = dataframe.loc[
+                filter_not_na, self.geometry_column
+            ].apply(wkt.loads)
+            geometry = self.geometry_column
 
         geodataframe = gpd.GeoDataFrame(
             dataframe,
-            geometry=gpd.points_from_xy(
-                dataframe[self.longitude_column],
-                dataframe[self.latitude_column],
-            ),
-            crs=self.coordinate_reference_system[0] if isinstance(self.coordinate_reference_system, tuple) else self.coordinate_reference_system,
+            geometry=geometry,
+            crs=self.coordinate_reference_system[0]
+            if isinstance(self.coordinate_reference_system, tuple)
+            else self.coordinate_reference_system,
         )
         return geodataframe
 
@@ -161,6 +183,7 @@ class ParquetLoader(LoaderBase):
                 f"  File: {self.file_path}\n"
                 f"  Latitude Column: {self.latitude_column}\n"
                 f"  Longitude Column: {self.longitude_column}\n"
+                f"  Geometry Column: {self.geometry_column}\n"
                 f"  Engine: {self.engine}\n"
                 f"  Columns: {cols}\n"
                 f"  CRS: {self.coordinate_reference_system}\n"
@@ -172,6 +195,7 @@ class ParquetLoader(LoaderBase):
                 "file": self.file_path,
                 "latitude_column": self.latitude_column,
                 "longitude_column": self.longitude_column,
+                "geometry_column": self.geometry_column,
                 "engine": self.engine,
                 "columns": cols,
                 "coordinate_reference_system": self.coordinate_reference_system,

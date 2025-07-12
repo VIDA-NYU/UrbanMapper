@@ -14,16 +14,23 @@ def require_either_or_attributes(attr_groups, error_msg=None):
     Returns:
         Decorator for the function.
     """
+
     def decorator(func):
         @wraps(func)
         def wrapper(self, *args, **kwargs):
             for group in attr_groups:
-                if all(hasattr(self, attr) and getattr(self, attr) is not None for attr in group):
+                if all(
+                    hasattr(self, attr) and getattr(self, attr) is not None
+                    for attr in group
+                ):
                     break
             else:
                 raise ValueError(
-                    error_msg or f"At least one of the following attribute groups must be fully set: {attr_groups}"
+                    error_msg
+                    or f"At least one of the following attribute groups must be fully set: {attr_groups}"
                 )
             return func(self, *args, **kwargs)
+
         return wrapper
+
     return decorator

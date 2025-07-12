@@ -1,4 +1,4 @@
-from typing import Tuple, Dict, Any
+from typing import Tuple, Dict, Any, Optional
 import geopandas as gpd
 from pathlib import Path
 from beartype import beartype
@@ -305,11 +305,12 @@ class OSMFeatures(UrbanLayerBase):
     def _map_nearest_layer(
         self,
         data: gpd.GeoDataFrame,
-        longitude_column: str,
-        latitude_column: str,
-        output_column: str = "nearest_feature",
-        threshold_distance: float | None = None,
-        _reset_layer_index: bool = True,
+        longitude_column: Optional[str] = None,
+        latitude_column: Optional[str] = None,
+        geometry_column: Optional[str] = None,
+        output_column: Optional[str] = "nearest_feature",
+        threshold_distance: Optional[float] = None,
+        _reset_layer_index: Optional[bool] = True,
         **kwargs,
     ) -> Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
         """Map points to their nearest `OSM features`.
@@ -346,14 +347,23 @@ class OSMFeatures(UrbanLayerBase):
             - [x] The method converts to a projected `CRS` for accurate distance calculations.
         """
         dataframe = data.copy()
-        if "geometry" not in dataframe.columns:
-            dataframe = gpd.GeoDataFrame(
-                dataframe,
-                geometry=gpd.points_from_xy(
-                    dataframe[longitude_column], dataframe[latitude_column]
-                ),
-                crs=self.coordinate_reference_system,
-            )
+
+        if dataframe.active_geometry_name is None:
+            if geometry_column is None:
+                dataframe = gpd.GeoDataFrame(
+                    dataframe,
+                    geometry=gpd.points_from_xy(
+                        dataframe[longitude_column], dataframe[latitude_column]
+                    ),
+                    crs=self.coordinate_reference_system,
+                )
+            else:
+                dataframe = gpd.GeoDataFrame(
+                    dataframe,
+                    geometry=geometry_column,
+                    crs=self.coordinate_reference_system,
+                )
+
         if not dataframe.crs.is_projected:
             utm_crs = dataframe.estimate_utm_crs()
             dataframe = dataframe.to_crs(utm_crs)

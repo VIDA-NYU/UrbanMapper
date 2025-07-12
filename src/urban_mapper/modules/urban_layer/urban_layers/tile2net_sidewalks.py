@@ -1,6 +1,6 @@
 import geopandas as gpd
 from pathlib import Path
-from typing import Tuple, Any
+from typing import Tuple, Any, Optional
 from beartype import beartype
 
 from urban_mapper.utils import require_attributes_not_none
@@ -96,11 +96,12 @@ class Tile2NetSidewalks(UrbanLayerBase):
     def _map_nearest_layer(
         self,
         data: gpd.GeoDataFrame,
-        longitude_column: str,
-        latitude_column: str,
-        output_column: str = "nearest_sidewalk",
-        threshold_distance: float | None = None,
-        _reset_layer_index: bool = True,
+        longitude_column: Optional[str] = None,
+        latitude_column: Optional[str] = None,
+        geometry_column: Optional[str] = None,
+        output_column: Optional[str] = "nearest_sidewalk",
+        threshold_distance: Optional[float] = None,
+        _reset_layer_index: Optional[bool] = True,
         **kwargs,
     ) -> Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
         """Map points to their nearest sidewalk segments.
@@ -137,14 +138,22 @@ class Tile2NetSidewalks(UrbanLayerBase):
             already projected, ensuring accurate distance calculations.
         """
         dataframe = data.copy()
-        if "geometry" not in dataframe.columns:
-            dataframe = gpd.GeoDataFrame(
-                dataframe,
-                geometry=gpd.points_from_xy(
-                    dataframe[longitude_column], dataframe[latitude_column]
-                ),
-                crs=self.coordinate_reference_system,
-            )
+
+        if dataframe.active_geometry_name is None:
+            if longitude_column is not None and latitude_column is not None:
+                dataframe = gpd.GeoDataFrame(
+                    dataframe,
+                    geometry=gpd.points_from_xy(
+                        dataframe[longitude_column], dataframe[latitude_column]
+                    ),
+                    crs=self.coordinate_reference_system,
+                )
+            else:
+                dataframe = gpd.GeoDataFrame(
+                    dataframe,
+                    geometry=geometry_column,
+                    crs=self.coordinate_reference_system,
+                )
 
         if not dataframe.crs.is_projected:
             utm_crs = dataframe.estimate_utm_crs()
@@ -160,16 +169,24 @@ class Tile2NetSidewalks(UrbanLayerBase):
             max_distance=threshold_distance,
             distance_col="distance_to_sidewalk",
         )
-        mapped_data[output_column] = mapped_data["feature_id"]
+
+        if longitude_column is not None and latitude_column is not None:
+            mapped_data[output_column] = mapped_data["feature_id"]
+            mapped_data = mapped_data.drop(
+                columns=["feature_id", "distance_to_sidewalk", "index_right"]
+            )
+        else:
+            mapped_data = mapped_data.reset_index()
+            mapped_data = mapped_data.sort_values("feature_id").groupby("index")
+            mapped_data = mapped_data["feature_id"].unique()
+
+            # One data row can be projected into many layer items
+            dataframe.loc[mapped_data.index, output_column] = mapped_data.values
+            mapped_data = dataframe
 
         if _reset_layer_index:
             self.layer = self.layer.reset_index()
-
-        mapped_data = mapped_data[~mapped_data.index.duplicated(keep="first")]
-
-        return self.layer, mapped_data.drop(
-            columns=["feature_id", "distance_to_sidewalk", "index_right"]
-        )
+        return self.layer, mapped_data
 
     @require_attributes_not_none(
         "layer", error_msg="Layer not built. Call from_file() first."

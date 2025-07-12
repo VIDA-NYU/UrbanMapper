@@ -15,7 +15,11 @@ def ensure_coordinate_reference_system(
             self, "coordinate_reference_system", DEFAULT_CRS
         )
 
-        target_coordinate_reference_system = target_coordinate_reference_system[1] if isinstance(target_coordinate_reference_system, tuple) else target_coordinate_reference_system
+        target_coordinate_reference_system = (
+            target_coordinate_reference_system[1]
+            if isinstance(target_coordinate_reference_system, tuple)
+            else target_coordinate_reference_system
+        )
 
         if loaded_geodataframe.crs is None:
             loaded_geodataframe.set_crs(
