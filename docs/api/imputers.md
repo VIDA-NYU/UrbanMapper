@@ -1,7 +1,7 @@
 # Imputers
 
 !!! tip "What is the Imputer module?"
-    The `imputer` module is responsible for handling missing data in geospatial datasets.
+    The `imputer` module is responsible for handling missing data in geospatial datasets, dealing with missing information of latitude-longitude data columns or geometry specified in [WKT format](https://libgeos.org/specifications/wkt/).
 
     Meanwhile, we recommend to look through the [`Example`'s Imputer](../copy_of_examples/1-Per-Module/3-imputer/) for a more hands-on introduction about
     the Imputer module and its usage.
