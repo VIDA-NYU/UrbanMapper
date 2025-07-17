@@ -93,6 +93,7 @@ data = (
     .loader
     .from_file("./pluto.csv")
     .with_columns(longitude_column="longitude", latitude_column="latitude")
+#    .with_columns(geometry_column=<geometry_column_name>") # Replace <geometry_column_name> with the actual name of your geometry column instead of latitude and longitude columns.
     .load()
 )
 data.head(10)  # Preview the first ten rows
@@ -118,8 +119,8 @@ layer = (
     .with_type("streets_intersections")
     .from_place("Downtown Brooklyn, New York City, USA", network_type="drive")
     .with_mapping(
-        longitude_column="longitude",
-        latitude_column="latitude",
+        longitude_column="longitude", latitude_column="latitude",
+#        geometry_column=<geometry_column_name>"), # Replace <geometry_column_name> with the actual name of your geometry column instead of latitude and longitude columns.        
         output_column="nearest_intersection",
         threshold_distance=50, # Optional.
     )
@@ -146,6 +147,7 @@ imputed_data = (
     .imputer
     .with_type("SimpleGeoImputer")
     .on_columns(longitude_column="longitude", latitude_column="latitude")
+#    .on_columns(geometry_column=<geometry_column_name>") # Replace <geometry_column_name> with the actual name of your geometry column instead of latitude and longitude columns.
     .transform(data, layer)
 )
 print(f"Missing after: {imputed_data[['longitude', 'latitude']].isna().sum()}")

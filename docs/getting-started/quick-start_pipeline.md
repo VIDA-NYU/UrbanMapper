@@ -92,6 +92,7 @@ urban_layer = (
     .with_mapping(
         longitude_column="longitude",
         latitude_column="latitude",
+#        geometry_column="<geometry_column_name>", # a column with geometries such as Point, Line, or Polygons instead of only one latitude-longitude information per data row        
         output_column="nearest_intersection",
         threshold_distance=50,  # Optional.
     )
@@ -103,6 +104,7 @@ loader = (
     .loader
     .from_file("./pluto.csv")
     .with_columns(longitude_column="longitude", latitude_column="latitude")
+#    .with_columns(geometry_column=<geometry_column_name>") # Replace <geometry_column_name> with the actual name of your geometry column instead of latitude and longitude columns.
     .build()
 )
 
@@ -111,6 +113,7 @@ imputer = (
     .imputer
     .with_type("SimpleGeoImputer")
     .on_columns(longitude_column="longitude", latitude_column="latitude")
+#    .on_columns(geometry_column=<geometry_column_name>") # Replace <geometry_column_name> with the actual name of your geometry column instead of latitude and longitude columns.
     .build()
 )
 

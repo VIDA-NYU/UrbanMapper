@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import pandas as pd
+import numpy as np
 from beartype import beartype
 from urban_mapper.utils import require_arguments_not_none
 
@@ -69,4 +70,9 @@ class BaseAggregator(ABC):
         Raises:
             ValueError: If input_dataframe is None or empty.
         """
+        first_value = input_dataframe.iloc[0][self.group_by_column]
+
+        if isinstance(first_value, (list, tuple, set, np.ndarray)):
+            input_dataframe = input_dataframe.explode(self.group_by_column)
+
         return self._aggregate(input_dataframe)

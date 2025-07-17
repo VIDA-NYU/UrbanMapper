@@ -2,10 +2,11 @@ import json
 from collections import defaultdict
 from itertools import islice
 from pathlib import Path
-from typing import Optional, Union, Dict
+from typing import Optional, Union, Dict, Tuple
 
 import datasets
 import geopandas as gpd
+from shapely import wkt
 import huggingface_hub
 import pandas as pd
 from beartype import beartype
@@ -72,13 +73,22 @@ class LoaderFactory:
         self.latitude_column: Optional[str] = None
         self.longitude_column: Optional[str] = None
         self.map_columns: Optional[Dict[str, str]] = None
-        self.crs: str = DEFAULT_CRS
+        self.geometry_column: Optional[str] = None
+        self.crs: Union[str, Tuple[str, str]] = DEFAULT_CRS
         self._instance: Optional[LoaderBase] = None
         self._preview: Optional[dict] = None
 
-    @reset_attributes_before(
-        ["source_type", "source_data", "latitude_column", "longitude_column"]
-    )
+    def _reset(self):
+        self.source_type = None
+        self.source_data = None
+        self.latitude_column = None
+        self.longitude_column = None
+        self.map_columns = None
+        self.geometry_column = None
+        self.crs = DEFAULT_CRS
+        self._instance = None
+        self._preview = None
+
     def from_file(self, file_path: str) -> "LoaderFactory":
         """Configure the factory to load data from a file.
 
@@ -96,10 +106,8 @@ class LoaderFactory:
             >>> loader = mapper.loader.from_file("data/points.csv")
             >>> # Next steps would typically be to call with_columns() and load()
         """
+        self._reset()
         self.source_type = "file"
-        self.latitude_column = None
-        self.longitude_column = None
-        self.map_columns = None
         self.source_data = file_path
         logger.log(
             "DEBUG_LOW",
@@ -129,10 +137,12 @@ class LoaderFactory:
             >>> # For regular DataFrames, you must specify coordinate columns:
             >>> loader.with_columns(longitude_column="lon", latitude_column="lat")
         """
+        self._reset()
         self.source_type = "dataframe"
         self.source_data = dataframe
         self.latitude_column = "None"
         self.longitude_column = "None"
+        self.geometry_column = "None"
         self.map_columns = "None"
         logger.log(
             "DEBUG_LOW",
@@ -267,6 +277,7 @@ class LoaderFactory:
             - XXX (similarity: 85%)
 
         """
+        self._reset()
         self.source_type = "huggingface"
         try:
             if number_of_rows:
@@ -375,6 +386,7 @@ class LoaderFactory:
         self.latitude_column = "None"
         self.longitude_column = "None"
         self.map_columns = "None"
+        self.geometry_column = "None"
         logger.log(
             "DEBUG_LOW",
             f"FROM_HUGGINGFACE: Loaded dataset {repo_id} with "
@@ -385,18 +397,20 @@ class LoaderFactory:
 
     def with_columns(
         self,
-        longitude_column: str,
-        latitude_column: str,
+        longitude_column: Optional[str] = None,
+        latitude_column: Optional[str] = None,
+        geometry_column: Optional[str] = None,
     ) -> "LoaderFactory":
-        """Specify the latitude and longitude columns in the data source.
+        """Specify either the latitude and longitude columns or a single geometry column in the data source.
         
-        This method configures which columns in the data source contain the latitude
-        and longitude coordinates. This is required for `CSV` and `Parquet` files, as well
-        as for `pandas DataFrames` without geometry.
+        This method configures which columns in the data source contain the latitude,
+        longitude coordinates, or geometry data. Either both `latitude_column` and
+        `longitude_column` must be set, or `geometry_column` must be set.
         
         Args:
-            longitude_column: Name of the column containing longitude values.
-            latitude_column: Name of the column containing latitude values.
+            longitude_column: Name of the column containing longitude values (optional).
+            latitude_column: Name of the column containing latitude values (optional).
+            geometry_column: Name of the column containing geometry data (optional).
             
         Returns:
             The LoaderFactory instance for method chaining.
@@ -404,17 +418,22 @@ class LoaderFactory:
         Examples:
             >>> loader = mapper.loader.from_file("data/points.csv")\
             ...     .with_columns(longitude_column="lon", latitude_column="lat")
+            >>> loader = mapper.loader.from_file("data/points.csv")\
+            ...     .with_columns(geometry_column="geom")
         """
         self.latitude_column = latitude_column
         self.longitude_column = longitude_column
+        self.geometry_column = geometry_column
         logger.log(
             "DEBUG_LOW",
             f"WITH_COLUMNS: Initialised LoaderFactory "
-            f"with latitude_column={latitude_column} and longitude_column={longitude_column}",
+            f"with either latitude_column={latitude_column} and longitude_column={longitude_column} or geometry_column={geometry_column}",
         )
         return self
 
-    def with_crs(self, crs: str = DEFAULT_CRS) -> "LoaderFactory":
+    def with_crs(
+        self, crs: Union[str, Tuple[str, str]] = DEFAULT_CRS
+    ) -> "LoaderFactory":
         """Specify the coordinate reference system for the loaded data.
         
         This method configures the `coordinate reference system (CRS)` to use for the loaded
@@ -423,6 +442,9 @@ class LoaderFactory:
         Args:
             crs: The coordinate reference system to use, in any format accepted by geopandas
                 (default: `EPSG:4326`, which is standard `WGS84` coordinates).
+                If a string, it specifies the coordinate reference system to use (default: 'EPSG:4326').
+                If a tuple (source_crs, target_crs), it defines a conversion from the source CRS to the target CRS (default target CRS: 'EPSG:4326').
+
             
         Returns:
             The LoaderFactory instance for method chaining.
@@ -431,6 +453,9 @@ class LoaderFactory:
             >>> loader = mapper.loader.from_file("data/points.csv")\
             ...     .with_columns(longitude_column="lon", latitude_column="lat")\
             ...     .with_crs("EPSG:3857")  # Use Web Mercator projection
+            >>> loader = mapper.loader.from_file("data/points.csv")\
+            ...     .with_columns(longitude_column="lon", latitude_column="lat")\
+            ...     .with_crs( ("EPSG:2263", "EPSG:3857") )  # Use NY State Plane to load data and convert them to Web Mercator projection
         """
         self.crs = crs
         logger.log(
@@ -464,7 +489,7 @@ class LoaderFactory:
         )
         return self
 
-    def _load_from_file(self, coordinate_reference_system: str) -> gpd.GeoDataFrame:
+    def _load_from_file(self) -> gpd.GeoDataFrame:
         file_path: str = self.source_data
         file_ext = Path(file_path).suffix.lower()
         loader_class = FILE_LOADER_FACTORY[file_ext]["class"]
@@ -472,46 +497,58 @@ class LoaderFactory:
             file_path,
             latitude_column=self.latitude_column,
             longitude_column=self.longitude_column,
-            coordinate_reference_system=coordinate_reference_system,
+            geometry_column=self.geometry_column,
+            coordinate_reference_system=self.crs,
             map_columns=self.map_columns,
         )
         return self._instance.load_data_from_file()
 
-    def _load_from_dataframe(
-        self, coordinate_reference_system: str
-    ) -> gpd.GeoDataFrame:
-        input_dataframe: Union[pd.DataFrame, gpd.GeoDataFrame] = self.source_data
+    def _load_from_dataframe(self) -> gpd.GeoDataFrame:
+        input_dataframe: Union[pd.DataFrame, gpd.GeoDataFrame] = self.source_data.copy()
         if isinstance(input_dataframe, gpd.GeoDataFrame):
             geo_dataframe: gpd.GeoDataFrame = input_dataframe.copy()
         else:
-            geo_dataframe = gpd.GeoDataFrame(
-                input_dataframe,
-                geometry=gpd.points_from_xy(
+            if self.latitude_column is not None and self.longitude_column is not None:
+                geometry = gpd.points_from_xy(
                     input_dataframe[self.longitude_column],
                     input_dataframe[self.latitude_column],
-                ),
-                crs=coordinate_reference_system,
+                )
+            else:
+                filter_not_na = input_dataframe[self.geometry_column].notna()
+                input_dataframe.loc[filter_not_na, self.geometry_column] = (
+                    input_dataframe.loc[filter_not_na, self.geometry_column].apply(
+                        wkt.loads
+                    )
+                )
+                geometry = self.geometry_column
+
+            geo_dataframe = gpd.GeoDataFrame(
+                input_dataframe,
+                geometry=geometry,
+                crs=self.crs[0] if isinstance(self.crs, tuple) else self.crs,
             )
+
+        target_coordinate_reference_system = (
+            self.crs[1] if isinstance(self.crs, tuple) else self.crs
+        )
+
         if geo_dataframe.crs is None:
-            geo_dataframe.set_crs(coordinate_reference_system, inplace=True)
-        elif geo_dataframe.crs.to_string() != coordinate_reference_system:
-            geo_dataframe = geo_dataframe.to_crs(coordinate_reference_system)
+            geo_dataframe.set_crs(target_coordinate_reference_system, inplace=True)
+        elif geo_dataframe.crs.to_string() != target_coordinate_reference_system:
+            geo_dataframe = geo_dataframe.to_crs(target_coordinate_reference_system)
+
         if self.map_columns is not None and self.map_columns != "None":
             geo_dataframe = geo_dataframe.rename(columns=self.map_columns)
 
         return geo_dataframe
 
     @require_attributes(["source_type", "source_data"])
-    def load(self, coordinate_reference_system: str = DEFAULT_CRS) -> gpd.GeoDataFrame:
+    def load(self) -> gpd.GeoDataFrame:
         """Load the data and return it as a `GeoDataFrame`.
         
         This method loads the data from the configured source and returns it as a
         geopandas `GeoDataFrame`. It handles the details of loading from different
         source types and formats.
-        
-        Args:
-            coordinate_reference_system: The coordinate reference system to use for the
-                loaded data (default: "EPSG:4326", which is standard WGS84 coordinates).
                 
         Returns:
             A GeoDataFrame containing the loaded data.
@@ -529,27 +566,38 @@ class LoaderFactory:
             >>> # Load shapefile data
             >>> gdf = mapper.loader.from_file("data/boundaries.shp").load()
         """
+        has_geometry = self.geometry_column is not None
+        has_lat_or_long = (
+            self.latitude_column is not None or self.longitude_column is not None
+        )
+        has_lat_and_long = (
+            self.latitude_column is not None and self.longitude_column is not None
+        )
+
         if self.source_type == "file":
             file_ext = Path(self.source_data).suffix.lower()
             if file_ext not in FILE_LOADER_FACTORY:
                 raise ValueError(f"Unsupported file format: {file_ext}")
             loader_info = FILE_LOADER_FACTORY[file_ext]
             if loader_info["requires_columns"] and (
-                self.latitude_column is None or self.longitude_column is None
+                (has_geometry and has_lat_or_long)
+                or (not has_geometry and not has_lat_and_long)
             ):
                 raise ValueError(
-                    f"Loader for {file_ext} requires latitude and longitude columns. Call with_columns() first."
+                    f"Loader for {file_ext} requires latitude and longitude columns or only geometry column. Call with_columns() with valid column names."
                 )
-            loaded_data = self._load_from_file(coordinate_reference_system)
+            loaded_data = self._load_from_file()
             if self._preview is not None:
                 self.preview(format=self._preview["format"])
             return loaded_data
         elif self.source_type == "dataframe":
-            if self.latitude_column == "None" or self.longitude_column == "None":
+            if (has_geometry and has_lat_or_long) or (
+                not has_geometry and not has_lat_and_long
+            ):
                 raise ValueError(
-                    "DataFrame loading requires latitude and longitude columns. Call with_columns() with valid column names."
+                    "DataFrame loading requires latitude and longitude columns or only geometry column. Call with_columns() with valid column names."
                 )
-            loaded_data = self._load_from_dataframe(coordinate_reference_system)
+            loaded_data = self._load_from_dataframe()
             if self._preview is not None:
                 logger.log(
                     "DEBUG_LOW",
@@ -557,12 +605,14 @@ class LoaderFactory:
                 )
             return loaded_data
         elif self.source_type == "huggingface":
-            if self.latitude_column == "None" or self.longitude_column == "None":
+            if (has_geometry and has_lat_or_long) or (
+                not has_geometry and not has_lat_and_long
+            ):
                 raise ValueError(
-                    "Hugging Face dataset loading requires latitude and longitude columns. "
+                    "Hugging Face dataset loading requires latitude and longitude columns or only geometry column. "
                     "Call with_columns() with valid column names."
                 )
-            loaded_data = self._load_from_dataframe(coordinate_reference_system)
+            loaded_data = self._load_from_dataframe()
             if self._preview is not None:
                 logger.log(
                     "DEBUG_LOW",
@@ -609,9 +659,17 @@ class LoaderFactory:
             raise ValueError(f"Unsupported file format: {file_ext}")
         loader_info = FILE_LOADER_FACTORY[file_ext]
         loader_class = loader_info["class"]
-        requires_columns = loader_info["requires_columns"]
-        if requires_columns and (
-            self.latitude_column is None or self.longitude_column is None
+        has_geometry = self.geometry_column is not None
+        has_lat_or_long = (
+            self.latitude_column is not None or self.longitude_column is not None
+        )
+        has_lat_and_long = (
+            self.latitude_column is not None and self.longitude_column is not None
+        )
+
+        if loader_info["requires_columns"] and (
+            (has_geometry and has_lat_or_long)
+            or (not has_geometry and not has_lat_and_long)
         ):
             raise ValueError(
                 f"Loader for {file_ext} requires latitude and longitude columns. Call with_columns() first."
@@ -620,6 +678,7 @@ class LoaderFactory:
             file_path=self.source_data,
             latitude_column=self.latitude_column,
             longitude_column=self.longitude_column,
+            geometry_column=self.geometry_column,
             coordinate_reference_system=self.crs,
             map_columns=self.map_columns,
         )

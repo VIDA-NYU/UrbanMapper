@@ -122,9 +122,10 @@ class UrbanLayerFactory:
 
     def with_mapping(
         self,
-        longitude_column: str | None = None,
-        latitude_column: str | None = None,
-        output_column: str | None = None,
+        latitude_column: Optional[str] = None,
+        longitude_column: Optional[str] = None,
+        geometry_column: Optional[str] = None,
+        output_column: Optional[str] = None,
         **mapping_kwargs,
     ) -> "UrbanLayerFactory":
         """Add a mapping configuration to the `urban layer`.
@@ -179,6 +180,8 @@ class UrbanLayerFactory:
             mapping["longitude_column"] = longitude_column
         if latitude_column:
             mapping["latitude_column"] = latitude_column
+        if geometry_column:
+            mapping["geometry_column"] = geometry_column
         if output_column:
             mapping["output_column"] = output_column
         mapping["kwargs"] = mapping_kwargs

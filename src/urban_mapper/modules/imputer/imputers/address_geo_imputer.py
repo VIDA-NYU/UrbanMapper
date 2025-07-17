@@ -54,10 +54,11 @@ class AddressGeoImputer(GeoImputerBase):
         self,
         latitude_column: Optional[str] = None,
         longitude_column: Optional[str] = None,
+        geometry_column: Optional[str] = None,
         data_id: Optional[str] = None,
         address_column: Optional[str] = None,
     ):
-        super().__init__(latitude_column, longitude_column, data_id)
+        super().__init__(latitude_column, longitude_column, geometry_column, data_id)
         self.address_column = address_column
 
     def _transform(
@@ -77,13 +78,17 @@ class AddressGeoImputer(GeoImputerBase):
         """
         _ = urban_layer
         dataframe = input_geodataframe.copy()
-        mask_missing = (
-            dataframe[self.latitude_column].isna()
-            | dataframe[self.longitude_column].isna()
-        )
+
+        if self.geometry_column is None:
+            mask_missing = (
+                dataframe[self.latitude_column].isna()
+                | dataframe[self.longitude_column].isna()
+            )
+        else:
+            mask_missing = dataframe[self.geometry_column].isna()
         missing_records = dataframe[mask_missing].copy()
 
-        def geocode_address(row):
+        def geocode_address(row, active_geometry_name):
             address = str(row.get(self.address_column, "")).strip()
             if not address:
                 return None
@@ -92,17 +97,21 @@ class AddressGeoImputer(GeoImputerBase):
                 if not latitude_longitude:
                     return None
                 latitude_value, longitude_value = latitude_longitude
-                return pd.Series(
-                    {
-                        self.latitude_column: latitude_value,
-                        self.longitude_column: longitude_value,
-                        "geometry": Point(longitude_value, latitude_value),
-                    }
-                )
+                row[self.latitude_column] = latitude_value
+                row[self.longitude_column] = longitude_value
+
+                if active_geometry_name is None:
+                    row["geometry"] = Point(longitude_value, latitude_value)
+                else:
+                    row[active_geometry_name] = Point(longitude_value, latitude_value)
+
+                return row
             except Exception:
                 return None
 
-        geocoded_data = missing_records.apply(geocode_address, axis=1)
+        geocoded_data = missing_records.apply(
+            geocode_address, axis=1, args=(missing_records.active_geometry_name,)
+        )
         valid_indices = geocoded_data.dropna().index
 
         if not valid_indices.empty:

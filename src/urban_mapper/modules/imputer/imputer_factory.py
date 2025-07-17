@@ -7,7 +7,7 @@ from beartype import beartype
 import geopandas as gpd
 import json
 from urban_mapper.modules.urban_layer.abc_urban_layer import UrbanLayerBase
-from urban_mapper.utils.helpers import require_attributes_not_none
+from urban_mapper.utils import require_attributes_not_none, require_either_or_attributes
 from .abc_imputer import GeoImputerBase
 from ...utils.helpers.reset_attribute_before import reset_attributes_before
 from urban_mapper import logger
@@ -46,11 +46,21 @@ class ImputerFactory:
         self._imputer_type: Optional[str] = None
         self._latitude_column: Optional[str] = None
         self._longitude_column: Optional[str] = None
+        self._geometry_column: Optional[str] = None
         self._extra_params: Dict[str, Any] = {}
         self._instance: Optional[GeoImputerBase] = None
         self._preview: Optional[dict] = None
 
-    @reset_attributes_before(["_imputer_type", "_latitude_column", "_longitude_column"])
+    def _reset(self):
+        self._data_id = None
+        self._imputer_type = None
+        self._latitude_column = None
+        self._longitude_column = None
+        self._geometry_column = None
+        self._extra_params = {}
+        self._instance = None
+        self._preview = None
+
     def with_type(self, primitive_type: str) -> "ImputerFactory":
         """Set the imputer type to instantiate.
 
@@ -66,6 +76,8 @@ class ImputerFactory:
         !!! tip
             Check IMPUTER_REGISTRY keys for valid imputer types.
         """
+        self._reset()
+
         if self._imputer_type is not None:
             logger.log(
                 "DEBUG_MID",
@@ -121,8 +133,9 @@ class ImputerFactory:
 
     def on_columns(
         self,
-        longitude_column: str,
-        latitude_column: str,
+        longitude_column: Optional[str] = None,
+        latitude_column: Optional[str] = None,
+        geometry_column: Optional[str] = None,
         **extra_params,
     ) -> "ImputerFactory":
         """Configure latitude and longitude columns.
@@ -137,6 +150,7 @@ class ImputerFactory:
         """
         self._longitude_column = longitude_column
         self._latitude_column = latitude_column
+        self._geometry_column = geometry_column
         self._extra_params = extra_params
         logger.log(
             "DEBUG_LOW",
@@ -146,11 +160,8 @@ class ImputerFactory:
         )
         return self
 
-    @require_attributes_not_none(
-        "_imputer_type",
-        "_latitude_column",
-        "_longitude_column",
-    )
+    @require_attributes_not_none("_imputer_type")
+    @require_either_or_attributes([["_latitude_column", "_longitude_column"], ["_geometry_column"]])
     def transform(
         self,
         input_geodataframe: Union[Dict[str, gpd.GeoDataFrame], gpd.GeoDataFrame],
@@ -178,6 +189,7 @@ class ImputerFactory:
         self._instance = imputer_class(
             latitude_column=self._latitude_column,
             longitude_column=self._longitude_column,
+            geometry_column=self._geometry_column,
             data_id=self._data_id,
             **self._extra_params,
         )
@@ -224,16 +236,22 @@ class ImputerFactory:
             "WARNING: build() should only be used in UrbanPipeline. In other cases, "
             "using transform() is a better choice.",
         )
+        has_geometry = self._geometry_column is not None
+        has_lat_and_long = (
+            self._latitude_column is not None and self._longitude_column is not None
+        )
+
         if self._imputer_type is None:
             raise ValueError("Imputer type must be specified. Call with_type() first.")
-        if self._latitude_column is None or self._longitude_column is None:
+        if not has_geometry and not has_lat_and_long:
             raise ValueError(
-                "Latitude and longitude columns must be specified. Call on_columns() first."
+                "Latitude/longitude or geometry columns must be specified. Call on_columns() first."
             )
         imputer_class = IMPUTER_REGISTRY[self._imputer_type]
         self._instance = imputer_class(
             latitude_column=self._latitude_column,
             longitude_column=self._longitude_column,
+            geometry_column=self._geometry_column,
             data_id=self._data_id,
             **self._extra_params,
         )

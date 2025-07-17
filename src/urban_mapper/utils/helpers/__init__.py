@@ -6,6 +6,7 @@ from .require_dynamic_columns import require_dynamic_columns
 from .require_single_attribute_value import require_single_attribute_value
 from .require_attribute_none import require_attribute_none
 from .file_exists import file_exists
+from .require_either_or_attributes import require_either_or_attributes
 
 __all__ = [
     "require_attributes",
@@ -16,4 +17,5 @@ __all__ = [
     "require_single_attribute_value",
     "require_attribute_none",
     "file_exists",
+    "require_either_or_attributes",
 ]

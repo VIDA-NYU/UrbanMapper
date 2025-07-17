@@ -3,7 +3,7 @@ from typing import Optional, Union, Dict, Any
 import geopandas as gpd
 from beartype import beartype
 
-from urban_mapper.utils import require_arguments_not_none, require_attributes
+from urban_mapper.utils import require_arguments_not_none, require_either_or_attributes
 from urban_mapper.modules.urban_layer.abc_urban_layer import UrbanLayerBase
 
 
@@ -30,12 +30,14 @@ class GeoImputerBase(ABC):
         self,
         latitude_column: Optional[str] = None,
         longitude_column: Optional[str] = None,
+        geometry_column: Optional[str] = None,
         data_id: Optional[str] = None,
         **extra_params,
     ) -> None:
         self.data_id = data_id
         self.latitude_column = latitude_column
         self.longitude_column = longitude_column
+        self.geometry_column = geometry_column
 
     @abstractmethod
     def _transform(
@@ -70,7 +72,9 @@ class GeoImputerBase(ABC):
         "input_geodataframe", error_msg="Input GeoDataFrame cannot be None."
     )
     @require_arguments_not_none("urban_layer", error_msg="Urban layer cannot be None.")
-    @require_attributes(["latitude_column", "longitude_column"])
+    @require_either_or_attributes(
+        [["latitude_column", "longitude_column"], ["geometry_column"]]
+    )
     def transform(
         self,
         input_geodataframe: Union[Dict[str, gpd.GeoDataFrame], gpd.GeoDataFrame],
