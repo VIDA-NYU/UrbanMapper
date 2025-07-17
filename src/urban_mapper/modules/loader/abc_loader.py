@@ -40,21 +40,20 @@ class LoaderBase(ABC):
         self.additional_loader_parameters: Dict[str, Any] = additional_loader_parameters
 
     @abstractmethod
-    def _load_data_from_file(self) -> gpd.GeoDataFrame:
+    def _load_data_from_file(self) -> Any:
         """Internal implementation method for loading data from a file.
 
-        This method is called by `load_data_from_file()` after validation is performed.
-
-        !!! warning "Method Not Implemented"
-            This method must be implemented by subclasses. It should contain the logic
-            for reading the file and converting it to a `GeoDataFrame`.
+        Cette méthode doit être implémentée par les sous-classes. 
+        Pour les loaders tabulaires (CSV, Shapefile, Parquet), elle doit retourner un GeoDataFrame.
+        Pour les loaders raster, elle peut retourner un dictionnaire ou un tableau numpy contenant les données raster et les métadonnées.
 
         Returns:
-            A `GeoDataFrame` containing the loaded spatial data.
+            - Pour les loaders tabulaires : un `GeoDataFrame` contenant les données spatiales chargées.
+            - Pour les loaders raster : un objet contenant les données raster (ex: dict ou numpy.ndarray).
 
         Raises:
-            ValueError: If required columns are missing or the file format is invalid.
-            FileNotFoundError: If the file does not exist.
+            ValueError: Si des colonnes requises sont manquantes ou le format de fichier est invalide.
+            FileNotFoundError: Si le fichier n'existe pas.
         """
         ...
 
@@ -111,4 +110,5 @@ class LoaderBase(ABC):
         Raises:
             ValueError: If an unsupported format is requested.
         """
+        pass
         pass
