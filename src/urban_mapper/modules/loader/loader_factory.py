@@ -16,7 +16,7 @@ from urban_mapper.config import DEFAULT_CRS
 from urban_mapper.modules.loader.abc_loader import LoaderBase
 from urban_mapper.modules.loader.loaders.csv_loader import CSVLoader
 from urban_mapper.modules.loader.loaders.parquet_loader import ParquetLoader
-from .loaders.raster_loader import RasterLoader  # Importing RasterLoader of the new raster loader module
+from urban_mapper.modules.loader.loaders.raster_loader import RasterLoader  # Importing RasterLoader of the new raster loader module
 from urban_mapper.modules.loader.loaders.shapefile_loader import ShapefileLoader
 from urban_mapper.utils import require_attributes
 from urban_mapper.utils.helpers.reset_attribute_before import reset_attributes_before
@@ -470,6 +470,8 @@ class LoaderFactory:
             f"WITH_MAP: Initialised LoaderFactory with map_columns={map_columns}",
         )
         return self
+    
+    
 
     def _load_from_file(self, coordinate_reference_system: str):
         file_path: str = self.source_data
