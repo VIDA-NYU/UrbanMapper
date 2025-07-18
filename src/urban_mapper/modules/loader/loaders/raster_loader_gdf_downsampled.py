@@ -10,8 +10,30 @@ from pyproj import CRS, Transformer
 
 class RasterLoader:
     """
-    Loader for raster files with block-wise downsampling (average pooling) and centroids as geometry.
+    Loader for raster files (GeoTIFF, PNG+world file, etc.) with block-wise downsampling (average pooling) and polygons as geometry.
     Returns a GeoDataFrame where each row corresponds to an aggregated pixel (block).
+    
+    It allows fast preview of raster properties, pixel-wise spatialization, and direct integration with the UrbanMapper factory.
+
+    Attributes:
+        file_path (str): Path to the raster file to load.
+        gdf (geopandas.GeoDataFrame): GeoDataFrame where each row is a pixel (with geometry, area, coordinates, and value).
+        meta (dict): Raster metadata (dimensions, CRS, etc.).
+        bounds (tuple): Geographic extent of the raster as (left, bottom, right, top).
+        block_size (int): Size of the blocks for downsampling (default is 10, meaning 10x10 pixels).
+
+    Example:
+         >>> rst_loader = (
+                mapper
+                .loader # From the loader module
+                .from_file("file_path.tif") # To update with your own path
+            )
+        >>> gdf = rst_loader.load() # Load the data and return data 
+        >>> gdf       
+        >>> meta = rst_loader._instance.meta
+        >>> bounds = rst_loader._instance.bounds
+    
+    
     """
 
     def __init__(self, file_path, block_size=10, **kwargs):   # block_size est le facteur de downsampling (4x4 par défaut)
@@ -22,7 +44,7 @@ class RasterLoader:
 
     def _downsample_band(self, band):
         """
-        Effectue le downsampling par blocs et calcule la moyenne pour chaque bloc non-recouvrant.
+        Downsamples the raster band by averaging non-overlapping blocks of pixels.Effectue le downsampling par blocs et calcule la moyenne pour chaque bloc non-recouvrant.
         """
         h, w = band.shape
         bs = self.block_size
@@ -39,6 +61,18 @@ class RasterLoader:
         return band_ds
 
     def _load_data_from_file(self) -> gpd.GeoDataFrame:
+         """
+        Loads raster data and returns a GeoDataFrame where each row represents  a pixel (with geometry, area, coordinates, and value).
+        NoData pixels are included with value set to None.
+
+        Returns :
+        -------
+            gpd.GeoDataFrame
+            A GeoDataFrame with columns: pixel_id, row, col, area, latitude, longitude, value, geometry.
+        Raises:
+            RuntimeError: If there is an error while loading the raster file.  
+        NB : the loader doesn't return metadata and bounds, but they are stored in the instance attributes (cf docstring example).           
+        """
         try:
             with rasterio.open(self.file_path) as src:
                 band = src.read(1)
@@ -49,7 +83,7 @@ class RasterLoader:
                 self.meta = src.meta
                 self.bounds = src.bounds
 
-                # Handle NoData: met à NaN pour la moyenne
+                # Handle NoData: 
                 if nodata is not None:
                     band = np.where(band == nodata, np.nan, band)
 
@@ -57,10 +91,10 @@ class RasterLoader:
                 band_ds = self._downsample_band(band)
                 h_ds, w_ds = band_ds.shape
 
-                # Génère les indices ligne/colonne de chaque pixel agrégé
+                # Generate indices for the downsampled raster
                 rows, cols = np.indices((h_ds, w_ds))
 
-                # Calcule la position du centre de chaque bloc dans l'image d'origine
+                # Calcul coordinates of the center of each block
                 bs = self.block_size
                 center_rows = rows * bs + bs // 2
                 center_cols = cols * bs + bs // 2
@@ -70,10 +104,11 @@ class RasterLoader:
                 xs = np.array(xs).flatten()
                 ys = np.array(ys).flatten()
 
-                # Calcul des valeurs
+                # Flatten values for the downsampled band
                 values = band_ds.flatten()
 
-                # Geometry = centre (comme un Point)
+                # Geometry creation : Polygon for each aggregated pixel
+                # Each pixel is represented as a polygon with 4 corners
                 geoms = []
                 for r, c in zip(center_rows.flatten(), center_cols.flatten()):
                     # (r, c) = ligne et colonne du bloc (dans la grille agrégée)
@@ -82,7 +117,7 @@ class RasterLoader:
                     max_row = min_row + bs
                     max_col = min_col + bs
 
-                    # On récupère les coordonnées des 4 coins du pixel agrégé :
+                    # Collect coordinates of the 4 corners of the aggregated pixel :
                     corners = [
                         rasterio.transform.xy(transform, min_row, min_col, offset='ul'),  # haut-gauche
                         rasterio.transform.xy(transform, min_row, max_col, offset='ur'),  # haut-droit
@@ -92,11 +127,12 @@ class RasterLoader:
                     poly = Polygon(corners)
                     geoms.append(poly)
 
-                # Latitude/Longitude par transformation CRS → WGS84
+           
+                # Latitude/longitude per transformation from CRS to WGS84
                 transformer = Transformer.from_crs(crs, 4326, always_xy=True)
                 lon, lat = transformer.transform(xs, ys)
                 
-                # Aire pour chaque bloc (en unités CRS projeté) — zone du bloc
+                # Area for each block (in projected CRS units) — area of the block
                 if CRS.from_user_input(crs).is_projected:
                     pixel_width = abs(transform.a)
                     pixel_height = abs(transform.e)
@@ -105,7 +141,8 @@ class RasterLoader:
                 else:
                     areas = [None] * values.size  # Hors CRS projeté, zone complexe : à raffiner si utile
 
-                # Création du GeoDataFrame
+                
+                # Create GeoDataFrame with pixel_id, row, col, area, value, latitude, longitude, and geometry
                 gdf = gpd.GeoDataFrame({
                     'pixel_id': np.arange(len(values)),
                     'row': rows.flatten(),
