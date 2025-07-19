@@ -89,7 +89,7 @@ class StreetNetwork:
             bbox = kwargs.pop("bbox")
             if not isinstance(bbox, tuple) or len(bbox) != 4:
                 raise ValueError("'bbox' must be a tuple of (left, bottom, right, top)")
-            self._graph = ox.graph_from_bbox(*bbox, **kwargs)
+            self._graph = ox.graph_from_bbox(bbox, **kwargs)
         elif method == "place":
             if "query" not in kwargs:
                 raise ValueError("Method 'place' requires 'query'")
