@@ -521,8 +521,7 @@ class AdminRegions(OSMFeatures):
 
     def from_point(
         self,
-        lat: float,
-        lon: float,
+        center_point: Tuple[float, float],
         dist: float,
         overwrite_admin_level: str | None = None,
         **kwargs,
@@ -534,6 +533,7 @@ class AdminRegions(OSMFeatures):
         overridden if needed.
 
         Args:
+            center_point: Tuple of (`latitude`, `longitude`) specifying the centre point.
             lat: Latitude of the point to load administrative regions for.
             lon: Longitude of the point to load administrative regions for.
             dist: Distance in meters to search around the point. Consider this a radius.
@@ -562,12 +562,12 @@ class AdminRegions(OSMFeatures):
             >>> # Get neighborhoods around a specific point
             >>> neighborhoods = AdminRegions()
             >>> neighborhoods.division_type = "neighborhood"
-            >>> neighborhoods.from_point(40.730610, -73.935242, dist=500)
+            >>> neighborhoods.from_point((40.730610, -73.935242), dist=500)
 
             >>> # Override admin level for more control
             >>> cities = AdminRegions()
             >>> cities.division_type = "city"
-            >>> cities.from_point(40.730610, -73.935242, dist=500, overwrite_admin_level="8")
+            >>> cities.from_point((40.730610, -73.935242), dist=500, overwrite_admin_level="8")
         """
         if self.division_type is None:
             raise ValueError("Division type not set for this layer.")
@@ -579,7 +579,7 @@ class AdminRegions(OSMFeatures):
         self.tags = {"boundary": "administrative"}
         self.feature_network = AdminFeatures()
         self.feature_network.load(
-            "point", self.tags, lat=lat, lon=lon, dist=dist, **kwargs
+            "point", self.tags, center_point=center_point, dist=dist, **kwargs
         )
         all_boundaries = self.feature_network.features.to_crs(
             self.coordinate_reference_system
