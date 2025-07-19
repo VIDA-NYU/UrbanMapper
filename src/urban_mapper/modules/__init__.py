@@ -25,6 +25,10 @@ from .urban_layer import (
     OSMFeatures,
     UrbanLayerFactory,
     CustomUrbanLayer,
+    RegionCities,
+    RegionCountries,
+    RegionStates,
+    RegionNeighborhoods,
 )
 
 from .pipeline_generator import (
@@ -56,9 +60,13 @@ __all__ = [
     "Tile2NetSidewalks",
     "Tile2NetCrosswalks",
     "OSMFeatures",
-    UrbanLayerFactory,
+    "UrbanLayerFactory",
     "GPT4OPipelineGenerator",
     "PipelineGeneratorBase",
     "PipelineGeneratorFactory",
     "CustomUrbanLayer",
+    "RegionCities",
+    "RegionCountries",
+    "RegionStates",
+    "RegionNeighborhoods",
 ]
