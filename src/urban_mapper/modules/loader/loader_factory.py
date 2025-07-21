@@ -1,6 +1,6 @@
-import json
-from collections import defaultdict
-from itertools import islice
+import json 
+from collections import defaultdict 
+from itertools import islice 
 from pathlib import Path
 from typing import Optional, Union, Dict
 
@@ -16,6 +16,7 @@ from urban_mapper.config import DEFAULT_CRS
 from urban_mapper.modules.loader.abc_loader import LoaderBase
 from urban_mapper.modules.loader.loaders.csv_loader import CSVLoader
 from urban_mapper.modules.loader.loaders.parquet_loader import ParquetLoader
+from urban_mapper.modules.loader.loaders.raster_loader import RasterLoader  # Importing RasterLoader of the new raster loader module
 from urban_mapper.modules.loader.loaders.shapefile_loader import ShapefileLoader
 from urban_mapper.utils import require_attributes
 from urban_mapper.utils.helpers.reset_attribute_before import reset_attributes_before
@@ -24,6 +25,12 @@ FILE_LOADER_FACTORY = {
     ".csv": {"class": CSVLoader, "requires_columns": True},
     ".shp": {"class": ShapefileLoader, "requires_columns": False},
     ".parquet": {"class": ParquetLoader, "requires_columns": True},
+    # Adding of new formats supported by RasterLoader
+    ".tif": {"class": RasterLoader, "requires_columns": False},
+    ".tiff": {"class": RasterLoader, "requires_columns": False},
+    ".jp2": {"class": RasterLoader, "requires_columns": False},
+    ".png": {"class": RasterLoader, "requires_columns": False},
+
 }
 
 
@@ -75,6 +82,7 @@ class LoaderFactory:
         self.crs: str = DEFAULT_CRS
         self._instance: Optional[LoaderBase] = None
         self._preview: Optional[dict] = None
+        self.options = {}
 
     @reset_attributes_before(
         ["source_type", "source_data", "latitude_column", "longitude_column"]
@@ -84,8 +92,8 @@ class LoaderFactory:
 
         This method sets up the factory to load data from a file path. The file format
         is determined by the file extension. Supported formats include `CSV`, `shapefile`,
-        and `Parquet`.
-
+        and `Parquet`. 
+        
         Args:
             file_path: Path to the data file to load.
 
@@ -463,8 +471,32 @@ class LoaderFactory:
             f"WITH_MAP: Initialised LoaderFactory with map_columns={map_columns}",
         )
         return self
+    
+    def with_options(self, **options,) -> "LoaderFactory":
+        """
+        Set additional key-value options to configure loader behavior.
 
-    def _load_from_file(self, coordinate_reference_system: str) -> gpd.GeoDataFrame:
+        This method allows you to specify arbitrary configuration options, such as block size, resolution, or other loader parameters. These options will be forwarded to the loader upon instantiation.
+
+        Args:
+            **options: Arbitrary keyword arguments representing loader configuration options.
+
+        Returns:
+            The LoaderFactory instance for method chaining.
+
+        Examples:
+            >>> loader = mapper.loader.from_file("data/raster.tif")\
+            ...     .with_options(block_size=10, use_polygons=True)
+        """
+        self.options.update(options)
+        logger.log(
+            "DEBUG_LOW",
+            f"WITH_OPTIONS: Updated LoaderFactory with options={options}",
+        )
+        return self
+
+
+    def _load_from_file(self, coordinate_reference_system: str):
         file_path: str = self.source_data
         file_ext = Path(file_path).suffix.lower()
         loader_class = FILE_LOADER_FACTORY[file_ext]["class"]
@@ -475,7 +507,8 @@ class LoaderFactory:
             coordinate_reference_system=coordinate_reference_system,
             map_columns=self.map_columns,
         )
-        return self._instance.load_data_from_file()
+        # Appel générique, le type de retour dépend du loader (GeoDataFrame pour tabulaire, dict/array pour raster)
+        return self._instance._load_data_from_file()
 
     def _load_from_dataframe(
         self, coordinate_reference_system: str
@@ -502,9 +535,9 @@ class LoaderFactory:
         return geo_dataframe
 
     @require_attributes(["source_type", "source_data"])
-    def load(self, coordinate_reference_system: str = DEFAULT_CRS) -> gpd.GeoDataFrame:
-        """Load the data and return it as a `GeoDataFrame`.
-        
+    def load(self, coordinate_reference_system: str = DEFAULT_CRS):
+        """Load the data and return it as a `GeoDataFrame` or raster object.
+
         This method loads the data from the configured source and returns it as a
         geopandas `GeoDataFrame`. It handles the details of loading from different
         source types and formats.
@@ -543,7 +576,7 @@ class LoaderFactory:
             loaded_data = self._load_from_file(coordinate_reference_system)
             if self._preview is not None:
                 self.preview(format=self._preview["format"])
-            return loaded_data
+            return loaded_data  # Peut être un GeoDataFrame ou un objet raster selon le loader
         elif self.source_type == "dataframe":
             if self.latitude_column == "None" or self.longitude_column == "None":
                 raise ValueError(
