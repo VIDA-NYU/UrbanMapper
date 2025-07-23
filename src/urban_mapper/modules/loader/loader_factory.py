@@ -506,6 +506,7 @@ class LoaderFactory:
             longitude_column=self.longitude_column,
             coordinate_reference_system=coordinate_reference_system,
             map_columns=self.map_columns,
+            **self.options
         )
         # Appel générique, le type de retour dépend du loader (GeoDataFrame pour tabulaire, dict/array pour raster)
         return self._instance._load_data_from_file()
