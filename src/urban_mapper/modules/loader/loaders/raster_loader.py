@@ -36,7 +36,7 @@ class RasterLoader:
     
     """
 
-    def __init__(self, file_path, block_size=10, **kwargs):   # block_size est le facteur de downsampling (4x4 par défaut)
+    def __init__(self, file_path, block_size=10, **kwargs):   # block_size is the size of the blocks for downsampling (default is 10, meaning 10x10 pixels)
         self.file_path = file_path
         self.block_size = block_size
         self.meta = None
@@ -44,20 +44,21 @@ class RasterLoader:
 
     def _downsample_band(self, band):
         """
-        Downsamples the raster band by averaging non-overlapping blocks of pixels.Effectue le downsampling par blocs et calcule la moyenne pour chaque bloc non-recouvrant.
+        Downsamples the raster band by averaging non-overlapping blocks of pixels.
         """
         h, w = band.shape
         bs = self.block_size
 
-        # Découpe l'image aux dimensions multiples du block_size pour éviter les bords incomplets
+        
+        # Cut the band to a size that is a multiple of block_size for preventing incomplete edges
         h_ds = h // bs
         w_ds = w // bs
         band_cropped = band[:h_ds * bs, :w_ds * bs]
 
-        # Remodèle pour avoir un 4D (h_blocks, block_size, w_blocks, block_size) puis moyenne par bloc
+        # Reshape the band into blocks of size (block_size, block_size) then mean over these blocks
+        
         band_blocks = band_cropped.reshape(h_ds, bs, w_ds, bs)
-        band_ds = band_blocks.mean(axis=(1, 3))  # moyenne sur les axes blocs internes
-
+        band_ds = band_blocks.mean(axis=(1, 3))  # mean over the block dimensions
         return band_ds
 
     def _load_data_from_file(self) -> gpd.GeoDataFrame:
@@ -111,7 +112,8 @@ class RasterLoader:
                 # Each pixel is represented as a polygon with 4 corners
                 geoms = []
                 for r, c in zip(center_rows.flatten(), center_cols.flatten()):
-                    # (r, c) = ligne et colonne du bloc (dans la grille agrégée)
+                    # (r,c) = lines and columns of the downsampled raster
+                
                     min_row = r - bs // 2
                     min_col = c - bs // 2
                     max_row = min_row + bs
@@ -119,10 +121,10 @@ class RasterLoader:
 
                     # Collect coordinates of the 4 corners of the aggregated pixel :
                     corners = [
-                        rasterio.transform.xy(transform, min_row, min_col, offset='ul'),  # haut-gauche
-                        rasterio.transform.xy(transform, min_row, max_col, offset='ur'),  # haut-droit
-                        rasterio.transform.xy(transform, max_row, max_col, offset='lr'),  # bas-droit
-                        rasterio.transform.xy(transform, max_row, min_col, offset='ll')   # bas-gauche
+                        rasterio.transform.xy(transform, min_row, min_col, offset='ul'),  # upper-left
+                        rasterio.transform.xy(transform, min_row, max_col, offset='ur'),  # upper-right
+                        rasterio.transform.xy(transform, max_row, max_col, offset='lr'),  # bottom-right
+                        rasterio.transform.xy(transform, max_row, min_col, offset='ll')   # bottom-left
                     ]
                     poly = Polygon(corners)
                     geoms.append(poly)
@@ -139,7 +141,7 @@ class RasterLoader:
                     area = (pixel_width * pixel_height) * (bs * bs)
                     areas = np.full(values.shape, area)
                 else:
-                    areas = [None] * values.size  # Hors CRS projeté, zone complexe : à raffiner si utile
+                    areas = [None] * values.size  # If CRS is geographic, area is not defined
 
                 
                 # Create GeoDataFrame with pixel_id, row, col, area, value, latitude, longitude, and geometry

@@ -508,7 +508,7 @@ class LoaderFactory:
             map_columns=self.map_columns,
             **self.options
         )
-        # Appel générique, le type de retour dépend du loader (GeoDataFrame pour tabulaire, dict/array pour raster)
+        
         return self._instance._load_data_from_file()
 
     def _load_from_dataframe(
@@ -577,7 +577,7 @@ class LoaderFactory:
             loaded_data = self._load_from_file(coordinate_reference_system)
             if self._preview is not None:
                 self.preview(format=self._preview["format"])
-            return loaded_data  # Peut être un GeoDataFrame ou un objet raster selon le loader
+            return loaded_data 
         elif self.source_type == "dataframe":
             if self.latitude_column == "None" or self.longitude_column == "None":
                 raise ValueError(
