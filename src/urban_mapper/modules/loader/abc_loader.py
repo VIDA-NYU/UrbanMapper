@@ -43,17 +43,20 @@ class LoaderBase(ABC):
     def _load_data_from_file(self) -> Any:
         """Internal implementation method for loading data from a file.
 
-        Cette méthode doit être implémentée par les sous-classes. 
-        Pour les loaders tabulaires (CSV, Shapefile, Parquet), elle doit retourner un GeoDataFrame.
-        Pour les loaders raster, elle peut retourner un dictionnaire ou un tableau numpy contenant les données raster et les métadonnées.
+        This method is called by `load_data_from_file()` after validation is performed.
+
+        !!! warning "Method Not Implemented"
+            This method must be implemented by subclasses. It should contain the logic
+            for reading the file and converting it to a `GeoDataFrame`.
 
         Returns:
-            - Pour les loaders tabulaires : un `GeoDataFrame` contenant les données spatiales chargées.
-            - Pour les loaders raster : un objet contenant les données raster (ex: dict ou numpy.ndarray).
+            A `GeoDataFrame` containing the loaded spatial data (expect for the 
+            Raster Loader for which two loaders exist : one which return a `GeoDataFrame` 
+            and one which return the data in a 3D NumpyArray).
 
         Raises:
-            ValueError: Si des colonnes requises sont manquantes ou le format de fichier est invalide.
-            FileNotFoundError: Si le fichier n'existe pas.
+            ValueError: If required columns are missing or the file format is invalid.
+            FileNotFoundError: If the file does not exist.
         """
         ...
 
