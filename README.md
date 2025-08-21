@@ -98,3 +98,8 @@ at [UrbanMapper Documentation](https://urbanmapper.readthedocs.io/en/latest/).
 ## Licence
 
 `UrbanMapper` is released under the [MIT Licence](./LICENCE).
+
+## Acknowledgments
+This work is supported by the NSF and is part of the [OSCUR initiative]([url](https://oscur.org/)).
+
+<img src="docs/public/resources/oscur_logo_black.png" width="200px">
