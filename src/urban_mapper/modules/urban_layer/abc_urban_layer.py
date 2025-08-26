@@ -370,10 +370,11 @@ class UrbanLayerBase(ABC):
 
                     if self.data_id is None or self.data_id == key:
                         self.layer, temp_mapped = self._map_nearest_layer(
-                            gdf,
-                            lon_col,
-                            lat_col,
-                            out_col,
+                            data=gdf,
+                            longitude_column=lon_col,
+                            latitude_column=lat_col,
+                            geometry_column=geo_col,
+                            output_column=out_col,
                             _reset_layer_index=(
                                 mapping == self.mappings[-1] and key == last_key
                             ),
