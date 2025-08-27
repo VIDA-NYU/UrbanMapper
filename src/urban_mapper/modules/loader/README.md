@@ -3,10 +3,9 @@
 ⚠️ **Important Note**: This branch contains the development of the raster loader tool that I developed during my internship. However, please note that I have only included the following in this branch: the different versions of the loaders, interesting examples in notebooks, unit tests, and a few readme files.
 It therefore does not represent all the work I did during my internship and is not sufficiently explanatory. It just allows you to have all the code to compile directly in the UrbanMapper environment so that you can compile and execute it. 
 In fact, I have also created a GitHub repository containing much more detail, namely: all the code present here, other code of interest to the project, my internship report, my overview, a literature review, detailed readme files for everything, the data used in my notebooks, the requirements, etc.
-This repo is available at the following address : 
+This repository is available at the following address:
 
 https://github.com/JUDITH-sketch/Rasters_Studies_for_UrbanMapper-OSCUR
-
 
 Finally, on my branch, the changes I made are as follows:
 - src/modules/loader/loaders: addition of a loader for rasters with six available versions, an explanation of what each of these versions allows you to do, and unit tests. 
