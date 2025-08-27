@@ -38,6 +38,16 @@ class EnricherConfig:
         self.debug: bool = False
         self.data_id: Optional[str] = None
 
+    def reset(self): 
+        self.group_by = None
+        self.values_from = None
+        self.action = None
+        self.aggregator_config = {}
+        self.enricher_type = "SingleAggregatorEnricher"
+        self.enricher_config = {}
+        self.debug = False
+        self.data_id = None               
+
     def with_data(
         self,
         group_by: Union[str, List[str]],
@@ -67,6 +77,7 @@ class EnricherConfig:
             >>> mapper = um.UrbanMapper()
             >>> config = mapper.enricher.with_data(group_by="street")
         """
+        self.reset()
         self.group_by = [group_by] if isinstance(group_by, str) else group_by
         self.values_from = (
             [values_from] if isinstance(values_from, str) else values_from
