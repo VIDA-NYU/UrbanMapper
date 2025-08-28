@@ -7,6 +7,7 @@ from shapely.geometry import Point
 from shapely.geometry import Polygon
 from rasterio.transform import xy
 from pyproj import CRS, Transformer
+from shapely.geometry import box
 
 class RasterLoader:
     """
