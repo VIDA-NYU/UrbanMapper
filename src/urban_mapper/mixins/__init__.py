@@ -7,6 +7,7 @@ from .urban_pipeline import UrbanPipelineMixin
 from .pipeline_generator import PipelineGeneratorMixin
 from .filter import FilterMixin
 from .imputer import ImputerMixin
+from .model import ModelMixin
 
 __all__ = [
     "LoaderMixin",
@@ -18,4 +19,5 @@ __all__ = [
     "PipelineGeneratorMixin",
     "FilterMixin",
     "ImputerMixin",
+    "ModelMixin",
 ]

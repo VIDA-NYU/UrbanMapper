@@ -42,6 +42,7 @@ class LoaderFactory:
         source_data: The actual data source (file path or dataframe).
         latitude_column: The name of the column containing latitude values.
         longitude_column: The name of the column containing longitude values.
+        geometry_column: The name of column containing data geometry.
         crs: The coordinate reference system to use for the loaded data.
         _instance: The underlying loader instance (internal use only).
         _preview: Preview configuration (internal use only).
