@@ -7,6 +7,7 @@ from urban_mapper.modules.filter import GeoFilterBase
 from urban_mapper.modules.enricher import EnricherBase
 from urban_mapper.modules.urban_layer.abc_urban_layer import UrbanLayerBase
 from urban_mapper.modules.visualiser import VisualiserBase
+from urban_mapper.modules.model import ModelBase
 from alive_progress import alive_bar
 
 
@@ -98,7 +99,8 @@ class PipelineExecutor:
         num_imputers = sum(isinstance(step, GeoImputerBase) for _, step in self.steps)
         num_filters = sum(isinstance(step, GeoFilterBase) for _, step in self.steps)
         num_enrichers = sum(isinstance(step, EnricherBase) for _, step in self.steps)
-        total_steps = 1 + num_loaders + num_imputers + num_filters + num_enrichers
+        num_models = sum(isinstance(step, ModelBase) for _, step in self.steps)
+        total_steps = 1 + num_loaders + num_imputers + num_filters + num_enrichers + num_models
 
         if num_loaders == 0:
             raise ValueError("Pipeline must include exactly one LoaderBase step.")
@@ -145,6 +147,12 @@ class PipelineExecutor:
                     bar()
                     bar.title = f"~> Applying enricher: {name}..."
                     urban_layer_instance = step.enrich(self.data, urban_layer_instance)
+
+            for name, step in self.steps:
+                if isinstance(step, ModelBase):
+                    bar()
+                    bar.title = f"~> Applying model: {name}..."
+                    urban_layer_instance.layer = step.fit_predict(urban_layer_instance.layer)
 
             self.urban_layer = urban_layer_instance
             self._composed = True

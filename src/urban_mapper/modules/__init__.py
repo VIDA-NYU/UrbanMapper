@@ -33,6 +33,8 @@ from .pipeline_generator import (
     PipelineGeneratorFactory,
 )
 
+from .model import ModelFactory
+
 __all__ = [
     "LoaderBase",
     "CSVLoader",
@@ -56,9 +58,10 @@ __all__ = [
     "Tile2NetSidewalks",
     "Tile2NetCrosswalks",
     "OSMFeatures",
-    UrbanLayerFactory,
+    "UrbanLayerFactory",
     "GPT4OPipelineGenerator",
     "PipelineGeneratorBase",
     "PipelineGeneratorFactory",
     "CustomUrbanLayer",
+    "ModelFactory", 
 ]
