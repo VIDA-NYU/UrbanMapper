@@ -50,6 +50,9 @@ dependencies = [
     "alive-progress>=3.2.0",
     "datasets>=3.5.0",
     "mapclassify>=2.8.1",
+    "pykrige>=1.7.2",
+    "pysal>=25.1",
+    "spreg>=1.8.3",    
 ]
 
 [project.optional-dependencies]

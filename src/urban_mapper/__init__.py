@@ -8,6 +8,7 @@ from .mixins import (
     AuctusSearchMixin,
     PipelineGeneratorMixin,
     UrbanPipelineMixin,
+    ModelMixin
 )
 from .modules import (
     LoaderBase,
@@ -32,6 +33,7 @@ from .modules import (
     GPT4OPipelineGenerator,
     PipelineGeneratorBase,
     PipelineGeneratorFactory,
+    ModelFactory, 
 )
 
 from .urban_mapper import UrbanMapper
@@ -71,4 +73,6 @@ __all__ = [
     "PipelineGeneratorBase",
     "PipelineGeneratorFactory",
     "UrbanPipelineMixin",
+    "ModelMixin",
+    "ModelFactory", 
 ]

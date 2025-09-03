@@ -45,6 +45,8 @@ from .pipeline_generator import (
     PipelineGeneratorFactory,
 )
 
+from .model import ModelFactory
+
 __all__ = [
     "LoaderBase",
     "FileLoaderBase",
@@ -80,4 +82,5 @@ __all__ = [
     "RegionCountries",
     "RegionStates",
     "RegionNeighborhoods",
+    "ModelFactory", 
 ]
