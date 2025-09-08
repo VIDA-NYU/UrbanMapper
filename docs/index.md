@@ -43,6 +43,8 @@ See a trailer-style video below to get a quick overview of `UrbanMapper` and its
 <iframe width="660" height="415" src="https://www.youtube-nocookie.com/embed/QUmfvda_z2U?si=nXKwC4_LA1C99ZR_&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>
 
+---
+
 ## `Urban Layers` Currently Supported
 
 `UrbanMapper` currently supports the following `urban layers`:
@@ -174,3 +176,4 @@ practical use cases showcases its capabilities in `transportation`, `safety`, `e
   pipeline.
 - [Urban Mapper's Examples](./EXAMPLES.md): Explore the `examples/` interactively via Jupyter notebooks.
 - [API Reference](api/loaders.md): Complete API documentation
+- [Urban Mapper's Official Model Context Protocol (MCP) — "Control Your Urban Analysis with LLMs"](https://mcpstack.readthedocs.io/en/latest/tutorials/urbanmapper-jupyter/)
