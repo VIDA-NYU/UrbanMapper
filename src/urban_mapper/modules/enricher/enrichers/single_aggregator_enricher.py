@@ -71,7 +71,7 @@ class SingleAggregatorEnricher(EnricherBase):
         """
         aggregated_df = self.aggregator.aggregate(input_geodataframe)
         enriched_values = (
-            aggregated_df["value"].reindex(urban_layer.layer.index).fillna(0)
+            aggregated_df["value"].reindex(urban_layer.layer.index, fill_value=0)
         )
         urban_layer = self.set_layer_data_source(urban_layer, aggregated_df.index)
         urban_layer.layer[self.output_column] = enriched_values
