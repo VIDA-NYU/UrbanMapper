@@ -1,5 +1,5 @@
 from typing import Callable, Dict
-import pandas as pd
+import pandas as pd, numpy as np
 from beartype import beartype
 from urban_mapper.modules.enricher.aggregator.abc_aggregator import BaseAggregator
 
@@ -10,7 +10,18 @@ AGGREGATION_FUNCTIONS: Dict[str, Callable[[pd.Series], float]] = {
     "median": pd.Series.median,
     "min": pd.Series.min,
     "max": pd.Series.max,
+    "mode": pd.Series.mode,
 }
+
+
+def extract_first_element(g, include_groups=False):
+    if isinstance(g, (list, tuple, set, np.ndarray)):
+        if isinstance(g, set):
+            g = list(g)
+
+        return np.nan if len(g) == 0 else g[0]
+
+    return g
 
 
 @beartype
@@ -73,5 +84,8 @@ class SimpleAggregator(BaseAggregator):
         """
         grouped = input_dataframe.groupby(self.group_by_column)
         aggregated = grouped[self.value_column].agg(self.aggregation_function)
-        indices = grouped.apply(lambda g: list(g.index))
+        ## if 'mode' function is applied, some rows can have a list of values with the same high count.
+        ## It always takes the first of the values.
+        aggregated = aggregated.apply(extract_first_element, include_groups=False)
+        indices = grouped.apply(lambda g: list(g.index), include_groups=False)
         return pd.DataFrame({"value": aggregated, "indices": indices})
