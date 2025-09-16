@@ -657,7 +657,7 @@ class ModelBase(ABC, BaseEstimator):
       self,
       input_geodataframe: Union[gpd.GeoDataFrame, pd.DataFrame],
       **kwargs,
-  ) -> Union[gpd.GeoDataFrame, pd.DataFrame]:
+  ) -> Union[gpd.GeoDataFrame, pd.DataFrame, np.ndarray]:
     """
         It splits the data into train, validation (if necessary), and test subset.
         Fits the model with the train/validation subsets and returns the pedictions for the input dataset 
