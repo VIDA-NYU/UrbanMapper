@@ -371,19 +371,20 @@ class OSMFeatures(UrbanLayerBase):
         else:
             layer_projected = self.layer
 
+        unique_id = [ "index" if id is None else id for id in list(layer_projected.index.names) ]
         features_reset = layer_projected.reset_index()
-        unique_id = "osmid" if "osmid" in features_reset.columns else "index"
+        unique_id = "osmid" if "osmid" in features_reset.columns else unique_id
 
         mapped_data = gpd.sjoin_nearest(
             dataframe,
-            features_reset[["geometry", unique_id]],
+            features_reset[["geometry"] + unique_id],
             how="left",
             max_distance=threshold_distance,
             distance_col="distance_to_feature",
         )
-        mapped_data[output_column] = mapped_data[unique_id]
+        mapped_data[output_column] = mapped_data[unique_id] if len(unique_id) == 1 else mapped_data[unique_id].apply(lambda x: ','.join(x.dropna().astype(str)), axis=1)
         return self.layer, mapped_data.drop(
-            columns=[unique_id, "distance_to_feature", "index_right"],
+            columns=unique_id + ["distance_to_feature", "index_right"],
             errors="ignore",
         )
 
