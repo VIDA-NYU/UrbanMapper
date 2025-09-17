@@ -102,4 +102,10 @@ at [UrbanMapper Documentation](https://urbanmapper.readthedocs.io/en/latest/).
 ## Acknowledgments
 This work is supported by the NSF and is part of the [OSCUR initiative]([url](https://oscur.org/)).
 
-<img src="docs/public/resources/oscur_logo_black.png" width="200px">
+<div>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/public/resources/oscur_logo_light.png" width="200px">
+    <source media="(prefers-color-scheme: light)" srcset="docs/public/resources/oscur_logo_dark.png" width="200px">
+    <img alt="Fallback image description" src="docs/public/resources/oscur_logo_dark.png" width="200px">
+  </picture>
+</div>
