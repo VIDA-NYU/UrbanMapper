@@ -4,6 +4,8 @@ from .loaders import (
     CSVLoader,
     ShapefileLoader,
     ParquetLoader,
+    DataFrameLoader,
+    HuggingFaceLoader,    
 )
 from .loader_factory import LoaderFactory
 
@@ -13,5 +15,7 @@ __all__ = [
     "CSVLoader",
     "ShapefileLoader",
     "ParquetLoader",
+    "DataFrameLoader",
+    "HuggingFaceLoader",
     "LoaderFactory",
 ]

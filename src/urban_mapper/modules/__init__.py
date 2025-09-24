@@ -4,6 +4,8 @@ from .loader import (
     CSVLoader,
     ShapefileLoader,
     ParquetLoader,
+    DataFrameLoader,
+    HuggingFaceLoader,
 )
 from .imputer import (
     GeoImputerBase,
@@ -49,6 +51,8 @@ __all__ = [
     "CSVLoader",
     "ShapefileLoader",
     "ParquetLoader",
+    "DataFrameLoader",
+    "HuggingFaceLoader",
     "GeoImputerBase",
     "SimpleGeoImputer",
     "AddressGeoImputer",
