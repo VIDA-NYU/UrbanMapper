@@ -36,7 +36,7 @@ class ShapefileLoader(LoaderBase):
         >>> loader = ShapefileLoader(
         ...     file_path="data.shp"
         ... )
-        >>> gdf = loader.load_data_from_file()
+        >>> gdf = loader.load()
         >>>
         >>> # With specified latitude and longitude columns
         >>> loader = ShapefileLoader(
@@ -44,10 +44,10 @@ class ShapefileLoader(LoaderBase):
         ...     latitude_column="lat",
         ...     longitude_column="lon"
         ... )
-        >>> gdf = loader.load_data_from_file()
+        >>> gdf = loader.load()
     """
 
-    def _load_data_from_file(self) -> gpd.GeoDataFrame:
+    def _load(self) -> gpd.GeoDataFrame:
         """Load data from a shapefile and return a `GeoDataFrame`.
 
         This method reads a `shapefile` using geopandas, ensures it has a geometry column,

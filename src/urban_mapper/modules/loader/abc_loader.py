@@ -46,10 +46,10 @@ class LoaderBase(ABC):
         self.additional_loader_parameters: Dict[str, Any] = additional_loader_parameters
 
     @abstractmethod
-    def _load_data_from_file(self) -> gpd.GeoDataFrame:
+    def _load(self) -> gpd.GeoDataFrame:
         """Internal implementation method for loading data from a file.
 
-        This method is called by `load_data_from_file()` after validation is performed.
+        This method is called by `load()` after validation is performed.
 
         !!! warning "Method Not Implemented"
             This method must be implemented by subclasses. It should contain the logic
@@ -64,13 +64,12 @@ class LoaderBase(ABC):
         """
         ...
 
-    @file_exists("file_path")
     @ensure_coordinate_reference_system
-    def load_data_from_file(self) -> gpd.GeoDataFrame:
-        """Load spatial data from a file.
+    def load(self) -> gpd.GeoDataFrame:
+        """Load spatial data from a source.
 
         This is the main public method for using `loaders`. It performs validation
-        on the inputs before delegating to the implementation-specific `_load_data_from_file` method.
+        on the inputs before delegating to the implementation-specific `_load` method.
         It also ensures the file exists and that the coordinate reference system is properly set.
 
         Returns:
@@ -81,26 +80,23 @@ class LoaderBase(ABC):
             ValueError: If required columns are missing or the file format is invalid.
 
         Examples:
-            >>> from urban_mapper.modules.loader import CSVLoader
-            >>> loader = CSVLoader("taxi_data.csv", latitude_column="pickup_lat", longitude_column="pickup_lng")
-            >>> gdf = loader.load_data_from_file()
         """
-        loaded_file = self._load_data_from_file()
+        loaded_data = self._load()
 
         if self.additional_loader_parameters.get("map_columns") is not None:
             map_columns = self.additional_loader_parameters.get("map_columns")
 
             if (
-                loaded_file.active_geometry_name is not None
-                and loaded_file.active_geometry_name in map_columns.keys()
+                loaded_data.active_geometry_name is not None
+                and loaded_data.active_geometry_name in map_columns.keys()
             ):
-                source = loaded_file.active_geometry_name
-                loaded_file = loaded_file.rename_geometry(map_columns[source])
+                source = loaded_data.active_geometry_name
+                loaded_data = loaded_data.rename_geometry(map_columns[source])
                 del map_columns[source]
 
-            loaded_file = loaded_file.rename(columns=map_columns)
+            loaded_data = loaded_data.rename(columns=map_columns)
 
-        return loaded_file
+        return loaded_data
 
     @abstractmethod
     def preview(self, format: str = "ascii") -> Any:
