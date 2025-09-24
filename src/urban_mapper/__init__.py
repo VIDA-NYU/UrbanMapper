@@ -11,6 +11,7 @@ from .mixins import (
 )
 from .modules import (
     LoaderBase,
+    FileLoaderBase,
     CSVLoader,
     ShapefileLoader,
     ParquetLoader,
@@ -39,6 +40,7 @@ logger.level("DEBUG_HIGH", no=15, color="<green>", icon="🔬")
 
 __all__ = [
     "LoaderBase",
+    "FileLoaderBase",
     "CSVLoader",
     "ShapefileLoader",
     "ParquetLoader",

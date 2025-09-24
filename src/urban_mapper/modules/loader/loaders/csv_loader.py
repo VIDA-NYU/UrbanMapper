@@ -5,12 +5,13 @@ from beartype import beartype
 from pathlib import Path
 from typing import Union, Optional, Any, Tuple
 
-from urban_mapper.modules.loader.abc_loader import LoaderBase
+from urban_mapper.modules.loader.loaders.file_loader import FileLoaderBase
 from urban_mapper.config import DEFAULT_CRS
 from urban_mapper.utils.helpers import require_either_or_attributes
 
+
 @beartype
-class CSVLoader(LoaderBase):
+class CSVLoader(FileLoaderBase):
     """Loader for `CSV` files containing spatial data.
 
     This loader reads data from `CSV` (or other delimiter-separated) files and

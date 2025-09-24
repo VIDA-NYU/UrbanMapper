@@ -2,11 +2,11 @@ from typing import Any
 
 import geopandas as gpd
 from beartype import beartype
-from urban_mapper.modules.loader.abc_loader import LoaderBase
+from urban_mapper.modules.loader.loaders.file_loader import FileLoaderBase
 
 
 @beartype
-class ShapefileLoader(LoaderBase):
+class ShapefileLoader(FileLoaderBase):
     """Loader for `shapefiles` containing spatial data.
 
     This loader reads data from `shapefiles` and returns a `GeoDataFrame`. Shapefiles
