@@ -173,7 +173,7 @@ class Tile2NetCrosswalks(UrbanLayerBase):
         if longitude_column is not None and latitude_column is not None:
             mapped_data[output_column] = mapped_data["feature_id"]
             mapped_data = mapped_data.drop(
-                columns=["feature_id", "distance_to_sidewalk", "index_right"]
+                columns=["feature_id", "distance_to_crosswalk", "index_right"]
             )
         else:
             mapped_data = mapped_data.reset_index()

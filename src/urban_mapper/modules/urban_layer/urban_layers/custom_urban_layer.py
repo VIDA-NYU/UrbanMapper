@@ -222,6 +222,9 @@ class CustomUrbanLayer(UrbanLayerBase):
         else:
             layer_projected = self.layer
 
+        features_reset = layer_projected.reset_index()
+        unique_id = ["index_right"] if "index_right" in features_reset.columns else list(layer_projected.index.names)
+
         mapped_data = gpd.sjoin_nearest(
             dataframe,
             layer_projected[["geometry"]],
@@ -229,16 +232,14 @@ class CustomUrbanLayer(UrbanLayerBase):
             max_distance=threshold_distance,
             distance_col="distance_to_feature",
         )
-        mapped_data[output_column] = mapped_data.index_right
-
-        if mapped_data.index.duplicated().any():
-            mapped_data = mapped_data.reset_index(drop=True)
+        mapped_data[output_column] = mapped_data[unique_id].apply(lambda x: ','.join(x.dropna().astype(str)), axis=1)
 
         if _reset_layer_index:
             self.layer = self.layer.reset_index()
 
         return self.layer, mapped_data.drop(
-            columns=["distance_to_feature", "index_right"], errors="ignore"
+            columns=unique_id + ["distance_to_feature", "index_right"], 
+            errors="ignore"
         )
 
     @require_attributes_not_none(
