@@ -23,30 +23,52 @@
     options:
         heading: "LoaderBase"
         members:
-            - load_data_from_file 
-            - _load_data_from_file 
+            - load 
+            - _load
             - preview
+
+## ::: urban_mapper.modules.loader.FileLoaderBase
+    options:
+        heading: "FileLoaderBase"
+        members:
+            - load 
+            - _load
+            - preview            
 
 ## ::: urban_mapper.modules.loader.CSVLoader
     options:
         heading: "CSVLoader"
         members:
-            - _load_data_from_file 
+            - _load
             - preview
 
 ## ::: urban_mapper.modules.loader.ParquetLoader
     options:
         heading: "ParquetLoader"
         members:
-            - _load_data_from_file 
+            - _load
             - preview
 
 ## ::: urban_mapper.modules.loader.ShapefileLoader
     options:
         heading: "ShapefileLoader"
         members:
-            - _load_data_from_file 
+            - _load
             - preview
+
+## ::: urban_mapper.modules.loader.DataFrameLoader
+    options:
+        heading: "DataFrameLoader"
+        members:
+            - _load
+            - preview     
+
+## ::: urban_mapper.modules.loader.HuggingFaceLoader
+    options:
+        heading: "HuggingFaceLoader"
+        members:
+            - _load
+            - preview                     
 
 ## ::: urban_mapper.modules.loader.LoaderFactory
     options:

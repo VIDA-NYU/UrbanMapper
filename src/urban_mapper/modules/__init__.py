@@ -1,4 +1,12 @@
-from .loader import LoaderBase, CSVLoader, ShapefileLoader, ParquetLoader
+from .loader import (
+    LoaderBase,
+    FileLoaderBase,
+    CSVLoader,
+    ShapefileLoader,
+    ParquetLoader,
+    DataFrameLoader,
+    HuggingFaceLoader,
+)
 from .imputer import (
     GeoImputerBase,
     SimpleGeoImputer,
@@ -39,9 +47,12 @@ from .pipeline_generator import (
 
 __all__ = [
     "LoaderBase",
+    "FileLoaderBase",
     "CSVLoader",
     "ShapefileLoader",
     "ParquetLoader",
+    "DataFrameLoader",
+    "HuggingFaceLoader",
     "GeoImputerBase",
     "SimpleGeoImputer",
     "AddressGeoImputer",

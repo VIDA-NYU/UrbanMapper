@@ -1,11 +1,9 @@
 from abc import ABC, abstractmethod
-from pathlib import Path
 from typing import Union, Optional, Any, Dict, Tuple
 import geopandas as gpd
 from beartype import beartype
 from urban_mapper.modules.loader.helpers import ensure_coordinate_reference_system
 from urban_mapper.config import DEFAULT_CRS
-from urban_mapper.utils import file_exists
 
 
 @beartype
@@ -18,7 +16,6 @@ class LoaderBase(ABC):
     transformations and validation of required spatial columns.
 
     Attributes:
-        file_path (Path): Path to the file to load.
         latitude_column (str): Name of the column containing latitude values.
         longitude_column (str): Name of the column containing longitude values.
         coordinate_reference_system (Union[str, Tuple[str, str]]):
@@ -29,14 +26,12 @@ class LoaderBase(ABC):
 
     def __init__(
         self,
-        file_path: Union[str, Path],
         latitude_column: Optional[str] = None,
         longitude_column: Optional[str] = None,
         geometry_column: Optional[str] = None,
         coordinate_reference_system: Union[str, Tuple[str, str]] = DEFAULT_CRS,
         **additional_loader_parameters: Any,
     ) -> None:
-        self.file_path: Path = Path(file_path)
         self.latitude_column: str = latitude_column or ""
         self.longitude_column: str = longitude_column or ""
         self.geometry_column: str = geometry_column or ""
@@ -46,10 +41,10 @@ class LoaderBase(ABC):
         self.additional_loader_parameters: Dict[str, Any] = additional_loader_parameters
 
     @abstractmethod
-    def _load_data_from_file(self) -> gpd.GeoDataFrame:
+    def _load(self) -> gpd.GeoDataFrame:
         """Internal implementation method for loading data from a file.
 
-        This method is called by `load_data_from_file()` after validation is performed.
+        This method is called by `load()` after validation is performed.
 
         !!! warning "Method Not Implemented"
             This method must be implemented by subclasses. It should contain the logic
@@ -64,13 +59,12 @@ class LoaderBase(ABC):
         """
         ...
 
-    @file_exists("file_path")
     @ensure_coordinate_reference_system
-    def load_data_from_file(self) -> gpd.GeoDataFrame:
-        """Load spatial data from a file.
+    def load(self) -> gpd.GeoDataFrame:
+        """Load spatial data from a source.
 
         This is the main public method for using `loaders`. It performs validation
-        on the inputs before delegating to the implementation-specific `_load_data_from_file` method.
+        on the inputs before delegating to the implementation-specific `_load` method.
         It also ensures the file exists and that the coordinate reference system is properly set.
 
         Returns:
@@ -81,26 +75,23 @@ class LoaderBase(ABC):
             ValueError: If required columns are missing or the file format is invalid.
 
         Examples:
-            >>> from urban_mapper.modules.loader import CSVLoader
-            >>> loader = CSVLoader("taxi_data.csv", latitude_column="pickup_lat", longitude_column="pickup_lng")
-            >>> gdf = loader.load_data_from_file()
         """
-        loaded_file = self._load_data_from_file()
+        loaded_data = self._load()
 
         if self.additional_loader_parameters.get("map_columns") is not None:
             map_columns = self.additional_loader_parameters.get("map_columns")
 
             if (
-                loaded_file.active_geometry_name is not None
-                and loaded_file.active_geometry_name in map_columns.keys()
+                loaded_data.active_geometry_name is not None
+                and loaded_data.active_geometry_name in map_columns.keys()
             ):
-                source = loaded_file.active_geometry_name
-                loaded_file = loaded_file.rename_geometry(map_columns[source])
+                source = loaded_data.active_geometry_name
+                loaded_data = loaded_data.rename_geometry(map_columns[source])
                 del map_columns[source]
 
-            loaded_file = loaded_file.rename(columns=map_columns)
+            loaded_data = loaded_data.rename(columns=map_columns)
 
-        return loaded_file
+        return loaded_data
 
     @abstractmethod
     def preview(self, format: str = "ascii") -> Any:

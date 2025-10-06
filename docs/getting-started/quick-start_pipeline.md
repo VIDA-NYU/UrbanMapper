@@ -131,7 +131,7 @@ visualiser = (
     mapper
     .visual
     .with_type("Interactive")
-    .with_style({"tiles": "CartoDB dark_matter", "colorbar_text_color": "white"})
+    .with_style({"tiles": "CartoDB Positron", "colorbar_text_color": "gray"})
     .build()
 )
 

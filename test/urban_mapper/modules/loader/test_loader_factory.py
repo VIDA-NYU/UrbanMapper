@@ -11,6 +11,7 @@ class TestLoaderFactory:
     parquet_path = "test/data_files/small_VZV_Speed_Humps_with_LatLon.parquet"
     shape_path = "test/data_files/small_PLUTO/MapPLUTO_UNCLIPPED.shp"
     hugginface_path = "oscur/NYC_speed_humps"
+    number_of_rows = 1000
 
     def test_from_csv_file(self):
         """
@@ -161,7 +162,6 @@ class TestLoaderFactory:
         )
         assert loader.build() is not None
 
-    # TODO: Why can user only call .build for files?
     def test_from_dataframe(self):
         dataframe = pd.read_csv(self.csv_path)
 
@@ -214,23 +214,22 @@ class TestLoaderFactory:
         """
         Build method
     """
-        # loader = self.loader.from_dataframe(dataframe).with_columns(geometry_column="the_geom").with_crs(("EPSG:4326", "EPSG:2263")).with_map({"Shape_STLe": "shape"})
-        # assert loader.build() is not None
+        loader = self.loader.from_dataframe(dataframe).with_columns(geometry_column="the_geom").with_crs(("EPSG:4326", "EPSG:2263")).with_map({"Shape_STLe": "shape"})
+        assert loader.build() is not None
 
-    # TODO: Why can user only call .build for files?
     def test_from_huggingface(self):
         """
         Lat/Long columns
         """
-        data = self.loader.from_huggingface(self.hugginface_path).with_columns(
-            longitude_column="longitude", latitude_column="latitude"
+        data = self.loader.from_huggingface(self.hugginface_path, number_of_rows=self.number_of_rows).with_columns(
+            longitude_column="longitude", latitude_column="latitude", 
         )
         assert isinstance(data.load(), gpd.GeoDataFrame)
 
         """
         Geometry columns
     """
-        data = self.loader.from_huggingface(self.hugginface_path).with_columns(
+        data = self.loader.from_huggingface(self.hugginface_path, number_of_rows=self.number_of_rows).with_columns(
             geometry_column="the_geom"
         )
         assert isinstance(data.load(), gpd.GeoDataFrame)
@@ -239,7 +238,7 @@ class TestLoaderFactory:
         Source coordinate references
     """
         data = (
-            self.loader.from_huggingface(self.hugginface_path)
+            self.loader.from_huggingface(self.hugginface_path, number_of_rows=self.number_of_rows)
             .with_columns(geometry_column="the_geom")
             .with_crs("EPSG:4326")
         )
@@ -249,7 +248,7 @@ class TestLoaderFactory:
         Source-target coordinate references
     """
         data = (
-            self.loader.from_huggingface(self.hugginface_path)
+            self.loader.from_huggingface(self.hugginface_path, number_of_rows=self.number_of_rows)
             .with_columns(geometry_column="the_geom")
             .with_crs(("EPSG:4326", "EPSG:2263"))
         )
@@ -259,7 +258,7 @@ class TestLoaderFactory:
         Map column names
     """
         data = (
-            self.loader.from_huggingface(self.hugginface_path)
+            self.loader.from_huggingface(self.hugginface_path, number_of_rows=self.number_of_rows)
             .with_columns(geometry_column="the_geom")
             .with_map({"Shape_STLe": "shape"})
         )
@@ -268,8 +267,8 @@ class TestLoaderFactory:
         """
         Build method
     """
-        # loader = self.loader.from_huggingface(self.hugginface_path).with_columns(geometry_column="the_geom").with_crs(("EPSG:4326", "EPSG:2263")).with_map({"Shape_STLe": "shape"})
-        # assert loader.build() is not None
+        loader = self.loader.from_huggingface(self.hugginface_path, number_of_rows=self.number_of_rows).with_columns(geometry_column="the_geom").with_crs(("EPSG:4326", "EPSG:2263")).with_map({"Shape_STLe": "shape"})
+        assert loader.build() is not None
 
     def test_preview(self):
         loader = self.loader.from_file(self.csv_path).with_columns(

@@ -177,20 +177,21 @@ Pre-commit hooks enforce standards by running checks (like `ruff`) before commit
     Loaders pull data (e.g., CSV, Shapefiles) into a `GeoDataFrame`{ title="A GeoDataFrame is a pandas DataFrame with geospatial capabilities." }.
 
     1. **Subclass `LoaderBase`** (`urban_mapper/modules/loader/abc_loader.py`):
-        - Implement `load_data_from_file`. Refer to the `base` class for details.
+        - Implement `_load`. Refer to the `base` class for details.
+        Note: If it works from a file, consider being subclass of `FileLoaderBase`** (`urban_mapper/modules/loader/file_loader.py`):
     2. **Register It**:
-        - Add to `FILE_LOADER_FACTORY` in `urban_mapper/modules/loader/loader_factory.py`.
+        - Add to `LOADER_FACTORY` in `urban_mapper/modules/loader/loader_factory.py`.
 
     **Example** (`csv_loader.py`):
     ```python
-    from urban_mapper.modules.loader.abc_loader import LoaderBase
+    from urban_mapper.modules.loader.file_loader import FileLoaderBase
     import geopandas as gpd
     import pandas as pd
     from beartype import beartype
 
     @beartype
-    class CSVLoader(LoaderBase):
-        def load_data_from_file(self) -> gpd.GeoDataFrame:
+    class CSVLoader(FileLoaderBase):
+        def _load(self) -> gpd.GeoDataFrame:
             df = pd.read_csv(self.file_path)  #(1)
             # Convert to GeoDataFrame...
             return gdf

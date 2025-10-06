@@ -5,12 +5,13 @@ from beartype import beartype
 from pathlib import Path
 from typing import Union, Optional, Any, Tuple
 
-from urban_mapper.modules.loader.abc_loader import LoaderBase
+from urban_mapper.modules.loader.loaders.file_loader import FileLoaderBase
 from urban_mapper.config import DEFAULT_CRS
 from urban_mapper.utils.helpers import require_either_or_attributes
 
+
 @beartype
-class CSVLoader(LoaderBase):
+class CSVLoader(FileLoaderBase):
     """Loader for `CSV` files containing spatial data.
 
     This loader reads data from `CSV` (or other delimiter-separated) files and
@@ -37,14 +38,14 @@ class CSVLoader(LoaderBase):
         ...     latitude_column="pickup_lat",
         ...     longitude_column="pickup_lng"
         ... )
-        >>> gdf = loader.load_data_from_file()
+        >>> gdf = loader.load()
         >>>
         >>> # Basic usage with geometry
         >>> loader = CSVLoader(
         ...     file_path="taxi_trips.csv",
         ...     geometry_column="the_geom"
         ... )
-        >>> gdf = loader.load_data_from_file()
+        >>> gdf = loader.load()
         >>>
         >>> # With custom separator and encoding
         >>> loader = CSVLoader(
@@ -53,7 +54,7 @@ class CSVLoader(LoaderBase):
         ...     separator=";",
         ...     encoding="latin-1"
         ... )
-        >>> gdf = loader.load_data_from_file()
+        >>> gdf = loader.load()
         >>>
         >>> # With CRS
         >>> loader = CSVLoader(
@@ -62,7 +63,7 @@ class CSVLoader(LoaderBase):
         ...     longitude_column="lng",
         ...     coordinate_reference_system="EPSG:4326"
         ... )
-        >>> gdf = loader.load_data_from_file()
+        >>> gdf = loader.load()
         >>>
         >>> # With source-target CRS
         >>> loader = CSVLoader(
@@ -71,7 +72,7 @@ class CSVLoader(LoaderBase):
         ...     longitude_column="lng",
         ...     coordinate_reference_system=("EPSG:4326", "EPSG:3857")
         ... )
-        >>> gdf = loader.load_data_from_file()
+        >>> gdf = loader.load()
     """
 
     def __init__(
@@ -100,7 +101,7 @@ class CSVLoader(LoaderBase):
         [["latitude_column", "longitude_column"], ["geometry_column"]],
         error_msg="Either both 'latitude_column' and 'longitude_column' must be set, or 'geometry_column' must be set.",
     )
-    def _load_data_from_file(self) -> gpd.GeoDataFrame:
+    def _load(self) -> gpd.GeoDataFrame:
         """Load data from a CSV file and convert it to a `GeoDataFrame`.
 
         This method reads a `CSV` file using pandas, validates the latitude and

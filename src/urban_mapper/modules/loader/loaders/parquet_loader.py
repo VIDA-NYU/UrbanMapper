@@ -5,13 +5,13 @@ from beartype import beartype
 from pathlib import Path
 from typing import Union, Optional, Any, Tuple
 
-from urban_mapper.modules.loader.abc_loader import LoaderBase
+from urban_mapper.modules.loader.loaders.file_loader import FileLoaderBase
 from urban_mapper.config import DEFAULT_CRS
 from urban_mapper.utils import require_attributes, require_either_or_attributes
 
 
 @beartype
-class ParquetLoader(LoaderBase):
+class ParquetLoader(FileLoaderBase):
     """Loader for `Parquet` files containing spatial data.
 
     This loader reads data from `Parquet` files and converts them to `GeoDataFrames`
@@ -37,7 +37,7 @@ class ParquetLoader(LoaderBase):
         ...     latitude_column="lat",
         ...     longitude_column="lon"
         ... )
-        >>> gdf = loader.load_data_from_file()
+        >>> gdf = loader.load()
         >>>
         >>> # With custom columns and engine
         >>> loader = ParquetLoader(
@@ -47,7 +47,7 @@ class ParquetLoader(LoaderBase):
         ...     engine="fastparquet",
         ...     columns=["latitude", "longitude", "value"]
         ... )
-        >>> gdf = loader.load_data_from_file()
+        >>> gdf = loader.load()
         >>>
         >>> # With CRS
         >>> loader = ParquetLoader(
@@ -56,7 +56,7 @@ class ParquetLoader(LoaderBase):
         ...     longitude_column="longitude",
         ...     coordinate_reference_system="EPSG:4326"
         ... )
-        >>> gdf = loader.load_data_from_file()
+        >>> gdf = loader.load()
         >>>
         >>> # With source-target CRS
         >>> loader = ParquetLoader(
@@ -65,7 +65,7 @@ class ParquetLoader(LoaderBase):
         ...     longitude_column="longitude",
         ...     coordinate_reference_system=("EPSG:4326", "EPSG:3857")
         ... )
-        >>> gdf = loader.load_data_from_file()
+        >>> gdf = loader.load()
     """
 
     def __init__(
@@ -94,7 +94,7 @@ class ParquetLoader(LoaderBase):
         [["latitude_column", "longitude_column"], ["geometry_column"]],
         error_msg="Either both 'latitude_column' and 'longitude_column' must be set, or 'geometry_column' must be set.",
     )
-    def _load_data_from_file(self) -> gpd.GeoDataFrame:
+    def _load(self) -> gpd.GeoDataFrame:
         """Load data from a `Parquet` file and convert it to a `GeoDataFrame`.
 
         This method reads a `Parquet` file using `pandas`, validates the latitude and
