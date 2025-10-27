@@ -61,6 +61,6 @@ class CountAggregator(BaseAggregator):
             ValueError: If required column is missing.
         """
         grouped = input_dataframe.groupby(self.group_by_column)
-        values = grouped.apply(self.count_function)
+        values = grouped.apply(self.count_function).astype(float)
         indices = grouped.apply(lambda g: list(g.index))
         return pd.DataFrame({"value": values, "indices": indices})
