@@ -1,0 +1,88 @@
+name: "💡 Feature Request"
+description: Suggest a new feature or enhancement for UrbanMapper.
+title: "💡 [FEAT] - <short summary>"
+labels:
+  - "feature"
+assignees:
+  - soniacq
+  - fabiofelix
+  - simonprovost
+body:
+  - type: markdown
+    attributes:
+      value: |
+        <p align="center">
+          <div align="center">
+            <picture>
+              <img alt="OSCUR LOGO" src="https://github.com/VIDA-NYU/UrbanMapper/raw/main/docs/public/resources/oscur_logo_gray.png" width="200px">
+            </picture>
+            <br />
+            <em>UrbanMapper</em> • <a href="https://urbanmapper.readthedocs.io/en/latest/">Docs</a> • <a href="https://github.com/VIDA-NYU/UrbanMapper">Repo</a>
+          </div>
+        </p>
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: "Before Submitting"
+      description: Please confirm the following.
+      options:
+        - label: I checked if this feature already exists or has been requested.
+          required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Problem / Motivation"
+      description: What problem are you trying to solve? Why is it important?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: "Proposed Solution"
+      description: Describe how the feature should work. Include API, CLI, or UX details if relevant.
+      placeholder: "Explain inputs/outputs, configuration, examples…"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: "Area / Component"
+      description: Which part of UrbanMapper does this touch?
+      options:
+        - "Loader"
+        - "Imputer"
+        - "Filter"
+        - "Enricher"
+        - "UrbanLayer"
+        - "Pipeline"
+        - "Pipeline Generator"
+        - "Visualiser"
+        - "JupyterGIS"
+        - "Auctus Search"
+        - "Docs & Examples"
+        - "Other"
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: "Examples / References"
+      description: Links, screenshots, or pseudo-code that illustrate the idea.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: "Willing to Contribute?"
+      options:
+        - "Yes"
+        - "No"
+
+  - type: markdown
+    attributes:
+      value: |
+        **Security Note:** Please do not share sensitive information in this request.
