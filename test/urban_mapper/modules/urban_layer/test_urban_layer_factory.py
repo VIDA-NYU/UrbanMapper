@@ -129,8 +129,8 @@ class TestUrbanLayerFactory:
                 )
             elif "region" in available_type:
                 factory = self.layer.with_type(available_type).from_address(
-                    "760 United Nations Plaza, Manhattan, New York, United States",
-                    dist=100.0,
+                    "Times Square, Manhattan, New York, USA",
+                    dist=2000.0,
                 )
             else:
                 factory = self.layer.with_type(available_type).from_address(

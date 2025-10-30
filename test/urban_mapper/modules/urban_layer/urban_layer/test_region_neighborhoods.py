@@ -46,8 +46,8 @@ class TestRegionNeighborhoods:
     def test_from_address(self):
         assert (
             self.layer.from_address(
-                "760 United Nations Plaza, Manhattan, New York, United States",
-                dist=100.0,
+                "Times Square, Manhattan, New York, USA",
+                dist=2000.0,
             )
             is None
         )
