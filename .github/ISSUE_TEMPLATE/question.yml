@@ -1,0 +1,72 @@
+name: "❓ Ask a Question"
+description: Ask a question about UrbanMapper.
+title: "❓ [QUESTION] - <short summary>"
+labels:
+  - "question"
+assignees:
+  - soniacq
+  - fabiofelix
+  - simonprovost
+body:
+  - type: markdown
+    attributes:
+      value: |
+        <p align="center">
+          <div align="center">
+            <picture>
+              <img alt="OSCUR LOGO" src="https://github.com/VIDA-NYU/UrbanMapper/raw/main/docs/public/resources/oscur_logo_gray.png" width="200px">
+            </picture>
+            <br />
+            <em>UrbanMapper</em> • <a href="https://urbanmapper.readthedocs.io/en/latest/">Docs</a> • <a href="https://github.com/VIDA-NYU/UrbanMapper">Repo</a>
+          </div>
+        </p>
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: "Before Submitting"
+      description: Please confirm the following.
+      options:
+        - label: I have checked the documentation and searched existing issues.
+          required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: "Your Question"
+      description: Ask your question clearly and concisely.
+      placeholder: "What would you like to know?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: "Context / Details"
+      description: Add any extra details that will help us answer (code snippets, error messages, links).
+      render: bash
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: "Area (optional)"
+      options:
+        - "Loader"
+        - "Imputer"
+        - "Filter"
+        - "Enricher"
+        - "UrbanLayer"
+        - "Pipeline"
+        - "Pipeline Generator"
+        - "Visualiser"
+        - "JupyterGIS"
+        - "Auctus Search"
+        - "Docs & Examples"
+        - "Other"
+
+  - type: markdown
+    attributes:
+      value: |
+        **Security Note:** Please do not share sensitive information in this question.

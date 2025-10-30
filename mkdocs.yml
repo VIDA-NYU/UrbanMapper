@@ -223,6 +223,6 @@ nav:
     - Auctus Mixins: api/auctus.md
     - Interactive Table VIS: api/interactive_table_vis.md
     - JupyterGIS Mixins: api/jupyter_gis.md
-  - Contributing: ./CONTRIBUTING.md
+  - Contributing: ./CONTRIBUTING_DEV.md
   - Releases: https://github.com/VIDA-NYU/UrbanMapper/releases
   - "Branding & UX": ./BRANDING.md
