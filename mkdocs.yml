@@ -62,6 +62,7 @@ markdown_extensions:
   - pymdownx.details
   - attr_list
   - abbr
+  - md_in_html
   - pymdownx.tilde
   - pymdownx.highlight:
       anchor_linenums: true
@@ -212,17 +213,20 @@ nav:
               - Two Pipeline: copy_of_examples/4-External-Libraries-Usages/3-jupyter_gis_multi_pipeline/2-two_pipeline.ipynb
               - Three Pipeline: copy_of_examples/4-External-Libraries-Usages/3-jupyter_gis_multi_pipeline/3-three_pipeline.ipynb
   - API Reference:
-    - Loaders: api/loaders.md
-    - Urban Layers: api/urban_layers.md
-    - Imputers: api/imputers.md
-    - Filters: api/filters.md
-    - Enrichers: api/enrichers.md
-    - Visualisers: api/visualisers.md
-    - Pipelines: api/pipelines.md
-    - Pipeline Generators: api/pipeline_generators.md
-    - Auctus Mixins: api/auctus.md
-    - Interactive Table VIS: api/interactive_table_vis.md
-    - JupyterGIS Mixins: api/jupyter_gis.md
+    - "API Reference": api/index.md
+    - Core Modules:
+        - Loaders: api/loaders.md
+        - Urban Layers: api/urban_layers.md
+        - Imputers: api/imputers.md
+        - Filters: api/filters.md
+        - Enrichers: api/enrichers.md
+        - Visualisers: api/visualisers.md
+        - Pipelines: api/pipelines.md
+    - Optional Modules:
+        - Pipeline Generators: api/pipeline_generators.md
+        - Auctus Mixins: api/auctus.md
+        - Interactive Table VIS: api/interactive_table_vis.md
+        - JupyterGIS Mixins: api/jupyter_gis.md
   - Contributing: ./CONTRIBUTING_DEV.md
   - Releases: https://github.com/VIDA-NYU/UrbanMapper/releases
   - "Branding & UX": ./BRANDING.md
