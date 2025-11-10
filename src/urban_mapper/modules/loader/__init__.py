@@ -5,7 +5,7 @@ from .loaders import (
     ShapefileLoader,
     ParquetLoader,
     DataFrameLoader,
-    HuggingFaceLoader,    
+    HuggingFaceLoader,
 )
 from .loader_factory import LoaderFactory
 

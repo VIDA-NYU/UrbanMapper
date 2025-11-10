@@ -63,7 +63,7 @@ class SimpleGeoImputer(GeoImputerBase):
         """
         if format == "ascii":
             lines = [
-                f"Imputer: SimpleGeoImputer",
+                "Imputer: SimpleGeoImputer",
                 f"  Action: Drop rows with missing '{self.latitude_column}' or '{self.longitude_column}'",
             ]
             if self.data_id:

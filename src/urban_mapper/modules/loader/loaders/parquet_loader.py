@@ -7,7 +7,7 @@ from typing import Union, Optional, Any, Tuple
 
 from urban_mapper.modules.loader.loaders.file_loader import FileLoaderBase
 from urban_mapper.config import DEFAULT_CRS
-from urban_mapper.utils import require_attributes, require_either_or_attributes
+from urban_mapper.utils import require_either_or_attributes
 
 
 @beartype

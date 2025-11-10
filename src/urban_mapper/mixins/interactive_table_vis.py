@@ -1,9 +1,33 @@
-from typing import Union, Optional, Dict, List
+from __future__ import annotations
+
+from typing import Dict, List, Optional, Union
+
 import geopandas as gpd
 import pandas as pd
-from IPython.display import display, HTML
-from skrub import TableReport
 from beartype import beartype
+
+from urban_mapper.config import (
+    optional_dependency_required,
+    raise_missing_optional_dependency,
+)
+
+try:  # pragma: no cover
+    from IPython.display import HTML, display
+    from skrub import TableReport
+except ImportError as error:  # pragma: no cover
+    _TABLE_VIS_AVAILABLE = False
+    _TABLE_VIS_IMPORT_ERROR = error
+    HTML = None  # type: ignore[assignment]
+    TableReport = None  # type: ignore[assignment]
+
+    def display(*_args, **_kwargs):  # type: ignore[override]
+        raise_missing_optional_dependency(
+            "interactive_table_vis", _TABLE_VIS_IMPORT_ERROR
+        )
+
+else:  # pragma: no cover
+    _TABLE_VIS_AVAILABLE = True
+    _TABLE_VIS_IMPORT_ERROR = None
 
 
 @beartype
@@ -36,6 +60,19 @@ class TableVisMixin:
         ... )
     """
 
+    @optional_dependency_required(
+        "interactive_table_vis",
+        lambda: _TABLE_VIS_AVAILABLE,
+        lambda: _TABLE_VIS_IMPORT_ERROR,
+    )
+    def __init__(self) -> None:
+        pass
+
+    @optional_dependency_required(
+        "interactive_table_vis",
+        lambda: _TABLE_VIS_AVAILABLE,
+        lambda: _TABLE_VIS_IMPORT_ERROR,
+    )
     def interactive_display(
         self,
         dataframe: Union[pd.DataFrame, gpd.GeoDataFrame],

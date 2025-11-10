@@ -38,7 +38,7 @@ class EnricherConfig:
         self.debug: bool = False
         self.data_id: Optional[str] = None
 
-    def _reset(self): 
+    def _reset(self):
         self.group_by = None
         self.values_from = None
         self.action = None
@@ -46,7 +46,7 @@ class EnricherConfig:
         self.enricher_type = "SingleAggregatorEnricher"
         self.enricher_config = {}
         self.debug = False
-        self.data_id = None               
+        self.data_id = None
 
     def with_data(
         self,

@@ -9,9 +9,9 @@ import dill
 import geopandas as gpd
 import pandas as pd
 from beartype import beartype
-from jupytergis import GISDocument
 from sklearn.utils._bunch import Bunch
 from urban_mapper import logger
+from urban_mapper.config import optional_dependency_required
 from urban_mapper.modules.enricher import EnricherBase
 from urban_mapper.modules.filter import GeoFilterBase
 from urban_mapper.modules.imputer import GeoImputerBase
@@ -21,6 +21,23 @@ from urban_mapper.modules.visualiser import VisualiserBase
 from urban_mapper.pipeline.executor import PipelineExecutor
 from urban_mapper.pipeline.validator import PipelineValidator
 from urban_mapper.utils import require_attributes_not_none
+
+
+try:  # pragma: no cover
+    from jupytergis import GISDocument
+except ImportError as error:  # pragma: no cover
+    GISDocument = None  # type: ignore[assignment]
+    _JUPYTERGIS_IMPORT_ERROR = error
+else:  # pragma: no cover
+    _JUPYTERGIS_IMPORT_ERROR = None
+
+
+def _jupytergis_available() -> bool:
+    return GISDocument is not None
+
+
+def _jupytergis_import_error() -> Optional[Exception]:
+    return _JUPYTERGIS_IMPORT_ERROR
 
 
 @beartype
@@ -413,6 +430,11 @@ class UrbanPipeline:
             raise ValueError(f"Unsupported format '{format}'.")
 
     @require_attributes_not_none("steps")
+    @optional_dependency_required(
+        "jupytergis_mixins",
+        _jupytergis_available,
+        _jupytergis_import_error,
+    )
     def to_jgis(
         self,
         filepath: str,
@@ -468,11 +490,6 @@ class UrbanPipeline:
                     "opacity": 0.9,
                 }
             ]
-        if GISDocument is None:
-            raise ImportError(
-                "jupytergis is required for this functionality. "
-                "Install it with `uv add jupytergis`."
-            )
         if not self.executor._composed:
             raise ValueError("Pipeline not composed. Call compose() first.")
 
@@ -501,6 +518,7 @@ class UrbanPipeline:
         bbox = enriched_layer.total_bounds
         extent = [bbox[0], bbox[1], bbox[2], bbox[3]]
 
+        assert GISDocument is not None
         doc = GISDocument(
             path=None,
             projection=projection,

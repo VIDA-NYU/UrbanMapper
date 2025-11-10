@@ -2,7 +2,6 @@ from typing import Any, Optional
 
 import geopandas as gpd
 import osmnx
-import pandas as pd
 from shapely.geometry import Point
 from beartype import beartype
 from urban_mapper.modules.urban_layer.abc_urban_layer import UrbanLayerBase
@@ -134,7 +133,7 @@ class AddressGeoImputer(GeoImputerBase):
         """
         if format == "ascii":
             lines = [
-                f"Imputer: AddressGeoImputer",
+                "Imputer: AddressGeoImputer",
                 f"  Action: Impute '{self.latitude_column}' and '{self.longitude_column}' "
                 f"using addresses from '{self.address_column}'",
             ]
@@ -147,7 +146,7 @@ class AddressGeoImputer(GeoImputerBase):
                 "imputer": "AddressGeoImputer",
                 "action": f"Impute '{self.latitude_column}' and '{self.longitude_column}' "
                 f"using addresses from '{self.address_column}'",
-                f"data_id": self.data_id,
+                "data_id": self.data_id,
             }
         else:
             raise ValueError(f"Unsupported format '{format}'")

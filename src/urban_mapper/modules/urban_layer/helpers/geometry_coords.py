@@ -24,13 +24,21 @@ def extract_point_coord(geoseries: gpd.GeoSeries) -> pd.DataFrame:
 
     for idx, geometry in geoseries.items():
         if isinstance(geometry, (Polygon, LineString)):
-            coordinates = geometry.exterior.coords if isinstance(geometry, Polygon) else geometry.coords
+            coordinates = (
+                geometry.exterior.coords
+                if isinstance(geometry, Polygon)
+                else geometry.coords
+            )
             coordinates = [list(point) for point in coordinates]
         elif isinstance(geometry, (MultiPolygon, MultiLineString)):
             coordinates = [
                 list(point)
                 for sub_geometry in geometry.geoms
-                for point in (sub_geometry.exterior.coords if isinstance(sub_geometry, Polygon) else sub_geometry.coords)
+                for point in (
+                    sub_geometry.exterior.coords
+                    if isinstance(sub_geometry, Polygon)
+                    else sub_geometry.coords
+                )
             ]
         elif isinstance(geometry, MultiPoint):
             coordinates = [[sub_point.x, sub_point.y] for sub_point in geometry.geoms]
