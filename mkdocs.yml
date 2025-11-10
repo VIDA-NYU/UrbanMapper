@@ -105,39 +105,36 @@ plugins:
         - copy_of_examples/*
       show_author: true
   - mkdocs-jupyter:
-      include_source: True
+      include_source: true
       execute: true
       execute_ignore:
-          - "copy_of_examples/1-Per-Module/1-loader.ipynb"
-          - "copy_of_examples/1-Per-Module/8-pipeline_generator.ipynb"
-          - "copy_of_examples/3-Case-Studies/3-Europe-Restaurants/1-EU_Restaurants_Pipeline.ipynb"
-          - "copy_of_examples/3-Case-Studies/4-Paris-Remarkable Trees/1-Paris_Remarquable_Trees_Pipeline.ipynb"
-          - "copy_of_examples/3-Case-Studies/4-Paris-Remarkable Trees/2-Paris_Remarquable_Trees_Advanced_Pipeline.ipynb"
-          - "copy_of_examples/3-Case-Studies/5-Overture-instead-of-OSM/1-overture_pipeline.ipynb"
-          - "copy_of_examples/3-Case-Studies/5-Overture-instead-of-OSM/2-overture_pipeline_advanced.ipynb"
-          - "copy_of_examples/4-External-Libraries-Usages/1-auctus_search.ipynb"
-          - "copy_of_examples/4-External-Libraries-Usages/3-jupyter_gis_multi_pipeline/1-one_pipeline.ipynb"
-          - "copy_of_examples/4-External-Libraries-Usages/3-jupyter_gis_multi_pipeline/2-two_pipeline.ipynb"
-          - "copy_of_examples/4-External-Libraries-Usages/3-jupyter_gis_multi_pipeline/3-three_pipeline.ipynb"
-          - "copy_of_examples/3-Case-Studies/1-Downtown-BK-Collisions/3-Downtown_BK_Collisions_Advanced_Pipeline.ipynb"
-          - "copy_of_examples/3-Case-Studies/1-Downtown-BK-Collisions/4-Downtown_BK_Collisions_Advanced_Pipeline_Extras.ipynb"
-          - "copy_of_examples/3-Case-Studies/2-Downtown-BK-Taxi-Trips/3-Downtown_BK_Taxi_Trips_Advanced_Pipeline.ipynb"
-          - "copy_of_examples/3-Case-Studies/2-Downtown-BK-Taxi-Trips/4-Downtown_BK_Taxi_Trips_Advanced_Pipeline_Extras.ipynb"
+        - "copy_of_examples/1-Per-Module/1-loader.ipynb"
+        - "copy_of_examples/1-Per-Module/8-pipeline_generator.ipynb"
+        - "copy_of_examples/3-Case-Studies/3-Europe-Restaurants/1-EU_Restaurants_Pipeline.ipynb"
+        - "copy_of_examples/3-Case-Studies/4-Paris-Remarkable Trees/1-Paris_Remarquable_Trees_Pipeline.ipynb"
+        - "copy_of_examples/3-Case-Studies/4-Paris-Remarkable Trees/2-Paris_Remarquable_Trees_Advanced_Pipeline.ipynb"
+        - "copy_of_examples/3-Case-Studies/5-Overture-instead-of-OSM/1-overture_pipeline.ipynb"
+        - "copy_of_examples/3-Case-Studies/5-Overture-instead-of-OSM/2-overture_pipeline_advanced.ipynb"
+        - "copy_of_examples/4-External-Libraries-Usages/1-auctus_search.ipynb"
+        - "copy_of_examples/4-External-Libraries-Usages/3-jupyter_gis_multi_pipeline/1-one_pipeline.ipynb"
+        - "copy_of_examples/4-External-Libraries-Usages/3-jupyter_gis_multi_pipeline/2-two_pipeline.ipynb"
+        - "copy_of_examples/4-External-Libraries-Usages/3-jupyter_gis_multi_pipeline/3-three_pipeline.ipynb"
+        - "copy_of_examples/3-Case-Studies/1-Downtown-BK-Collisions/3-Downtown_BK_Collisions_Advanced_Pipeline.ipynb"
+        - "copy_of_examples/3-Case-Studies/1-Downtown-BK-Collisions/4-Downtown_BK_Collisions_Advanced_Pipeline_Extras.ipynb"
+        - "copy_of_examples/3-Case-Studies/2-Downtown-BK-Taxi-Trips/3-Downtown_BK_Taxi_Trips_Advanced_Pipeline.ipynb"
+        - "copy_of_examples/3-Case-Studies/2-Downtown-BK-Taxi-Trips/4-Downtown_BK_Taxi_Trips_Advanced_Pipeline_Extras.ipynb"
 
   - mkdocstrings:
       handlers:
         python:
-          selection:
+          options:
             docstring_style: google
-          rendering:
             show_source: true
             heading_level: 3
             show_root_heading: true
             show_category_heading: true
-          options:
-            show_source: true
-            show_root_heading: true
             show_root_full_path: false
+
   - autorefs
   - privacy
   - social
