@@ -1,5 +1,11 @@
 # Auctus Mixin
 
+!!! note "Optional module"
+    Install the `auctus_mixins` extra to enable these features:
+
+    - `pip install urban-mapper[auctus_mixins]`
+    - `uv add urban-mapper --group auctus_mixins`
+
 !!! tip "What is Auctus Mixin?"
     The `Auctus` mixin is responsible to deliver access to Auctus Dataset Search API services via the `UrbanMapper`
     workflow. It provides a set of methods to search for datasets, get dataset details, and download datasets.

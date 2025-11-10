@@ -1,5 +1,11 @@
 # Interactive Table VIS Mixin
 
+!!! note "Optional module"
+    Install the `interactive_table_vis` extra before using these helpers:
+
+    - `pip install urban-mapper[interactive_table_vis]`
+    - `uv add urban-mapper --group interactive_table_vis`
+
 !!! tip "What is Interactive Table VIS Mixin?"
     The `Interactive Table VIS` mixin is responsible to allow the user to vis. and interact with any dataset of interest
     within your Jupyter Notebook much better than Pandas Dataframe visualisation. Showing off statistics on top
