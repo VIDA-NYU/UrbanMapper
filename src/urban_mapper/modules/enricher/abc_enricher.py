@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Any, Union, Dict
-import geopandas as gpd, pandas as pd, numpy as np
+import geopandas as gpd
+import pandas as pd
+import numpy as np
 from beartype import beartype
 from urban_mapper.modules.urban_layer.abc_urban_layer import UrbanLayerBase
 from pandas.core.indexes.base import Index

@@ -9,7 +9,6 @@ import json
 from urban_mapper.modules.urban_layer.abc_urban_layer import UrbanLayerBase
 from urban_mapper.utils.helpers import require_attributes_not_none
 from .abc_filter import GeoFilterBase
-from ...utils.helpers.reset_attribute_before import reset_attributes_before
 from urban_mapper import logger
 from thefuzz import process
 

@@ -9,7 +9,6 @@ import json
 from urban_mapper.modules.urban_layer.abc_urban_layer import UrbanLayerBase
 from urban_mapper.utils import require_attributes_not_none, require_either_or_attributes
 from .abc_imputer import GeoImputerBase
-from ...utils.helpers.reset_attribute_before import reset_attributes_before
 from urban_mapper import logger
 from thefuzz import process
 
@@ -161,7 +160,9 @@ class ImputerFactory:
         return self
 
     @require_attributes_not_none("_imputer_type")
-    @require_either_or_attributes([["_latitude_column", "_longitude_column"], ["_geometry_column"]])
+    @require_either_or_attributes(
+        [["_latitude_column", "_longitude_column"], ["_geometry_column"]]
+    )
     def transform(
         self,
         input_geodataframe: Union[Dict[str, gpd.GeoDataFrame], gpd.GeoDataFrame],

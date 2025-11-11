@@ -2,3 +2,31 @@
   --md-primary-fg-color:        #0675c5;
   --md-primary-fg-color--dark: #0560a2;
 }
+
+@media (min-width: 1024px) {
+  .md-typeset .grid.cards.core > ul {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+  .md-typeset .grid.cards.core > ul > li {
+    min-width: 0 !important;
+  }
+
+  .md-typeset .grid.cards.core > ul > li:last-child:nth-child(3n + 1) {
+    grid-column: 2 !important;
+  }
+
+  .md-typeset .grid.cards.core > ul > li:nth-last-child(2):nth-child(3n + 1) {
+    grid-column: 2 !important;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023.98px) {
+  .md-typeset .grid.cards.core > ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .md-typeset .grid.cards.core > ul > li:last-child:nth-child(2n + 1) {
+    grid-column: 1 / -1 !important;
+    justify-self: center;
+  }
+}

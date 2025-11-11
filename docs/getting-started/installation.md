@@ -59,5 +59,51 @@ jupyter lab
 ```
 ---
 
+## ➡️ Optional extras (optional modules)
+
+Install optional capabilities on demand:
+
+#### Notebook tooling
+
+```bash
+pip install urban-mapper[notebook]
+uv add urban-mapper --group notebook
+```
+
+#### Interactive table visualisations
+
+```bash
+pip install urban-mapper[interactive_table_vis]
+uv add urban-mapper --group interactive_table_vis
+```
+
+#### Auctus mixins
+
+```bash
+pip install urban-mapper[auctus_mixins]
+uv add urban-mapper --group auctus_mixins
+```
+
+#### Pipeline generators
+
+```bash
+pip install urban-mapper[pipeline_generators]
+uv add urban-mapper --group pipeline_generators
+```
+
+#### JupyterGIS mixins
+
+```bash
+pip install urban-mapper[jupytergis_mixins]
+uv add urban-mapper --group jupytergis_mixins
+```
+
+#### Everything at once
+
+```bash
+pip install urban-mapper[full]
+uv add urban-mapper --group full
+```
+
 ## ➡️ From Source (Developer)
 Building `UrbanMapper` from source lets you make changes to the code base. To install from the source, refer to the [Project Setup Guide](../CONTRIBUTING.md/#project-setup-guide).

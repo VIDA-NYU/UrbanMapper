@@ -120,7 +120,7 @@ class DataFrameLoader(LoaderBase):
                 )
                 self.dataframe[self.longitude_column] = pd.to_numeric(
                     self.dataframe[self.longitude_column], errors="coerce"
-                )                
+                )
                 geometry = gpd.points_from_xy(
                     self.dataframe[self.longitude_column],
                     self.dataframe[self.latitude_column],

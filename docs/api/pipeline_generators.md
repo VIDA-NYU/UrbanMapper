@@ -1,5 +1,11 @@
 # Pipeline Generators
 
+!!! note "Optional module"
+    Install the `pipeline_generators` extra before generating pipelines via LLMs:
+
+    - `pip install urban-mapper[pipeline_generators]`
+    - `uv add urban-mapper --group pipeline_generators`
+
 !!! tip "What is the Pipeline Generator module?"
     The `Pipeline Generator` module is solving the following scenario, imagine telling `UrbanMapper` exactly what 
     urban analysis you want, and watching it craft a pipeline for you—no coding required. Powered by 
