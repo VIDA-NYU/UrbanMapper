@@ -76,6 +76,7 @@ class LoaderFactory:
         self.crs: Union[str, Tuple[str, str]] = DEFAULT_CRS
         self._instance: Optional[LoaderBase] = None
         self._preview: Optional[dict] = None
+        self._columns_configured: bool = False
 
     def _reset(self):
         self.source_type = None
@@ -91,6 +92,7 @@ class LoaderFactory:
         self.debug_limit_list_datasets = None
         self._instance = None
         self._preview = None
+        self._columns_configured = False
 
     def from_file(self, file_path: str) -> "LoaderFactory":
         """Configure the factory to load data from a file.
@@ -195,7 +197,7 @@ class LoaderFactory:
         geometry_column: Optional[str] = None,
     ) -> "LoaderFactory":
         """Specify either the latitude and longitude columns or a single geometry column in the data source.
-        
+
         This method configures which columns in the data source contain the latitude,
         longitude coordinates, or geometry data. Either both `latitude_column` and
         `longitude_column` must be set, or `geometry_column` must be set.
@@ -214,9 +216,21 @@ class LoaderFactory:
             >>> loader = mapper.loader.from_file("data/points.csv")\
             ...     .with_columns(geometry_column="geom")
         """
+        if self._columns_configured:
+            raise ValueError(
+                "with_columns has already been configured for this loader. "
+                "Each loader instance can only define one coordinate configuration "
+                "(for example choose either pickup or dropoff coordinates when working "
+                "with taxi trips). Create a new loader to configure another set of coordinates."
+            )
         self.latitude_column = latitude_column
         self.longitude_column = longitude_column
         self.geometry_column = geometry_column
+        if any(
+            value is not None
+            for value in (latitude_column, longitude_column, geometry_column)
+        ):
+            self._columns_configured = True
         logger.log(
             "DEBUG_LOW",
             f"WITH_COLUMNS: Initialised LoaderFactory "

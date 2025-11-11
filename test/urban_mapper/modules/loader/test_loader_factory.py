@@ -13,6 +13,14 @@ class TestLoaderFactory:
     hugginface_path = "oscur/NYC_speed_humps"
     number_of_rows = 1000
 
+    def test_with_columns_called_twice_raises_value_error(self):
+        loader_factory = self.loader.from_file(self.csv_path).with_columns(
+            longitude_column="longitude", latitude_column="latitude"
+        )
+
+        with pytest.raises(ValueError, match="with_columns has already been configured"):
+            loader_factory.with_columns(geometry_column="the_geom")
+
     def test_from_csv_file(self):
         """
         Lat/Long columns
