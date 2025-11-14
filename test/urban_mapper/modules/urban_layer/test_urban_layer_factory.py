@@ -1,8 +1,57 @@
-import urban_mapper as um
 import pytest
+import urban_mapper as um
 
 from urban_mapper.modules.urban_layer import URBAN_LAYER_FACTORY
 from shapely import Polygon
+from shapely.geometry import mapping
+from urban_mapper.modules.urban_layer.urban_layers import uber_h3
+
+
+@pytest.fixture(autouse=True)
+def _stub_uber_h3_geocoder(monkeypatch):
+    """Mocking Nomatim to avoid rate-call-limit"""
+
+    polygon = Polygon(
+        [
+            [-73.984804, 40.753579],
+            [-73.983932, 40.753211],
+            [-73.983061, 40.752846],
+            [-73.982273, 40.753923],
+            [-73.982487, 40.754018],
+            [-73.983343, 40.754377],
+            [-73.983997, 40.754655],
+            [-73.984085, 40.754635],
+            [-73.984804, 40.753579],
+        ]
+    )
+    south, west, north, east = (
+        polygon.bounds[1],
+        polygon.bounds[0],
+        polygon.bounds[3],
+        polygon.bounds[2],
+    )
+
+    class _DummyLocation:
+        def __init__(self, latitude, longitude, raw):
+            self.latitude = latitude
+            self.longitude = longitude
+            self.raw = raw
+
+    class _DummyGeocoder:
+        def geocode(self, *_, **kwargs):
+            raw: dict[str, object] = {
+                "boundingbox": [str(south), str(north), str(east), str(west)]
+            }
+            if kwargs.get("geometry") == "geojson":
+                raw["geojson"] = mapping(polygon)
+            return _DummyLocation(40.7536, -73.9835, raw)
+
+    monkeypatch.setattr(
+        uber_h3.UberH3Grid,
+        "_get_geolocator",
+        lambda self: _DummyGeocoder(),
+        raising=False,
+    )
 
 
 # @pytest.mark.skip()

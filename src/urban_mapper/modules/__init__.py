@@ -37,6 +37,7 @@ from .urban_layer import (
     RegionCountries,
     RegionStates,
     RegionNeighborhoods,
+    UberH3Grid,
 )
 
 from .pipeline_generator import (
@@ -80,4 +81,5 @@ __all__ = [
     "RegionCountries",
     "RegionStates",
     "RegionNeighborhoods",
+    "UberH3Grid",
 ]
