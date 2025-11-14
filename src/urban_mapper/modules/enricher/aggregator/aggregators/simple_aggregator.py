@@ -70,8 +70,37 @@ class SimpleAggregator(BaseAggregator):
 
         Raises:
             KeyError: If required columns are missing.
+            ValueError: If input is empty or group_by_column has only NaNs.
+            TypeError: If aggregation_function does not return a scalar.
         """
+        if input_dataframe.empty:
+            raise ValueError(
+                "SimpleAggregator received an empty DataFrame. "
+                "This usually means a previous filter step removed all rows."
+            )
+
+        if self.group_by_column not in input_dataframe.columns:
+            raise KeyError(
+                f"group_by_column '{self.group_by_column}' not found in DataFrame columns."
+            )
+
+        if self.value_column not in input_dataframe.columns:
+            raise KeyError(
+                f"value_column '{self.value_column}' not found in DataFrame columns."
+            )
+
+        group_col = input_dataframe[self.group_by_column]
+        if group_col.isna().all():
+            raise ValueError(
+                f"Cannot aggregate because group_by_column '{self.group_by_column}' "
+                "contains only NaN values."
+            )
+
         grouped = input_dataframe.groupby(self.group_by_column)
+
         aggregated = grouped[self.value_column].agg(self.aggregation_function)
         indices = grouped.apply(lambda g: list(g.index))
-        return pd.DataFrame({"value": aggregated, "indices": indices})
+
+        df = pd.DataFrame({"value": aggregated, "indices": indices})
+        df.index.name = None
+        return df
