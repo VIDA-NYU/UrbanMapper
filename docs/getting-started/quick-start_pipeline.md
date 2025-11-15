@@ -130,7 +130,7 @@ enricher = (
 visualiser = (
     mapper
     .visual
-    .with_type("Interactive")
+    .with_type("geopandas_interactive")
     .with_style({"tiles": "CartoDB Positron", "colorbar_text_color": "gray"})
     .build()
 )

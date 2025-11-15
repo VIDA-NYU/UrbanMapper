@@ -224,13 +224,13 @@ enriched_layer.get_layer().head()  # Preview the enriched layer's GeoDataFrame c
 
 **Output**: An interactive Folium map showing average floors per intersection with a dark theme.
 
-The `visual` module creates an interactive map with the `Interactive` type and a dark `CartoDB dark_matter` style,
+The `visual` module creates an interactive map with the `geopandas_interactive` type and a dark `CartoDB dark_matter` style,
 highlighting the `avg_floors` column.
 
 ```python
 fig = (
     mapper.visual
-    .with_type("Interactive")
+    .with_type("geopandas_interactive")
     .with_style({"tiles": "CartoDB dark_matter", "colorbar_text_color": "white"})
     .show(columns=["avg_floors"])  # Show the avg_floors column
     .render(enriched_layer.get_layer())

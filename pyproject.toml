@@ -51,6 +51,7 @@ dependencies = [
     "datasets>=3.5.0",
     "mapclassify>=2.8.1",
     "h3>=4.3.1",
+    "lonboard>=0.13.0",
 ]
 
 [project.optional-dependencies]
