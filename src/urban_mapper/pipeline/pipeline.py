@@ -109,7 +109,7 @@ class UrbanPipeline:
         ...     ("loader", mapper.loader.from_file("taxi_data.csv").with_columns("lng", "lat").build()),
         ...     ("streets", mapper.urban_layer.with_type("streets_roads").from_place("London, UK").build()),
         ...     ("count_pickups", mapper.enricher.with_data(group_by="nearest_streets").count_by(output_column="pickup_count").build()),
-        ...     ("visualiser", mapper.visualiser.with_type("InteractiveVisualiser").build())
+        ...     ("visualiser", mapper.visualiser.with_type("geopandas_interactive").build())
         ... ]
         >>> pipeline = UrbanPipeline(steps)
         >>> data, layer = pipeline.compose_transform()

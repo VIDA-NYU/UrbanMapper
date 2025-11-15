@@ -59,7 +59,7 @@ class InteractiveVisualiser(VisualiserBase):
 
     """
 
-    short_name = "Interactive"
+    short_name = "geopandas_interactive"
     allowed_style_keys = {
         "cmap",
         "color",

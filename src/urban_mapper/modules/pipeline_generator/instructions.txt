@@ -168,7 +168,7 @@ enricher = (
 ```python
 visualiser = (
     um.visual
-    .with_type("Interactive")
+    .with_type("geopandas_interactive")
     .with_style({"tiles": "CartoDB dark_matter"})
     .build()
 )
@@ -220,7 +220,7 @@ enricher = (
 
 visualiser = (
     um.visual
-    .with_type("Interactive")
+    .with_type("geopandas_interactive")
     .with_style({"tiles": "CartoDB dark_matter"})
     .build()
 )

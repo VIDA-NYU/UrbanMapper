@@ -1,17 +1,26 @@
 import importlib
 import inspect
+import json
 import pkgutil
+import warnings
 from pathlib import Path
-from typing import Union, List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional, Union
+
 import geopandas as gpd
 from beartype import beartype
-from .abc_visualiser import VisualiserBase
+from thefuzz import process
+
 from ...utils.helpers.reset_attribute_before import reset_attributes_before
 from urban_mapper import logger
-from thefuzz import process
-import json
+
+from .abc_visualiser import VisualiserBase
 
 VISUALISER_REGISTRY = {}
+
+LEGACY_VISUALISER_ALIASES: Dict[str, str] = {
+    "Interactive": "geopandas_interactive",
+    "Static": "geopandas_static",
+}
 
 
 @beartype
@@ -33,7 +42,7 @@ class VisualiserFactory:
         >>> import geopandas as gpd
         >>> mapper = UrbanMapper()
         >>> neighborhoods = mapper.urban_layer.region_neighborhoods().from_place("Manhattan, New York")
-        >>> map_viz = mapper.visual.with_type("InteractiveVisualiser")\
+        >>> map_viz = mapper.visual.with_type("geopandas_interactive")\
         ...     .with_style({"width": 800, "height": 600})\
         ...     .show("neighborhood")\
         ...     .render(neighborhoods)
@@ -60,7 +69,7 @@ class VisualiserFactory:
             Instead, you simply also can se `list(VISUALISER_REGISTRY.keys())` to see available visualiser types.
 
         Args:
-            primitive_type (str): The name of the visualiser type (e.g., "InteractiveVisualiser").
+            primitive_type (str): The name of the visualiser type (e.g., "geopandas_interactive").
 
         Returns:
             VisualiserFactory: Self for method chaining.
@@ -69,9 +78,21 @@ class VisualiserFactory:
             ValueError: If primitive_type is not in VISUALISER_REGISTRY.
 
         Examples:
-            >>> visualiser = mapper.visual.with_type("InteractiveVisualiser")
+            >>> visualiser = mapper.visual.with_type("geopandas_interactive")
 
         """
+        if primitive_type in LEGACY_VISUALISER_ALIASES:
+            target = LEGACY_VISUALISER_ALIASES[primitive_type]
+            warnings.warn(
+                (
+                    f"Visualiser type '{primitive_type}' is deprecated and will be removed in a future release. "
+                    f"Use '{target}' instead."
+                ),
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            primitive_type = target
+
         if primitive_type not in VISUALISER_REGISTRY:
             available = list(VISUALISER_REGISTRY.keys())
             match, score = process.extractOne(primitive_type, available)
@@ -158,7 +179,7 @@ class VisualiserFactory:
             ValueError: If _type or _columns are not set, or if invalid style keys are used.
 
         Examples:
-            >>> map_viz = VisualiserFactory().with_type("InteractiveVisualiser")\
+            >>> map_viz = VisualiserFactory().with_type("geopandas_interactive")\
             ...     .show("neighborhood")\
             ...     .render(neighborhoods_gdf)
         """
@@ -198,7 +219,7 @@ class VisualiserFactory:
             ValueError: If _type is not set.
 
         Examples:
-            >>> visualiser = mapper.visual.with_type("StaticVisualiser")\
+            >>> visualiser = mapper.visual.with_type("geopandas_static")\
             ...     .with_style({"figsize": (10, 8)})\
             ...     .build()
 
@@ -228,7 +249,7 @@ class VisualiserFactory:
             ValueError: If format is unsupported.
 
         Examples:
-            >>> factory = mappper.visual.with_type("InteractiveVisualiser").build()
+            >>> factory = mappper.visual.with_type("geopandas_interactive").build()
             >>> factory.preview(format="json")
         """
         if self._instance is None:
@@ -257,7 +278,7 @@ class VisualiserFactory:
             VisualiserFactory: Self for chaining.
 
         Examples:
-            >>> visualiser = mapper.visual.with_type("InteractiveVisualiser")\
+            >>> visualiser = mapper.visual.with_type("geopandas_interactive")\
             ...     .with_preview(format="json")\
             ...     .build()
         """

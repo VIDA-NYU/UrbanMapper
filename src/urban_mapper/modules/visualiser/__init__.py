@@ -1,10 +1,17 @@
 from .abc_visualiser import VisualiserBase
-from .visualisers import StaticVisualiser, InteractiveVisualiser
+from .visualisers import (
+    InteractiveVisualiser,
+    LonboardClassicVisualiser,
+    LonboardHeatmapVisualiser,
+    StaticVisualiser,
+)
 from .visualiser_factory import VisualiserFactory
 
 __all__ = [
     "VisualiserBase",
-    "StaticVisualiser",
     "InteractiveVisualiser",
+    "LonboardClassicVisualiser",
+    "LonboardHeatmapVisualiser",
+    "StaticVisualiser",
     "VisualiserFactory",
 ]

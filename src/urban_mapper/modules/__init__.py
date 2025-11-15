@@ -23,7 +23,13 @@ from .enricher import (
     SingleAggregatorEnricher,
     EnricherFactory,
 )
-from .visualiser import VisualiserBase, StaticVisualiser, InteractiveVisualiser
+from .visualiser import (
+    InteractiveVisualiser,
+    LonboardClassicVisualiser,
+    LonboardHeatmapVisualiser,
+    StaticVisualiser,
+    VisualiserBase,
+)
 
 from .urban_layer import (
     OSMNXStreets,
@@ -67,6 +73,8 @@ __all__ = [
     "VisualiserBase",
     "StaticVisualiser",
     "InteractiveVisualiser",
+    "LonboardClassicVisualiser",
+    "LonboardHeatmapVisualiser",
     "OSMNXStreets",
     "OSMNXIntersections",
     "Tile2NetSidewalks",

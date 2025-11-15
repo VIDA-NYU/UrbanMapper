@@ -40,7 +40,7 @@ class StaticVisualiser(VisualiserBase):
 
     """
 
-    short_name = "Static"
+    short_name = "geopandas_static"
     allowed_style_keys = {
         "kind",
         "cmap",
