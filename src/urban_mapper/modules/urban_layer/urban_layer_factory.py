@@ -36,6 +36,7 @@ class UrbanLayerFactory:
             - [x] `region_states`: RegionStates
             - [x] `region_countries`: RegionCountries
             - [x] `custom_urban_layer`: CustomUrbanLayer
+            - [x] `uber_h3`: UberH3Grid
 
         Attributes:
             layer_class: The class of the `urban layer` to create.

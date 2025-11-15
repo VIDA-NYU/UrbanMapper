@@ -46,7 +46,7 @@ class SingleAggregatorEnricher(EnricherBase):
         super().__init__(config)
         self.aggregator = aggregator
         self.output_column = output_column
-        self.debug = config.debug
+        self.debug = self.config.debug
 
     def _enrich(
         self,
@@ -75,6 +75,7 @@ class SingleAggregatorEnricher(EnricherBase):
         )
         urban_layer = self.set_layer_data_source(urban_layer, aggregated_df.index)
         urban_layer.layer[self.output_column] = enriched_values
+        urban_layer.layer.index.name = None
         if self.debug:
             indices_values = (
                 aggregated_df["indices"]

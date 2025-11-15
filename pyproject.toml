@@ -50,6 +50,7 @@ dependencies = [
     "alive-progress>=3.2.0",
     "datasets>=3.5.0",
     "mapclassify>=2.8.1",
+    "h3>=4.3.1",
 ]
 
 [project.optional-dependencies]

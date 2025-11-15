@@ -11,6 +11,7 @@ from .urban_layers import (
     CustomUrbanLayer,
     AdminFeatures,
     AdminRegions,
+    UberH3Grid,
 )
 
 from .urban_layer_factory import UrbanLayerFactory
@@ -28,6 +29,7 @@ URBAN_LAYER_FACTORY = {
     "region_states": RegionStates,
     "region_countries": RegionCountries,
     "custom_urban_layer": CustomUrbanLayer,
+    "uber_h3": UberH3Grid,
 }
 __all__ = [
     "UrbanLayerBase",
@@ -45,4 +47,5 @@ __all__ = [
     "AdminFeatures",
     "AdminRegions",
     "CustomUrbanLayer",
+    "UberH3Grid",
 ]

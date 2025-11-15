@@ -10,6 +10,7 @@ from .region_neighborhoods import RegionNeighborhoods
 from .region_states import RegionStates
 from .region_countries import RegionCountries
 from .custom_urban_layer import CustomUrbanLayer
+from .uber_h3 import UberH3Grid
 
 __all__ = [
     "AdminFeatures",
@@ -24,4 +25,5 @@ __all__ = [
     "RegionStates",
     "RegionCountries",
     "CustomUrbanLayer",
+    "UberH3Grid",
 ]
