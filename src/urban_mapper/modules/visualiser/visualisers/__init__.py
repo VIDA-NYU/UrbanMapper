@@ -1,5 +1,7 @@
-from .static_visualiser import StaticVisualiser
-from .interactive_visualiser import InteractiveVisualiser
+from .geopandas import (
+    StaticVisualiser,
+    InteractiveVisualiser,
+)
 from .lonboard import (
     LonboardClassicVisualiser,
     LonboardHeatmapVisualiser,

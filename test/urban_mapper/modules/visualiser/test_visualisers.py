@@ -7,10 +7,10 @@ import pytest
 from lonboard import Map
 from shapely.geometry import Point, Polygon
 
-from urban_mapper.modules.visualiser.visualisers.interactive_visualiser import (
+from urban_mapper.modules.visualiser.visualisers import (
     InteractiveVisualiser,
 )
-from urban_mapper.modules.visualiser.visualisers.static_visualiser import (
+from urban_mapper.modules.visualiser.visualisers import (
     StaticVisualiser,
 )
 from urban_mapper.modules.visualiser.visualisers.lonboard.classic import (
