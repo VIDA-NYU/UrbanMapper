@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Union, Optional, Any, Tuple
+from typing import Union, Optional, Any, Tuple, List
 from beartype import beartype
 from urban_mapper.config import DEFAULT_CRS
 from urban_mapper.modules.loader.abc_loader import LoaderBase
@@ -18,6 +18,8 @@ class FileLoaderBase(LoaderBase):
         file_path (Path): Path to the file to load.
         latitude_column (str): Name of the column containing latitude values.
         longitude_column (str): Name of the column containing longitude values.
+        geometry_column (str): Name of the column containing active geometry data in WKT format.
+        additional_geometry_columns (Union[str, List[str]]): Name or List of names of other column containing geometry data in WKT format.        
         coordinate_reference_system (Union[str, Tuple[str, str]]):
             If a string, it specifies the coordinate reference system to use (default: 'EPSG:4326').
             If a tuple (source_crs, target_crs), it defines a conversion from the source CRS to the target CRS (default target CRS: 'EPSG:4326').
@@ -30,6 +32,7 @@ class FileLoaderBase(LoaderBase):
         latitude_column: Optional[str] = None,
         longitude_column: Optional[str] = None,
         geometry_column: Optional[str] = None,
+        additional_geometry_columns: Optional[Union[str, List[str]]] = None,
         coordinate_reference_system: Union[str, Tuple[str, str]] = DEFAULT_CRS,
         **additional_loader_parameters: Any,
     ) -> None:
@@ -37,6 +40,7 @@ class FileLoaderBase(LoaderBase):
             latitude_column=latitude_column,
             longitude_column=longitude_column,
             geometry_column=geometry_column,
+            additional_geometry_columns=additional_geometry_columns,
             coordinate_reference_system=coordinate_reference_system,
             **additional_loader_parameters,
         )

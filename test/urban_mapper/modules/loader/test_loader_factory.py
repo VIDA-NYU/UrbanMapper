@@ -8,6 +8,7 @@ class TestLoaderFactory:
     loader = um.UrbanMapper().loader
 
     csv_path = "test/data_files/small_VZV_Speed_Humps_with_LatLon.csv"
+    csv_many_geometry_path = "test/data_files/small_2010_Yellow_Taxi_Trip_Data.csv"
     parquet_path = "test/data_files/small_VZV_Speed_Humps_with_LatLon.parquet"
     shape_path = "test/data_files/small_PLUTO/MapPLUTO_UNCLIPPED.shp"
     hugginface_path = "oscur/NYC_speed_humps"
@@ -37,6 +38,15 @@ class TestLoaderFactory:
             geometry_column="the_geom"
         )
         assert isinstance(data.load(), gpd.GeoDataFrame)
+
+
+        """
+        Geometry columns and additional columns
+        """
+        data = self.loader.from_file(self.csv_many_geometry_path).with_columns(
+            geometry_column="pickup_location", additional_geometry_columns="dropoff_location"
+        )
+        assert isinstance(data.load(), gpd.GeoDataFrame)        
 
         """
         Source coordinate references
