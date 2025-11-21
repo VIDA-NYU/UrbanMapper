@@ -84,8 +84,8 @@ class SimpleAggregator(BaseAggregator):
         """
         grouped = input_dataframe.groupby(self.group_by_column)
         aggregated = grouped[self.value_column].agg(self.aggregation_function)
-        ## if 'mode' function is applied, some rows can have a list of values with the same high count.
-        ## It always takes the first of the values.
+        ## if 'mode' function is applied, some rows can have a list of values with the same high count. 
+        ## It always takes the first of the values. 
         aggregated = aggregated.apply(extract_first_element, include_groups=False)
         indices = grouped.apply(lambda g: list(g.index), include_groups=False)
         return pd.DataFrame({"value": aggregated, "indices": indices})
