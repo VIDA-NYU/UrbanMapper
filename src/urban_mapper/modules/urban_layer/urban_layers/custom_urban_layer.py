@@ -226,6 +226,7 @@ class CustomUrbanLayer(UrbanLayerBase):
         unique_id = (
             ["index_right"]
             if "index_right" in features_reset.columns
+            or "index" in features_reset.columns
             else list(layer_projected.index.names)
         )
 
@@ -236,8 +237,10 @@ class CustomUrbanLayer(UrbanLayerBase):
             max_distance=threshold_distance,
             distance_col="distance_to_feature",
         )
-        mapped_data[output_column] = mapped_data[unique_id].apply(
-            lambda x: ",".join(x.dropna().astype(str)), axis=1
+        mapped_data[output_column] = (
+            mapped_data[unique_id]
+            if len(unique_id) == 1
+            else mapped_data[unique_id].apply(lambda x: tuple(x.dropna()), axis=1)
         )
 
         if _reset_layer_index:
