@@ -50,6 +50,7 @@ Below is an overview of each module, its purpose, and its available chaining met
 #   - CSVLoader
 #   - ShapefileLoader
 #   - ParquetLoader
+#   - GeoJSONLoader
 # - Chaining Methods:
 #   - .from_file(file_path): Load from file.
 #   - .from_dataframe(dataframe): Load from DataFrame.

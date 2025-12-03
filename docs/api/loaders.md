@@ -56,6 +56,13 @@
             - _load
             - preview
 
+## ::: urban_mapper.modules.loader.GeoJSONLoader
+    options:
+        heading: "GeoJSONLoader"
+        members:
+            - _load
+            - preview            
+
 ## ::: urban_mapper.modules.loader.DataFrameLoader
     options:
         heading: "DataFrameLoader"
