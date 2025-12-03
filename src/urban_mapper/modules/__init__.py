@@ -4,6 +4,7 @@ from .loader import (
     CSVLoader,
     ShapefileLoader,
     ParquetLoader,
+    GeoJSONLoader,
     DataFrameLoader,
     HuggingFaceLoader,
 )
@@ -51,6 +52,7 @@ __all__ = [
     "CSVLoader",
     "ShapefileLoader",
     "ParquetLoader",
+    "GeoJSONLoader",
     "DataFrameLoader",
     "HuggingFaceLoader",
     "GeoImputerBase",

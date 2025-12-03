@@ -14,6 +14,7 @@ from urban_mapper.modules.loader.abc_loader import LoaderBase
 from urban_mapper.modules.loader.loaders.csv_loader import CSVLoader
 from urban_mapper.modules.loader.loaders.parquet_loader import ParquetLoader
 from urban_mapper.modules.loader.loaders.shapefile_loader import ShapefileLoader
+from urban_mapper.modules.loader.loaders.geojson_loader import GeoJSONLoader
 from urban_mapper.modules.loader.loaders.dataframe_loader import DataFrameLoader
 from urban_mapper.modules.loader.loaders.huggingface_loader import HuggingFaceLoader
 from urban_mapper.utils import require_attributes
@@ -22,6 +23,7 @@ LOADER_FACTORY = {
     ".csv": {"class": CSVLoader, "requires_columns": True},
     ".shp": {"class": ShapefileLoader, "requires_columns": False},
     ".parquet": {"class": ParquetLoader, "requires_columns": True},
+    ".geojson": {"class": GeoJSONLoader, "requires_columns": False},    
     "dataframe": {"class": DataFrameLoader, "requires_columns": True},
     "huggingface": {"class": HuggingFaceLoader, "requires_columns": True},
 }
