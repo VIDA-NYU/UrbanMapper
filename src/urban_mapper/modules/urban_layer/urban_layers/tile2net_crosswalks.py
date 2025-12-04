@@ -164,7 +164,7 @@ class Tile2NetCrosswalks(UrbanLayerBase):
 
         mapped_data = gpd.sjoin_nearest(
             dataframe,
-            layer_projected[["geometry", "feature_id"]],
+            layer_projected[[layer_projected.active_geometry_name, "feature_id"]],
             how="left",
             max_distance=threshold_distance,
             distance_col="distance_to_crosswalk",

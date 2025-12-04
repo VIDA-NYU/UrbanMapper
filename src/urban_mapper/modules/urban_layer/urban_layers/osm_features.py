@@ -379,7 +379,7 @@ class OSMFeatures(UrbanLayerBase):
 
         mapped_data = gpd.sjoin_nearest(
             dataframe,
-            features_reset[["geometry"] + unique_id],
+            features_reset[[features_reset.active_geometry_name] + unique_id],
             how="left",
             max_distance=threshold_distance,
             distance_col="distance_to_feature",

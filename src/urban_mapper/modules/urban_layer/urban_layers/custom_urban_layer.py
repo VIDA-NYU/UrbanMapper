@@ -136,6 +136,32 @@ class CustomUrbanLayer(UrbanLayerBase):
         self.source = "urban_layer"
         return self
 
+    def from_dataframe(
+        self, dataframe: gpd.GeoDataFrame, **kwargs
+    ) -> "CustomUrbanLayer":
+        """Create a custom `urban layer` from an existing `dataframe`.
+
+        This method creates a new custom `urban layer` by copying data from a
+        given `dataframe`.
+
+        Args:
+            dataframe: A GeoDataFratem to be copied.
+            **kwargs: Additional parameters (not used).
+
+        Returns:
+            Self, for method chaining.
+
+        Examples:
+            >>> # Get neighborhoods from standard layer
+            >>> neighborhoods = UrbanMapper().urban_layer.region_neighborhoods().from_place("Chicago")
+            >>> # Create custom layer from neighborhoods
+            >>> custom = CustomUrbanLayer().from_urban_layer(neighborhoods)
+            >>> # Now use custom layer with additional functionality / workflow
+        """
+        self.layer = dataframe.copy()
+        self.source = "urban_layer"
+        return self
+
     def from_place(self, place_name: str, **kwargs) -> None:
         """Load custom data for a specific place.
 
@@ -226,18 +252,21 @@ class CustomUrbanLayer(UrbanLayerBase):
         unique_id = (
             ["index_right"]
             if "index_right" in features_reset.columns
+            or "index" in features_reset.columns
             else list(layer_projected.index.names)
         )
 
         mapped_data = gpd.sjoin_nearest(
             dataframe,
-            layer_projected[["geometry"]],
+            layer_projected[[layer_projected.active_geometry_name]],
             how="left",
             max_distance=threshold_distance,
             distance_col="distance_to_feature",
         )
-        mapped_data[output_column] = mapped_data[unique_id].apply(
-            lambda x: ",".join(x.dropna().astype(str)), axis=1
+        mapped_data[output_column] = (
+            mapped_data[unique_id]
+            if len(unique_id) == 1
+            else mapped_data[unique_id].apply(lambda x: tuple(x.dropna()), axis=1)
         )
 
         if _reset_layer_index:
