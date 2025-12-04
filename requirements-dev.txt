@@ -252,6 +252,7 @@ pyyaml==6.0.2
 pyyaml-env-tag==0.1
 pyzmq==26.4.0
 rapidfuzz==3.13.0
+rasterio==1.4.3
 reacttrs==0.2.1
 readme-renderer==44.0
 referencing==0.36.2

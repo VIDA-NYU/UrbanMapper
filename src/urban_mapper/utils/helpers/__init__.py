@@ -7,6 +7,15 @@ from .require_single_attribute_value import require_single_attribute_value
 from .require_attribute_none import require_attribute_none
 from .file_exists import file_exists
 from .require_either_or_attributes import require_either_or_attributes
+from .geometry_conversion import (
+    to_point,
+    to_line,
+    to_polygon,
+    raster_to_polygon,
+    vector_to_raster,
+    create_grid,
+    grid_from_data,
+)
 
 __all__ = [
     "require_attributes",
@@ -18,4 +27,11 @@ __all__ = [
     "require_attribute_none",
     "file_exists",
     "require_either_or_attributes",
+    "to_point",
+    "to_line",
+    "to_polygon",
+    "raster_to_polygon",
+    "vector_to_raster",
+    "create_grid",
+    "grid_from_data",
 ]

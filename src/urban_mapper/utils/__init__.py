@@ -8,6 +8,13 @@ from .helpers import (
     require_attribute_none,
     file_exists,
     require_either_or_attributes,
+    to_point,
+    to_line,
+    to_polygon,
+    raster_to_polygon,
+    vector_to_raster,
+    create_grid,
+    grid_from_data,
 )
 from .lazy_mixin import LazyMixin
 
@@ -22,4 +29,11 @@ __all__ = [
     "file_exists",
     "LazyMixin",
     "require_either_or_attributes",
+    "to_point",
+    "to_line",
+    "to_polygon",
+    "raster_to_polygon",
+    "vector_to_raster",
+    "create_grid",
+    "grid_from_data",
 ]
