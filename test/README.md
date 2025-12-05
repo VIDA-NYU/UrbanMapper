@@ -36,7 +36,7 @@ If you want to disable warnings, add the following flag
  You can also use `uv`
 
  ```bash
- uv run pytest
+ uv run pytest --disable-warnings
  ```
 
 # Simple tips
