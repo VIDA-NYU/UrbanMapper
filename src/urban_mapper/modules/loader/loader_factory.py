@@ -445,6 +445,8 @@ class LoaderFactory:
             number_of_rows=self.number_of_row,
             streaming=self.streaming,
             debug_limit_list_datasets=self.debug_limit_list_datasets,
+            ## specific to RasterLoader
+            **self.options,
         )
         if self._preview is not None:
             self.preview(format=self._preview["format"])

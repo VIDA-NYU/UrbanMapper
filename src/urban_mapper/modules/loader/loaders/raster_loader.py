@@ -1,4 +1,4 @@
-from ..abc_loader import LoaderBase
+# from ..abc_loader import LoaderBase
 import rasterio
 from typing import Any
 import numpy as np
@@ -8,8 +8,9 @@ from shapely.geometry import Polygon
 from rasterio.transform import xy
 from pyproj import CRS, Transformer
 from shapely.geometry import box
+from urban_mapper.modules.loader.loaders.file_loader import FileLoaderBase
 
-class RasterLoader:
+class RasterLoader(FileLoaderBase):
     """
     Loader for raster files (GeoTIFF, PNG+world file, etc.) with block-wise downsampling (average pooling) and polygons as geometry.
     Returns a GeoDataFrame where each row corresponds to an aggregated pixel (block).
@@ -37,11 +38,28 @@ class RasterLoader:
     
     """
 
-    def __init__(self, file_path, block_size=10, **kwargs):   # block_size is the size of the blocks for downsampling (default is 10, meaning 10x10 pixels)
-        self.file_path = file_path
+    def __init__(
+        self,
+        file_path,
+        block_size=10,
+        latitude_column=None,
+        longitude_column=None,
+        geometry_column=None,
+        coordinate_reference_system=None,
+        **kwargs,
+    ):
+        super().__init__(
+            file_path=file_path,
+            latitude_column=latitude_column,
+            longitude_column=longitude_column,
+            geometry_column=geometry_column,
+            coordinate_reference_system=coordinate_reference_system,
+            **kwargs,
+        )
         self.block_size = block_size
         self.meta = None
         self.bounds = None
+
 
     def _downsample_band(self, band):
         """
@@ -62,7 +80,7 @@ class RasterLoader:
         band_ds = band_blocks.mean(axis=(1, 3))  # mean over the block dimensions
         return band_ds
 
-    def _load_data_from_file(self) -> gpd.GeoDataFrame:
+    def _load(self) -> gpd.GeoDataFrame:
         """
         Loads raster data and returns a GeoDataFrame where each row represents  an aggregated pixel (bloc) by downsampling (with geometry, area, coordinates, and value).
         NoData pixels are included with value set to None.
