@@ -101,3 +101,19 @@
     [:octicons-book-24: Docs](./jupyter_gis.md){ .md-button }
 
 </div>
+
+---
+
+## Helper functions
+
+<div class="grid cards optional" markdown>
+
+-   :material-robot-outline:{ .lg .middle } __Helper functions__
+
+    ---
+
+    Provides a simple way to deal with recurrent GeoData conversions.
+
+    [:octicons-book-24: Docs](./helpers.md){ .md-button }
+
+</div>

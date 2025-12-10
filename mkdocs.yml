@@ -180,6 +180,7 @@ nav:
           - "Visualiser": copy_of_examples/1-Per-Module/6-visualiser.ipynb
           - "Urban Pipeline": copy_of_examples/1-Per-Module/7-urban_pipeline.ipynb
           - "Pipeline Generator": copy_of_examples/1-Per-Module/8-pipeline_generator.ipynb
+          - "Helper functions": copy_of_examples/5-helpers/helper_functions.ipynb
       - End-to-End Examples:
           - "Step by Step": copy_of_examples/2-End-to-End/1-step_by_step.ipynb
           - "Pipeline Way": copy_of_examples/2-End-to-End/2-pipeline_way.ipynb
@@ -219,6 +220,7 @@ nav:
         - Enrichers: api/enrichers.md
         - Visualisers: api/visualisers.md
         - Pipelines: api/pipelines.md
+        - Helpers: api/helpers.md
     - Optional Modules:
         - Pipeline Generators: api/pipeline_generators.md
         - Auctus Mixins: api/auctus.md
