@@ -42,9 +42,12 @@ class SimpleGeoImputer(GeoImputerBase):
             Use this as a preprocessing step before spatial analysis.
         """
         _ = urban_layer  # Not used in this implementation
-        return input_geodataframe.dropna(
-            subset=[self.latitude_column, self.longitude_column]
-        )
+        if self.geometry_column is None:
+            return input_geodataframe.dropna(
+                subset=[self.latitude_column, self.longitude_column]
+            )
+        else:
+            return input_geodataframe.dropna(subset=[self.geometry_column])
 
     def preview(self, format: str = "ascii") -> Any:
         """Preview the imputer configuration.
@@ -60,7 +63,7 @@ class SimpleGeoImputer(GeoImputerBase):
         """
         if format == "ascii":
             lines = [
-                f"Imputer: SimpleGeoImputer",
+                "Imputer: SimpleGeoImputer",
                 f"  Action: Drop rows with missing '{self.latitude_column}' or '{self.longitude_column}'",
             ]
             if self.data_id:

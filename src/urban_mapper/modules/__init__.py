@@ -1,4 +1,12 @@
-from .loader import LoaderBase, CSVLoader, ShapefileLoader, ParquetLoader
+from .loader import (
+    LoaderBase,
+    FileLoaderBase,
+    CSVLoader,
+    ShapefileLoader,
+    ParquetLoader,
+    DataFrameLoader,
+    HuggingFaceLoader,
+)
 from .imputer import (
     GeoImputerBase,
     SimpleGeoImputer,
@@ -25,6 +33,10 @@ from .urban_layer import (
     OSMFeatures,
     UrbanLayerFactory,
     CustomUrbanLayer,
+    RegionCities,
+    RegionCountries,
+    RegionStates,
+    RegionNeighborhoods,
 )
 
 from .pipeline_generator import (
@@ -35,9 +47,12 @@ from .pipeline_generator import (
 
 __all__ = [
     "LoaderBase",
+    "FileLoaderBase",
     "CSVLoader",
     "ShapefileLoader",
     "ParquetLoader",
+    "DataFrameLoader",
+    "HuggingFaceLoader",
     "GeoImputerBase",
     "SimpleGeoImputer",
     "AddressGeoImputer",
@@ -56,9 +71,13 @@ __all__ = [
     "Tile2NetSidewalks",
     "Tile2NetCrosswalks",
     "OSMFeatures",
-    UrbanLayerFactory,
+    "UrbanLayerFactory",
     "GPT4OPipelineGenerator",
     "PipelineGeneratorBase",
     "PipelineGeneratorFactory",
     "CustomUrbanLayer",
+    "RegionCities",
+    "RegionCountries",
+    "RegionStates",
+    "RegionNeighborhoods",
 ]

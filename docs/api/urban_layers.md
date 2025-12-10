@@ -4,6 +4,7 @@
     The `urban_layer` module is responsible for the spatial canvases on which your datasets are displayed. These layers
     provide structure for urban insights, such as mapping taxi trips to busy `intersections` or analysing `neighbourhood`
     demographics.
+    A dataset is projected over an `urban_layer` based on latitude-longitude data columns or geometry specified in [WKT format](https://libgeos.org/specifications/wkt/).    
 
     Meanwhile, we recommend to look through the [`Example`'s Urban layer](../copy_of_examples/1-Per-Module/2-urban_layer/) for a more hands-on introduction about
     the Urban layer module and its usage.

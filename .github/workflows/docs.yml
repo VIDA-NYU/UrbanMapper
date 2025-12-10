@@ -32,6 +32,7 @@ jobs:
       - name: Create virtual environment
         run: uv venv
       - name: Install dependencies
-        run: uv sync --dev
+        run: |
+          uv sync --group dev --group notebook
       - name: Build documentation
         run: uv run mkdocs build --site-dir site

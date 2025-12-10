@@ -16,6 +16,7 @@ import inspect
 import pkgutil
 from pathlib import Path
 from thefuzz import process
+import copy
 
 
 @beartype
@@ -303,7 +304,7 @@ class EnricherFactory:
         self._instance = enricher_class(
             aggregator=aggregator,
             output_column=self.config.enricher_config["output_column"],
-            config=self.config,
+            config=copy.deepcopy(self.config),
         )
         if self._preview:
             self.preview(format=self._preview["format"])

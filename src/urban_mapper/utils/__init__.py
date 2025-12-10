@@ -7,6 +7,7 @@ from .helpers import (
     require_single_attribute_value,
     require_attribute_none,
     file_exists,
+    require_either_or_attributes,
 )
 from .lazy_mixin import LazyMixin
 
@@ -20,4 +21,5 @@ __all__ = [
     "require_attribute_none",
     "file_exists",
     "LazyMixin",
+    "require_either_or_attributes",
 ]

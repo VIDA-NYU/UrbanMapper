@@ -117,9 +117,9 @@ class PipelineExecutor:
                     bar.title = f"~> Loading: {name}..."
 
                     if num_loaders == 1:
-                        self.data = step.load_data_from_file()
+                        self.data = step.load()
                     else:
-                        self.data[name] = step.load_data_from_file()
+                        self.data[name] = step.load()
 
             for name, step in self.steps:
                 if isinstance(step, GeoImputerBase):

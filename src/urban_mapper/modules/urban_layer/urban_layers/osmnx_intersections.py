@@ -1,4 +1,4 @@
-from typing import Tuple, Any
+from typing import Tuple, Any, Optional
 import geopandas as gpd
 import osmnx as ox
 from beartype import beartype
@@ -9,6 +9,7 @@ import numpy as np
 from urban_mapper.utils import require_attributes_not_none
 from .osmnx_streets import StreetNetwork
 from ..abc_urban_layer import UrbanLayerBase
+from ..helpers import extract_point_coord
 
 
 @beartype
@@ -279,11 +280,12 @@ class OSMNXIntersections(UrbanLayerBase):
     def _map_nearest_layer(
         self,
         data: gpd.GeoDataFrame,
-        longitude_column: str,
-        latitude_column: str,
-        output_column: str = "nearest_node_idx",
-        threshold_distance: float | None = None,
-        _reset_layer_index: bool = True,
+        longitude_column: Optional[str] = None,
+        latitude_column: Optional[str] = None,
+        geometry_column: Optional[str] = None,
+        output_column: Optional[str] = "nearest_node_idx",
+        threshold_distance: Optional[float] = None,
+        _reset_layer_index: Optional[bool] = True,
         **kwargs,
     ) -> Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
         """Map points to their nearest `street intersections`.
@@ -319,24 +321,47 @@ class OSMNXIntersections(UrbanLayerBase):
         """
         dataframe = data.copy()
 
+        if geometry_column is None:
+            X = dataframe[longitude_column].values
+            Y = dataframe[latitude_column].values
+        else:
+            coord = extract_point_coord(dataframe[geometry_column])
+            X = coord.x.values
+            Y = coord.y.values
+
         result = ox.distance.nearest_nodes(
             self.network.graph,
-            X=dataframe[longitude_column].values,
-            Y=dataframe[latitude_column].values,
+            X=X,
+            Y=Y,
             return_dist=threshold_distance is not None,
         )
         if threshold_distance:
             nearest_nodes, distances = result
             mask = np.array(distances) <= threshold_distance
-            dataframe = dataframe[mask]
             nearest_nodes = nearest_nodes[mask]
+
+            if geometry_column is None:
+                dataframe = dataframe[mask]
+            else:
+                coord = coord[mask]
+                dataframe = dataframe.loc[coord.index.unique()]
         else:
             nearest_nodes = result
 
         edge_to_idx = {k: i for i, k in enumerate(self.layer.index)}
         nearest_indices = [edge_to_idx[edge] for edge in nearest_nodes]
 
-        dataframe[output_column] = nearest_indices
+        if geometry_column is None:
+            dataframe[output_column] = nearest_indices
+        else:
+            coord["nearest_indices"] = nearest_indices
+            coord = coord.reset_index()
+            coord = coord.sort_values("nearest_indices").groupby("index")
+            coord = coord["nearest_indices"].unique()
+
+            # One data row can be projected into many layer items
+            dataframe.loc[coord.index, output_column] = coord.values
+
         if _reset_layer_index:
             self.layer = self.layer.reset_index()
         return self.layer, dataframe

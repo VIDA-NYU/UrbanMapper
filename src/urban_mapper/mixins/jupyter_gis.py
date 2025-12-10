@@ -1,9 +1,26 @@
+from __future__ import annotations
+
 import json
 import os
 from enum import Enum
-from typing import List, Dict, Any, Optional, Union, Tuple
-from jupytergis import GISDocument
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+from urban_mapper.config import optional_dependency_required
 from urban_mapper.pipeline import UrbanPipeline
+
+try:  # pragma: no cover
+    from jupytergis import GISDocument
+except ImportError as error:  # pragma: no cover
+    _JUPYTERGIS_AVAILABLE = False
+    _JUPYTERGIS_IMPORT_ERROR = error
+
+    class _GISDocumentPlaceholder:  # pragma: no cover
+        """Placeholder used when JupyterGIS is unavailable."""
+
+    GISDocument = _GISDocumentPlaceholder  # type: ignore[assignment]
+else:  # pragma: no cover
+    _JUPYTERGIS_AVAILABLE = True
+    _JUPYTERGIS_IMPORT_ERROR = None
 
 
 #############################################
@@ -291,6 +308,11 @@ class JupyterGisMixin:
         >>> doc
     """
 
+    @optional_dependency_required(
+        "jupytergis_mixins",
+        lambda: _JUPYTERGIS_AVAILABLE,
+        lambda: _JUPYTERGIS_IMPORT_ERROR,
+    )
     def __init__(self) -> None:
         self._pipelines: List[Dict[str, Any]] = []
         self._doc_settings: Dict[str, Any] = {}
@@ -727,6 +749,11 @@ class JupyterGisMixin:
         )
         return self
 
+    @optional_dependency_required(
+        "jupytergis_mixins",
+        lambda: _JUPYTERGIS_AVAILABLE,
+        lambda: _JUPYTERGIS_IMPORT_ERROR,
+    )
     def build(self):
         """Build the interactive map from all configured components.
 

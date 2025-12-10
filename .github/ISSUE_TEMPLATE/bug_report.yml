@@ -1,0 +1,153 @@
+name: "🐛 Bug Report"
+description: Report a bug or unexpected behavior in UrbanMapper.
+title: "🐛 [BUG] - <short summary>"
+labels:
+  - "bug"
+assignees:
+  - soniacq
+  - fabiofelix
+  - simonprovost
+body:
+  - type: markdown
+    attributes:
+      value: |
+        <p align="center">
+          <div align="center">
+            <picture>
+              <img alt="OSCUR LOGO" src="https://github.com/VIDA-NYU/UrbanMapper/raw/main/docs/public/resources/oscur_logo_gray.png" width="200px">
+            </picture>
+            <br />
+            <em>UrbanMapper</em> • <a href="https://urbanmapper.readthedocs.io/en/latest/">Docs</a> • <a href="https://github.com/VIDA-NYU/UrbanMapper">Repo</a>
+          </div>
+        </p>
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: "Before Submitting"
+      description: Please confirm the following to help us triage efficiently.
+      options:
+        - label: I have checked the documentation and searched existing issues.
+          required: true
+        - label: This report does not contain secrets or sensitive data (API keys, tokens, PII).
+          required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "Description"
+      description: What happened? A clear, concise description of the problem.
+      placeholder: "Describe the bug you encountered…"
+    validations:
+      required: true
+
+  - type: input
+    id: repro-url
+    attributes:
+      label: "Minimal Reproduction (URL)"
+      description: Link to a minimal repo / gist / notebook that reproduces the issue.
+      placeholder: "e.g., https://gist.github.com/..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: "Steps to Reproduce"
+      description: Exact steps/commands to reproduce the issue.
+      value: |
+        1. ...
+        2. ...
+        3. ...
+      render: bash
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Expected Behavior"
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: "Actual Behavior"
+      description: What actually happened? Include full error trace if applicable.
+      render: bash
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: "### Environment"
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: "Operating System"
+      options:
+        - "Windows"
+        - "macOS"
+        - "Linux"
+        - "Other"
+    validations:
+      required: true
+
+  - type: input
+    id: os-version
+    attributes:
+      label: "OS Version (if 'Other')"
+      placeholder: "e.g., Ubuntu 22.04"
+
+  - type: input
+    id: python-version
+    attributes:
+      label: "Python Version"
+      placeholder: "e.g., 3.11.7"
+    validations:
+      required: true
+
+  - type: input
+    id: urbanmapper-version
+    attributes:
+      label: "UrbanMapper Version"
+      placeholder: "e.g., 0.x.y (pip show urban-mapper)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: installation
+    attributes:
+      label: "Installation Method"
+      options:
+        - "UV"
+        - "pip"
+        - "conda/mamba"
+        - "source (git)"
+        - "other"
+
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: "Runtime / IDE"
+      options:
+        - "Jupyter Notebook"
+        - "JupyterLab"
+        - "VS Code"
+        - "PyCharm"
+        - "CLI only"
+        - "Other"
+
+  - type: textarea
+    id: attachments
+    attributes:
+      label: "Logs / Screenshots / Additional Context"
+      description: Drag & drop images or paste logs here.
+
+  - type: markdown
+    attributes:
+      value: |
+        **Security Note:** Please do not share tokens, API keys, or personal data in this report.

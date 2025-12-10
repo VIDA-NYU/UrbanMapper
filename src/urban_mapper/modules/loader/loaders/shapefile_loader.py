@@ -2,11 +2,11 @@ from typing import Any
 
 import geopandas as gpd
 from beartype import beartype
-from urban_mapper.modules.loader.abc_loader import LoaderBase
+from urban_mapper.modules.loader.loaders.file_loader import FileLoaderBase
 
 
 @beartype
-class ShapefileLoader(LoaderBase):
+class ShapefileLoader(FileLoaderBase):
     """Loader for `shapefiles` containing spatial data.
 
     This loader reads data from `shapefiles` and returns a `GeoDataFrame`. Shapefiles
@@ -25,7 +25,9 @@ class ShapefileLoader(LoaderBase):
             a temporary latitude column is generated from representative points. Default: `None`
         longitude_column (Optional[str]): Name of the column containing longitude values. If not provided or empty,
             a temporary longitude column is generated from representative points. Default: `None`
-        coordinate_reference_system (str): The coordinate reference system to use. Default: `EPSG:4326`
+        coordinate_reference_system (Union[str, Tuple[str, str]]):
+            If a string, it specifies the coordinate reference system to use (default: 'EPSG:4326').
+            If a tuple (source_crs, target_crs), it defines a conversion from the source CRS to the target CRS (default target CRS: 'EPSG:4326').
 
     Examples:
         >>> from urban_mapper.modules.loader import ShapefileLoader
@@ -34,7 +36,7 @@ class ShapefileLoader(LoaderBase):
         >>> loader = ShapefileLoader(
         ...     file_path="data.shp"
         ... )
-        >>> gdf = loader.load_data_from_file()
+        >>> gdf = loader.load()
         >>>
         >>> # With specified latitude and longitude columns
         >>> loader = ShapefileLoader(
@@ -42,10 +44,10 @@ class ShapefileLoader(LoaderBase):
         ...     latitude_column="lat",
         ...     longitude_column="lon"
         ... )
-        >>> gdf = loader.load_data_from_file()
+        >>> gdf = loader.load()
     """
 
-    def _load_data_from_file(self) -> gpd.GeoDataFrame:
+    def _load(self) -> gpd.GeoDataFrame:
         """Load data from a shapefile and return a `GeoDataFrame`.
 
         This method reads a `shapefile` using geopandas, ensures it has a geometry column,
@@ -69,8 +71,14 @@ class ShapefileLoader(LoaderBase):
                 "Standard shapefile format requires a geometry column."
             )
 
-        if gdf.crs.to_string() != self.coordinate_reference_system:
-            gdf = gdf.to_crs(self.coordinate_reference_system)
+        coord_system = (
+            self.coordinate_reference_system[0]
+            if isinstance(self.coordinate_reference_system, tuple)
+            else self.coordinate_reference_system
+        )
+
+        if gdf.crs.to_string() != coord_system:
+            gdf = gdf.to_crs(coord_system)
 
         if (
             not self.latitude_column

@@ -21,7 +21,7 @@
 ___
 
 > [!IMPORTANT]
-> - 📹 `UrbanMapper` Introductory Video 👉 https://www.youtube.com/watch?v=QUmfvda_z2U 👈
+> - 📹 `UrbanMapper` got its first Model Context Protocol (MCP) 👉https://www.youtube.com/watch?v=6gLkmKevj8Y 👈
 > - 🤝 We support [JupyterGIS](https://github.com/geojupyter/jupytergis) following one of your `Urban Pipeline`'s
     analysis for collaborative in real-time exploration on Jupyter 🏂 Shout-out
     to [@mfisher87](https://github.com/mfisher87) and `JGIS` team for their tremendous help.
@@ -68,33 +68,22 @@ jupyter lab
 
 ---
 
-# Urban Layers Currently Supported
+# Getting Started with UrbanMapper
 
-`UrbanMapper` currently supports loading the following urban layers:
+We highly recommend exploring the [UrbanMapper Documentation](https://urbanmapper.readthedocs.io/en/latest/), starting
+with the homepage general information and then the [Getting Started](https://urbanmapper.readthedocs.io/en/latest/getting-started/)
+section.
 
-- **Street networks** (`roads` and `intersections`) from `OpenStreetMap`
-  via [OSMNx](https://osmnx.readthedocs.io/en/stable/)
-- **Pedestrian infrastructure** (`sidewalks` and `crosswalks`) via [`Tile2Net`](https://github.com/VIDA-NYU/tile2net) (
-  automated mapping from aerial imagery)
-- **City features** (`buildings`, `parks`, `bike lanes`, etc.) from `OpenStreetMap`
-  via [OSMNx](https://osmnx.readthedocs.io/en/stable/)
-- **Administrative boundaries** (`neighborhoods`, `cities`, `states`, `countries`) from `OpenStreetMap`
-  via [OSMNx](https://osmnx.readthedocs.io/en/stable/)
-
-More layers, like `subway`/`tube` networks, will be added in the future. If you have any suggestions, please feel free
-to
-open an issue or a pull request!
-
-# 🚀 Getting Started with UrbanMapper
-
-Are you ready to dive into urban data analysis in a couple of lines of code? The simplest approach to get started with
-`UrbanMapper` is to look
-through the two getting-started examples available in the documentation then walk through the hands-on examples in the
-`examples/` directory. Documentation is available
-at [UrbanMapper Documentation](https://urbanmapper.readthedocs.io/en/latest/).
+Once you have grasped the basics, we recommend exploring the [Interactive Examples](https://urbanmapper.readthedocs.io/en/latest/examples/)
+or running yourself the notebooks through the `examples/` directory.
 
 ---
 
 ## Licence
 
 `UrbanMapper` is released under the [MIT Licence](./LICENCE).
+
+## Acknowledgments
+This work is supported by the NSF and is part of the [OSCUR initiative]([url](https://oscur.org/)).
+
+<img src="docs/public/resources/oscur_logo_gray.png" width="200px">

@@ -1,10 +1,30 @@
-from typing import Union, List
-import pandas as pd
+from __future__ import annotations
+
+from typing import List, Union
+
 import geopandas as gpd
-from auctus_search import AuctusSearch, AuctusDatasetCollection
+import pandas as pd
+
+from urban_mapper.config import optional_dependency_required
+
+try:  # pragma: no cover
+    from auctus_search import AuctusDatasetCollection, AuctusSearch
+except ImportError as error:  # pragma: no cover
+    _AUCTUS_AVAILABLE = False
+    _AUCTUS_IMPORT_ERROR = error
+
+    class _AuctusSearchBase:  # pragma: no cover
+        """Fallback base class used when `auctus-search` is unavailable."""
+
+        pass
+
+else:  # pragma: no cover
+    _AUCTUS_AVAILABLE = True
+    _AUCTUS_IMPORT_ERROR = None
+    _AuctusSearchBase = AuctusSearch
 
 
-class AuctusSearchMixin(AuctusSearch):
+class AuctusSearchMixin(_AuctusSearchBase):
     """Mixin for searching, exploring, and loading datasets from the `Auctus data discovery` service.
 
     This mixin extends `AuctusSearch` to provide a simplified interface for discovering
@@ -57,6 +77,19 @@ class AuctusSearchMixin(AuctusSearch):
         >>> mapper.auctus.profile_dataset_from_auctus()
     """
 
+    @optional_dependency_required(
+        "auctus_mixins",
+        lambda: _AUCTUS_AVAILABLE,
+        lambda: _AUCTUS_IMPORT_ERROR,
+    )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    @optional_dependency_required(
+        "auctus_mixins",
+        lambda: _AUCTUS_AVAILABLE,
+        lambda: _AUCTUS_IMPORT_ERROR,
+    )
     def explore_datasets_from_auctus(
         self,
         search_query: Union[str, List[str]],
@@ -93,6 +126,11 @@ class AuctusSearchMixin(AuctusSearch):
             display_initial_results=display_initial_results,
         )
 
+    @optional_dependency_required(
+        "auctus_mixins",
+        lambda: _AUCTUS_AVAILABLE,
+        lambda: _AUCTUS_IMPORT_ERROR,
+    )
     def load_dataset_from_auctus(
         self, display_table: bool = True
     ) -> Union[pd.DataFrame, gpd.GeoDataFrame]:
@@ -113,6 +151,11 @@ class AuctusSearchMixin(AuctusSearch):
         """
         return self.load_selected_dataset(display_table)
 
+    @optional_dependency_required(
+        "auctus_mixins",
+        lambda: _AUCTUS_AVAILABLE,
+        lambda: _AUCTUS_IMPORT_ERROR,
+    )
     def profile_dataset_from_auctus(self) -> None:
         """Generate and display a profile report for the selected Auctus dataset.
 

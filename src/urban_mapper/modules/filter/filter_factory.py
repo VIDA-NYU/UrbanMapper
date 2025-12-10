@@ -9,7 +9,6 @@ import json
 from urban_mapper.modules.urban_layer.abc_urban_layer import UrbanLayerBase
 from urban_mapper.utils.helpers import require_attributes_not_none
 from .abc_filter import GeoFilterBase
-from ...utils.helpers.reset_attribute_before import reset_attributes_before
 from urban_mapper import logger
 from thefuzz import process
 
@@ -53,7 +52,13 @@ class FilterFactory:
         self._preview: Optional[dict] = None
         self._data_id: Optional[str] = None
 
-    @reset_attributes_before(["_filter_type"])
+    def _reset(self):
+        self._filter_type = None
+        self._extra_params = {}
+        self._instance = None
+        self._preview = None
+        self._data_id = None
+
     def with_type(self, primitive_type: str) -> "FilterFactory":
         """Specify the type of filter to use.
 
@@ -78,6 +83,8 @@ class FilterFactory:
             >>> filter_factory = mapper.filter.with_type("BoundingBoxFilter")
 
         """
+        self._reset()
+
         if self._filter_type is not None:
             logger.log(
                 "DEBUG_MID",
