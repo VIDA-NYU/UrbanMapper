@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Union, Optional, Any, Dict, Tuple
+from typing import Union, Optional, Any, Dict, Tuple, List
 import geopandas as gpd
 from beartype import beartype
+from shapely import wkt
 from urban_mapper.modules.loader.helpers import ensure_coordinate_reference_system
 from urban_mapper.config import DEFAULT_CRS
 
@@ -18,6 +19,8 @@ class LoaderBase(ABC):
     Attributes:
         latitude_column (str): Name of the column containing latitude values.
         longitude_column (str): Name of the column containing longitude values.
+        geometry_column (str): Name of the column containing active geometry data in WKT format.
+        additional_geometry_columns (Union[str, List[str]]): Name or List of names of other column containing geometry data in WKT format.
         coordinate_reference_system (Union[str, Tuple[str, str]]):
             If a string, it specifies the coordinate reference system to use (default: 'EPSG:4326').
             If a tuple (source_crs, target_crs), it defines a conversion from the source CRS to the target CRS (default target CRS: 'EPSG:4326').
@@ -29,12 +32,20 @@ class LoaderBase(ABC):
         latitude_column: Optional[str] = None,
         longitude_column: Optional[str] = None,
         geometry_column: Optional[str] = None,
+        additional_geometry_columns: Optional[Union[str, List[str]]] = None,
         coordinate_reference_system: Union[str, Tuple[str, str]] = DEFAULT_CRS,
         **additional_loader_parameters: Any,
     ) -> None:
         self.latitude_column: str = latitude_column or ""
         self.longitude_column: str = longitude_column or ""
         self.geometry_column: str = geometry_column or ""
+        self.additional_geometry_columns: Union[str, List[str]] = (
+            additional_geometry_columns or []
+        )
+
+        if isinstance(additional_geometry_columns, str):
+            self.additional_geometry_columns = [additional_geometry_columns]
+
         self.coordinate_reference_system: Union[str, Tuple[str, str]] = (
             coordinate_reference_system
         )
@@ -77,6 +88,14 @@ class LoaderBase(ABC):
         Examples:
         """
         loaded_data = self._load()
+
+        if len(self.additional_geometry_columns) > 0:
+            for column in self.additional_geometry_columns:
+                if column != self.geometry_column:
+                    filter_not_na = loaded_data[column].notna()
+                    loaded_data.loc[filter_not_na, column] = loaded_data.loc[
+                        filter_not_na, column
+                    ].apply(wkt.loads)
 
         if self.additional_loader_parameters.get("map_columns") is not None:
             map_columns = self.additional_loader_parameters.get("map_columns")

@@ -1,7 +1,7 @@
 import json
 from collections import defaultdict
 from pathlib import Path
-from typing import Optional, Union, Dict, Tuple
+from typing import Optional, Union, Dict, Tuple, List
 
 import geopandas as gpd
 import huggingface_hub
@@ -42,6 +42,8 @@ class LoaderFactory:
         source_data: The actual data source (file path or dataframe).
         latitude_column: The name of the column containing latitude values.
         longitude_column: The name of the column containing longitude values.
+        geometry_column: The name of column containing data geometry.
+        additional_geometry_columns: The name or a List of column names containing addiation geometries.
         crs: The coordinate reference system to use for the loaded data.
         _instance: The underlying loader instance (internal use only).
         _preview: Preview configuration (internal use only).
@@ -73,6 +75,7 @@ class LoaderFactory:
         self.longitude_column: Optional[str] = None
         self.map_columns: Optional[Dict[str, str]] = None
         self.geometry_column: Optional[str] = None
+        self.additional_geometry_columns: Optional[Union[str, List[str]]] = None
         self.crs: Union[str, Tuple[str, str]] = DEFAULT_CRS
         self._instance: Optional[LoaderBase] = None
         self._preview: Optional[dict] = None
@@ -85,6 +88,7 @@ class LoaderFactory:
         self.longitude_column = None
         self.map_columns = None
         self.geometry_column = None
+        self.additional_geometry_columns = None
         self.crs = DEFAULT_CRS
         self.repo_id = None
         self.number_of_row = None
@@ -195,6 +199,7 @@ class LoaderFactory:
         longitude_column: Optional[str] = None,
         latitude_column: Optional[str] = None,
         geometry_column: Optional[str] = None,
+        additional_geometry_columns: Optional[Union[str, List[str]]] = None,
     ) -> "LoaderFactory":
         """Specify either the latitude and longitude columns or a single geometry column in the data source.
 
@@ -206,6 +211,7 @@ class LoaderFactory:
             longitude_column: Name of the column containing longitude values (optional).
             latitude_column: Name of the column containing latitude values (optional).
             geometry_column: Name of the column containing geometry data (optional).
+            additional_geometry_columns: The name or a List of column names containing addiation geometries (optional).
             
         Returns:
             The LoaderFactory instance for method chaining.
@@ -226,6 +232,7 @@ class LoaderFactory:
         self.latitude_column = latitude_column
         self.longitude_column = longitude_column
         self.geometry_column = geometry_column
+        self.additional_geometry_columns = additional_geometry_columns
         if any(
             value is not None
             for value in (latitude_column, longitude_column, geometry_column)
@@ -403,6 +410,7 @@ class LoaderFactory:
             latitude_column=self.latitude_column,
             longitude_column=self.longitude_column,
             geometry_column=self.geometry_column,
+            additional_geometry_columns=self.additional_geometry_columns,
             coordinate_reference_system=self.crs,
             map_columns=self.map_columns,
             ## specific to FileLoaders (CSVLoader, ParquetLoader, and ShapefileLoader)

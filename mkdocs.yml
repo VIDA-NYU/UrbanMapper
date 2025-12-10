@@ -177,6 +177,7 @@ nav:
           - "Imputer": copy_of_examples/1-Per-Module/3-imputer.ipynb
           - "Filter": copy_of_examples/1-Per-Module/4-filter.ipynb
           - "Enricher": copy_of_examples/1-Per-Module/5-enricher.ipynb
+          - "Model": copy_of_examples/1-Per-Module/9-model.ipynb          
           - "Visualiser": copy_of_examples/1-Per-Module/6-visualiser.ipynb
           - "Urban Pipeline": copy_of_examples/1-Per-Module/7-urban_pipeline.ipynb
           - "Pipeline Generator": copy_of_examples/1-Per-Module/8-pipeline_generator.ipynb
@@ -217,6 +218,7 @@ nav:
         - Imputers: api/imputers.md
         - Filters: api/filters.md
         - Enrichers: api/enrichers.md
+        - Models: api/models.md
         - Visualisers: api/visualisers.md
         - Pipelines: api/pipelines.md
     - Optional Modules:

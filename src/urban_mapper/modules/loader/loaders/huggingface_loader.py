@@ -1,7 +1,7 @@
 import pandas as pd
 import geopandas as gpd
 from beartype import beartype
-from typing import Union, Optional, Any, Tuple
+from typing import Union, Optional, Any, Tuple, List
 from itertools import islice
 import datasets
 from thefuzz import process
@@ -128,6 +128,7 @@ class HuggingFaceLoader(LoaderBase):
         latitude_column: Optional[str] = None,
         longitude_column: Optional[str] = None,
         geometry_column: Optional[str] = None,
+        additional_geometry_columns: Optional[Union[str, List[str]]] = None,
         coordinate_reference_system: Union[str, Tuple[str, str]] = DEFAULT_CRS,
         **additional_loader_parameters: Any,
     ) -> None:
@@ -135,6 +136,7 @@ class HuggingFaceLoader(LoaderBase):
             latitude_column=latitude_column,
             longitude_column=longitude_column,
             geometry_column=geometry_column,
+            additional_geometry_columns=additional_geometry_columns,
             coordinate_reference_system=coordinate_reference_system,
             **additional_loader_parameters,
         )

@@ -40,6 +40,14 @@
 
     ---
 
+    Creating predictive models based on the enricher outputs.
+
+    [:octicons-book-24: Docs](./models.md){ .md-button .md-button--primary }
+
+-   :material-function-variant:{ .lg .middle } __Models__
+
+    ---
+
     Turn urban layers into meaningful statistics (counts per intersection, averages per neighborhood) with pluggable aggregators.
 
     [:octicons-book-24: Docs](./enrichers.md){ .md-button .md-button--primary }

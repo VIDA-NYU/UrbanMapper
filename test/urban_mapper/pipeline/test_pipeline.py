@@ -2,8 +2,36 @@ import urban_mapper as um
 import copy
 import pytest
 import os
+import numpy as np
+import pandas as pd
 from urban_mapper.pipeline import UrbanPipeline
 
+from sklearn.base import BaseEstimator
+from sklearn.feature_selection import SelectorMixin
+
+class MyFeatureSelection(SelectorMixin, BaseEstimator):
+   def __init__(self, ignore_feature):
+      self.__ignore_feature = [ignore_feature] if isinstance(ignore_feature, str) else ignore_feature
+      self.__mask = None
+
+   def fit(self, X, y=None):
+      self.feature_names_in_ = X.columns.tolist() if isinstance(X, pd.DataFrame) else [f"x{i}" for i in range(X.shape[1])]
+      self.__mask = np.zeros(X.shape[1], dtype=bool) #True: keep feature, False: remove feature
+      columns = list(X.columns)
+
+      for cl in X.select_dtypes(include='number').columns:
+        self.__mask[columns.index(cl)] = cl not in self.__ignore_feature
+        
+      return self
+
+   def __sklearn_tags__(self):
+      tags = super().__sklearn_tags__()
+      tags.input_tags.allow_nan = True
+
+      return tags
+   
+   def _get_support_mask(self):
+      return self.__mask
 
 # @pytest.mark.skip()
 class TestUrbanPipeline:
@@ -73,6 +101,22 @@ class TestUrbanPipeline:
         .aggregate_by(method="sum", output_column="sum_out")
         .build()
     )
+    model1 = ( 
+      um.UrbanMapper()
+      .model
+      .with_model("RandomForestRegressor")
+      .with_columns(target_column="max_out")
+      .with_transform(feature_selector=MyFeatureSelection(['u', 'v', 'key', 'from', 'to']))
+      .build()
+    )  
+    model2 = ( 
+      um.UrbanMapper()
+      .model
+      .with_model("RandomForestRegressor")
+      .with_columns(target_column="sum_out")
+      .with_transform(feature_selector=MyFeatureSelection(['u', 'v', 'key', 'from', 'to']))
+      .build()
+    )
 
     def test_init(self):
         """
@@ -86,6 +130,7 @@ class TestUrbanPipeline:
                 ("filter", self.filter),
                 ("enricher1", self.enricher1),
                 ("enricher2", self.enricher2),
+                ("model1", self.model1),
             ]
         )
 
@@ -104,6 +149,7 @@ class TestUrbanPipeline:
                 ("enricher1", self.enricher1),
                 ("enricher2", self.enricher2),
                 ("enricher3", self.enricher3),
+                ("model2", self.model2),
             ]
         )
 
@@ -123,6 +169,7 @@ class TestUrbanPipeline:
                 ("enricher1", self.enricher1),
                 ("enricher2", self.enricher2),
                 ("enricher3", self.enricher3),
+                ("model2", self.model2),
             ]
         )
 
@@ -152,6 +199,7 @@ class TestUrbanPipeline:
                 ("filter", self.filter),
                 ("enricher1", self.enricher1),
                 ("enricher2", self.enricher2),
+                ("model1", self.model1),
             ]
         )
 
@@ -170,6 +218,7 @@ class TestUrbanPipeline:
                 ("enricher1", self.enricher1),
                 ("enricher2", self.enricher2),
                 ("enricher3", self.enricher3),
+                ("model2", self.model2),
             ]
         )
 
@@ -187,6 +236,7 @@ class TestUrbanPipeline:
                 ("filter", self.filter),
                 ("enricher1", self.enricher1),
                 ("enricher2", self.enricher2),
+                ("model1", self.model1),
             ]
         )
 
@@ -205,6 +255,7 @@ class TestUrbanPipeline:
                 ("enricher1", self.enricher1),
                 ("enricher2", self.enricher2),
                 ("enricher3", self.enricher3),
+                ("model2", self.model2),
             ]
         )
 
@@ -222,6 +273,7 @@ class TestUrbanPipeline:
                 ("filter", self.filter),
                 ("enricher1", self.enricher1),
                 ("enricher2", self.enricher2),
+                ("model1", self.model1),
             ]
         )
 
@@ -240,6 +292,7 @@ class TestUrbanPipeline:
                 ("enricher1", self.enricher1),
                 ("enricher2", self.enricher2),
                 ("enricher3", self.enricher3),
+                ("model2", self.model2),
             ]
         )
 
@@ -262,6 +315,7 @@ class TestUrbanPipeline:
                 ("enricher1", self.enricher1),
                 ("enricher2", self.enricher2),
                 ("enricher3", self.enricher3),
+                ("model2", self.model2),                
             ]
         )
         pipeline.compose_transform()
@@ -287,6 +341,7 @@ class TestUrbanPipeline:
                 ("enricher1", self.enricher1),
                 ("enricher2", self.enricher2),
                 ("enricher3", self.enricher3),
+                ("model2", self.model2),
             ]
         )
 
@@ -308,6 +363,7 @@ class TestUrbanPipeline:
                 ("enricher1", self.enricher1),
                 ("enricher2", self.enricher2),
                 ("enricher3", self.enricher3),
+                ("model2", self.model2),
             ]
         )
         pipeline.compose_transform()
