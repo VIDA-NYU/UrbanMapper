@@ -219,7 +219,8 @@ class RasterLoader(FileLoaderBase):
                 f"  File: {self.file_path}\n"
                 f"  Dimensions (bands, height, width): {shape}\n"
                 f"  Data type: {dtype}\n"
-                f"  CRS: {crs}"
+                f"  CRS: {crs}\n"
+                f"  Additional params: {self.additional_loader_parameters}\n"
             )
         elif format == "json":
             return {
@@ -227,7 +228,8 @@ class RasterLoader(FileLoaderBase):
                 "file": self.file_path,
                 "shape": shape,
                 "dtype": str(dtype),
-                "crs": str(crs)
+                "crs": str(crs),
+                "additional_params": self.additional_loader_parameters,
             }
         else:
             raise ValueError(f"Unsupported format: {format}")
