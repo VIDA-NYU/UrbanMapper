@@ -1,5 +1,6 @@
-import json
-from collections import defaultdict
+import json 
+from collections import defaultdict 
+from itertools import islice 
 from pathlib import Path
 from typing import Optional, Union, Dict, Tuple
 
@@ -13,6 +14,7 @@ from urban_mapper.config import DEFAULT_CRS
 from urban_mapper.modules.loader.abc_loader import LoaderBase
 from urban_mapper.modules.loader.loaders.csv_loader import CSVLoader
 from urban_mapper.modules.loader.loaders.parquet_loader import ParquetLoader
+from urban_mapper.modules.loader.loaders.raster_loader import RasterLoader  # Importing RasterLoader of the new raster loader module
 from urban_mapper.modules.loader.loaders.shapefile_loader import ShapefileLoader
 from urban_mapper.modules.loader.loaders.dataframe_loader import DataFrameLoader
 from urban_mapper.modules.loader.loaders.huggingface_loader import HuggingFaceLoader
@@ -22,6 +24,12 @@ LOADER_FACTORY = {
     ".csv": {"class": CSVLoader, "requires_columns": True},
     ".shp": {"class": ShapefileLoader, "requires_columns": False},
     ".parquet": {"class": ParquetLoader, "requires_columns": True},
+    # Adding of new formats supported by RasterLoader
+    ".tif": {"class": RasterLoader, "requires_columns": False},
+    ".tiff": {"class": RasterLoader, "requires_columns": False},
+    ".jp2": {"class": RasterLoader, "requires_columns": False},
+    ".png": {"class": RasterLoader, "requires_columns": False},
+    # Adding DataFrame and HuggingFace Loaders
     "dataframe": {"class": DataFrameLoader, "requires_columns": True},
     "huggingface": {"class": HuggingFaceLoader, "requires_columns": True},
 }
@@ -76,6 +84,7 @@ class LoaderFactory:
         self.crs: Union[str, Tuple[str, str]] = DEFAULT_CRS
         self._instance: Optional[LoaderBase] = None
         self._preview: Optional[dict] = None
+        self.options = {}
         self._columns_configured: bool = False
 
     def _reset(self):
@@ -99,8 +108,8 @@ class LoaderFactory:
 
         This method sets up the factory to load data from a file path. The file format
         is determined by the file extension. Supported formats include `CSV`, `shapefile`,
-        and `Parquet`.
-
+        and `Parquet`. 
+        
         Args:
             file_path: Path to the data file to load.
 
@@ -295,10 +304,32 @@ class LoaderFactory:
             f"WITH_MAP: Initialised LoaderFactory with map_columns={map_columns}",
         )
         return self
+    
+    def with_options(self, **options,) -> "LoaderFactory":
+        """
+        Set additional key-value options to configure loader behavior.
+        This method allows you to specify arbitrary configuration options, such as block size, resolution, or other loader parameters. These options will be forwarded to the loader upon instantiation.
+
+        Args:
+            **options: Arbitrary keyword arguments representing loader configuration options.
+
+        Returns:
+            The LoaderFactory instance for method chaining.
+
+        Examples:
+            >>> loader = mapper.loader.from_file("data/raster.tif")\
+            ...     .with_options(block_size=10, use_polygons=True)
+        """
+        self.options.update(options)
+        logger.log(
+            "DEBUG_LOW",
+            f"WITH_OPTIONS: Updated LoaderFactory with options={options}",
+        )
+        return self
 
     @require_attributes(["source_type", "source_data"])
     def load(self) -> gpd.GeoDataFrame:
-        """Load the data and return it as a `GeoDataFrame`.
+        """Load the data and return it as a `GeoDataFrame` or raster object.
         
         This method loads the data from the configured source and returns it as a
         geopandas `GeoDataFrame`. It handles the details of loading from different
@@ -414,6 +445,8 @@ class LoaderFactory:
             number_of_rows=self.number_of_row,
             streaming=self.streaming,
             debug_limit_list_datasets=self.debug_limit_list_datasets,
+            ## specific to RasterLoader
+            **self.options,
         )
         if self._preview is not None:
             self.preview(format=self._preview["format"])

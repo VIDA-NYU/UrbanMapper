@@ -51,7 +51,9 @@ class LoaderBase(ABC):
             for reading the file and converting it to a `GeoDataFrame`.
 
         Returns:
-            A `GeoDataFrame` containing the loaded spatial data.
+            A `GeoDataFrame` containing the loaded spatial data (expect for the 
+            Raster Loader for which two loaders exist : one which return a `GeoDataFrame` 
+            and one which return the data in a 3D NumpyArray).
 
         Raises:
             ValueError: If required columns are missing or the file format is invalid.
@@ -116,4 +118,5 @@ class LoaderBase(ABC):
         Raises:
             ValueError: If an unsupported format is requested.
         """
+        pass
         pass
